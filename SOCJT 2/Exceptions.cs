@@ -36,12 +36,4 @@ namespace ConsoleApplication1
             //empty body
         }
     }
-
-    class GitTestClass : ApplicationException
-    {
-        public GitTestClass()
-        { 
-            //empty body
-        }
-    }
 }
