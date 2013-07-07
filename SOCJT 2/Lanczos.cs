@@ -471,7 +471,6 @@ namespace ConsoleApplication1
             }//do 200
             T = null;
         }
-        //RANDOM done new
 
         /// <summary>
         /// Rotate computes the first L columns of the matrix XS*QS where XS is an

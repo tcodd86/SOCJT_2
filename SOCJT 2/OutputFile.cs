@@ -419,13 +419,16 @@ namespace ConsoleApplication1
                 file.AppendLine("  ");
             }
 
-            file.AppendLine("&COMPARE_EIGENVECTORS");
-            for (int n = 0; n < input.eVecs.Count; n++)
+            if (input.beVecs)
             {
-                file.AppendLine(Convert.ToString(input.eVecs[n].Item1) + "  " + Convert.ToString(input.eVecs[n].Item2) + "  " + Convert.ToString(input.eVecs[n].Item3));
+                file.AppendLine("&COMPARE_EIGENVECTORS");
+                for (int n = 0; n < input.eVecs.Count; n++)
+                {
+                    file.AppendLine(Convert.ToString(input.eVecs[n].Item1) + "  " + Convert.ToString(input.eVecs[n].Item2) + "  " + Convert.ToString(input.eVecs[n].Item3));
+                }
+                file.AppendLine("/");
+                file.AppendLine(" ");
             }
-            file.AppendLine("/");
-            file.AppendLine(" ");
 
             file.AppendLine("&SPECTRA");
             file.AppendLine("UV = " + Convert.ToString(input.UV));
