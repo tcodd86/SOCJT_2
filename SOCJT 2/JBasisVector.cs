@@ -7,6 +7,9 @@ namespace ConsoleApplication1
 {
     class JBasisVector
     {
+        /// <summary>
+        /// Value of j
+        /// </summary>
         private decimal nJ;
         public decimal J
         {
@@ -14,6 +17,9 @@ namespace ConsoleApplication1
             set { nJ = value; }
         }//end property J
 
+        /// <summary>
+        /// Value of Lambda, label used to distinguish betwen two components of degenerate electronic state
+        /// </summary>
         private int nlambda;
         public int Lambda
         {
@@ -21,8 +27,11 @@ namespace ConsoleApplication1
             set { nlambda = value; }
         }//end property lambda
 
+        /// <summary>
+        /// List of Basis objects to store information for each mode in input file
+        /// </summary>
         public List<Basis> modesInVec = new List<Basis>();
-
+        
         public void setVec(List<Basis> basis, int lam)
         {
             int l = 0;
@@ -35,6 +44,28 @@ namespace ConsoleApplication1
             nJ = (decimal) l + ((decimal) lam) / 2M;
             Lambda = lam;
         }//end method setVec
+
+        /// <summary>
+        /// Constructor for JBasisVector
+        /// </summary>
+        /// <param name="basis">
+        /// List of basis objects
+        /// </param>
+        /// <param name="lam">
+        /// Lambda, the label distinguishing between the two components of the degenerate electronic state
+        /// </param>
+        public JBasisVector(List<Basis> basis, int lam)
+        {
+            int l = 0;
+            modesInVec.Clear();
+            modesInVec.AddRange(basis);
+            for (int i = 0; i < basis.Count; i++)
+            {
+                l += basis[i].l;
+            }
+            nJ = (decimal)l + ((decimal)lam) / 2M;
+            Lambda = lam;
+        }//end constructor
 
 
         /// <summary>
@@ -87,8 +118,9 @@ namespace ConsoleApplication1
 
                 for (int i = -1; i < 2; i += 2)
                 {
-                    JBasisVector vector = new JBasisVector();//moved this into the for loop so that I'm generating a new vector object for each value of lambda
-                    vector.setVec(modesInVec, i);
+                    //JBasisVector vector = new JBasisVector();//moved this into the for loop so that I'm generating a new vector object for each value of lambda
+                    //vector.setVec(modesInVec, i);
+                    JBasisVector vector = new JBasisVector(modesInVec, i);
                     if (vector.J <= maxJ & vector.J >= minJ)//flesh out this method to make it work THIS IS WHERE I PUT A BREAKPOINT
                     {
                         hamBasisSet.Add(vector);

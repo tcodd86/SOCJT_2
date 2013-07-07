@@ -40,59 +40,183 @@ namespace ConsoleApplication1
         public int modeVMax
         {
             get { return nmodeVMax; }
-            set { nmodeVMax = value; }
+            //set { nmodeVMax = value; }
         }//end property modeVMax
 
         private bool nfitOmega;
         public bool fitOmega
         {
             get { return nfitOmega; }
-            set { nfitOmega = value; }
+            //set { nfitOmega = value; }
         }//end property nfitOmega
 
         private bool nfitD;
         public bool fitD
         {
             get { return nfitD; }
-            set { nfitD = value; }
+            //set { nfitD = value; }
         }//end property nfitD
 
         private bool nfitK;
         public bool fitK
         {
             get { return nfitK; }
-            set { nfitK = value; }
+            //set { nfitK = value; }
         }//end property nfitK
 
         private bool nfitWEXE;
         public bool fitWEXE
         {
             get { return nfitWEXE; }
-            set { nfitWEXE = value; }
+            //set { nfitWEXE = value; }
         }//end property nfitWEXE
 
         private bool nIsAType;
         public bool IsAType
         {
             get { return nIsAType; }
-            set { nIsAType = value; }
+            //set { nIsAType = value; }
         }//end property nIsAType
 
         private double nmodeAOmega;
         public double modeAOmega
         {
             get { return nmodeAOmega; }
-            set { nmodeAOmega = value; }
+            //set { nmodeAOmega = value; }
         }//end property modeAOmega
 
         private double nmodeZeta;
         public double modeZeta
         {
             get { return nmodeZeta; }
-            set { nmodeZeta = value; }
+            //set { nmodeZeta = value; }
         }//end property modeZeta
         #endregion properties
 
+        /// <summary>
+        /// The constructor for a Mode object
+        /// </summary>
+        /// <param name="modeN">
+        /// What number mode is being initialized
+        /// </param>
+        /// <param name="inputF">
+        /// The string array containing the parsed input file
+        /// </param>
+        public Mode(int modeN, string[] inputF)
+        {
+            int whatMode = -1;
+            for (int i = 0; i < inputF.Length; i++)
+            {
+                if (inputF[i] == "&MODE_INFO")
+                {
+                    whatMode++;
+                }//end check to see if it's the right mode
+                if (whatMode == modeN)
+                {
+                    for (int u = i; ; u++)
+                    {
+                        if (inputF[u] == "MODEOMEGA")
+                        {
+                            nModeOmega = Convert.ToDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODED")
+                        {
+                            nD = Convert.ToDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODEK")
+                        {
+                            nK = Convert.ToDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODEWEXE")
+                        {
+                            nwExe = Convert.ToDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODEVMAX")
+                        {
+                            nmodeVMax = Convert.ToInt32(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODEA_OMEGA")
+                        {
+                            nmodeAOmega = Convert.ToDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u] == "MODEZETA")
+                        {
+                            nmodeZeta = Convert.ToDouble(inputF[u + 1]);
+                        }
+                        if (inputF[u] == "FIT_OMEGA")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                nfitOmega = true;
+                            }
+                            else
+                            {
+                                nfitOmega = false;
+                            }
+                        }
+                        if (inputF[u] == "FIT_D")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                nfitD = true;
+                            }
+                            else
+                            {
+                                nfitD = false;
+                            }
+                        }
+                        if (inputF[u] == "FIT_K")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                nfitK = true;
+                            }
+                            else
+                            {
+                                nfitK = false;
+                            }
+                            continue;
+                        }
+                        if (inputF[u] == "FIT_WEXE")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                nfitWEXE = true;
+                            }
+                            else
+                            {
+                                nfitWEXE = false;
+                            }
+                            continue;
+                        }
+                        if (inputF[u].ToUpper() == "ISATYPE")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                nIsAType = true;
+                            }
+                            else
+                            {
+                                nIsAType = false;
+                            }
+                            continue;
+                        }
+                        if (inputF[u] == "/")
+                        {
+                            break;
+                        }
+                    }//end u for loop
+                }//end if
+            }//end for
+        }//end method setMode
+
+        /*
         public void setMode(Mode thisMode, int modeN, string[] inputF)
         {
             int whatMode = -1;
@@ -104,15 +228,6 @@ namespace ConsoleApplication1
                 }//end check to see if it's the right mode
                 if (whatMode == modeN)
                 {
-                    //moved this stuff to the initialization loop to see if that helps
-                    /*
-                    thisMode.fitOmega = false;
-                    thisMode.fitD = false;
-                    thisMode.fitK = false;
-                    thisMode.fitWEXE = false;
-                    thisMode.IsAType = false;
-                    */
-
                     for (int u = i; ; u++)
                     {
                         if (inputF[u] == "MODEOMEGA")
@@ -155,6 +270,10 @@ namespace ConsoleApplication1
                             {
                                 thisMode.fitOmega = true;
                             }
+                            else
+                            {
+                                thisMode.fitOmega = false;
+                            }
                         }
                         if (inputF[u] == "FIT_D")
                         {
@@ -162,12 +281,20 @@ namespace ConsoleApplication1
                             {
                                 thisMode.fitD = true;
                             }
+                            else
+                            {
+                                thisMode.fitD = false;
+                            }
                         }
                         if (inputF[u] == "FIT_K")
                         {
                             if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
                             {
                                 thisMode.fitK = true;
+                            }
+                            else
+                            {
+                                thisMode.fitK = false;
                             }
                             continue;
                         }
@@ -177,6 +304,10 @@ namespace ConsoleApplication1
                             {
                                 thisMode.fitWEXE = true;
                             }
+                            else
+                            {
+                                thisMode.fitWEXE = false;
+                            }
                             continue;
                         }
                         if (inputF[u].ToUpper() == "ISATYPE")
@@ -184,6 +315,10 @@ namespace ConsoleApplication1
                             if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
                             {
                                 thisMode.IsAType = true;
+                            }
+                            else
+                            {
+                                thisMode.IsAType = false;
                             }
                             continue;
                         }
@@ -195,5 +330,6 @@ namespace ConsoleApplication1
                 }//end if
             }//end for
         }//end method setMode
+        */
     }//end class Mode
 }

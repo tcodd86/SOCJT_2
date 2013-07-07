@@ -233,7 +233,7 @@ namespace ConsoleApplication1
             double[,] z = new double[PS, PS];
 
             //solve eigenproblem using alglib library
-            alglib.evd.smatrixevd(tempMat, PS, 1, false, ref evs, ref z);//changed to false
+            alglib.evd.smatrixevd(tempMat, PS, 1, false, ref evs, ref z);//changed to false            
             //put results back into the expected format for MINVAL routine
             for (int i = 0; i < PS; i++)
             {

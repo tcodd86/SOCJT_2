@@ -68,6 +68,8 @@ namespace ConsoleApplication1
                 List<Mode> Modes = new List<Mode>();
                 for (int i = 0; i < input.nModes; i++)
                 {
+                    Modes.Add(new Mode(i, inputFile));
+                    /*
                     Modes.Add(new Mode());
                     Modes[i].fitOmega = false;
                     Modes[i].fitD = false;
@@ -75,6 +77,7 @@ namespace ConsoleApplication1
                     Modes[i].fitWEXE = false;
                     Modes[i].IsAType = false;
                     Modes[i].setMode(Modes[i], i, inputFile);
+                    */
                 }//end for
 
                 //This sets bool isQuad = false if K is zero and fitK is false for all modes.
@@ -125,6 +128,7 @@ namespace ConsoleApplication1
                     }
                 }
 
+                //This sets the fit boolean value to true if any values are to be fit
                 bool fit = false;
                 for (int i = 0; i < input.nModes; i++)
                 {
@@ -160,6 +164,7 @@ namespace ConsoleApplication1
                     }
                 }
 
+                //this checks the cross term fit boolean values
                 if (input.includeCrossTerms == true)
                 {
                     foreach (bool fitter in input.crossTermFit)
@@ -172,10 +177,12 @@ namespace ConsoleApplication1
                     }
                 }
 
+                //turns off the scan function if any values are being fit
                 if (fit == true)
                 {
                     input.Scan = false;
                 }
+
 
                 if (input.Scan == false)
                 {
@@ -196,6 +203,8 @@ namespace ConsoleApplication1
                     linesToWrite.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
                     File.WriteAllLines(filepathOUT, linesToWrite);
                 }//end no scan
+
+                //means a scan is being run
                 else
                 {
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
@@ -288,19 +297,19 @@ namespace ConsoleApplication1
             }//end try block
 
             //Exception handling
-            catch (DirectoryNotFoundException ex)
+            catch (DirectoryNotFoundException)
             {
                 Console.WriteLine("The directory does not exist");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (FileNotFoundException ex)
+            catch (FileNotFoundException)
             {
                 Console.WriteLine("The file does not exist");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (IndexOutOfRangeException ex)
+            catch (IndexOutOfRangeException)
             {
                 Console.WriteLine("An index out of range exception has occurred");
                 Console.WriteLine("Check to make sure that NMODES is correct and");
@@ -308,26 +317,26 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (FitFileNotFoundException fi)
+            catch (FitFileNotFoundException)
             {
                 Console.WriteLine("The fit file does not exist.");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (BasisSetTooSmallException bs)
+            catch (BasisSetTooSmallException)
             {
                 Console.WriteLine("At least one of the j-blocks has a dimension smaller than M.");
                 Console.WriteLine("Increase the basis set or decrease M.");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (SpinInvalidException se)
+            catch (SpinInvalidException)
             {
                 Console.WriteLine("S has an incorrect value.  S must be either integer or half integer.");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (AEAnharmonicTermException ae)
+            catch (AEAnharmonicTermException)
             {
                 Console.WriteLine("Cross anharmonic terms can only be included between two A modes.");
                 Console.WriteLine("Take out any cross anharmonic terms between A and E modes.");
