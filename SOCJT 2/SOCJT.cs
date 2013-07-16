@@ -30,7 +30,6 @@ namespace ConsoleApplication1
             long howMuchTime;
             decimal jMin;
             decimal jMax;
-            bool smallMat = true;
             //If is quadratic makes sure that the maxJ is at least 7.5
             if (isQuad == true)
             {
@@ -89,7 +88,7 @@ namespace ConsoleApplication1
             List<alglib.sparsematrix> sHamMatrix = new List<alglib.sparsematrix>();            
             alglib.sparsematrix[] array1;            
             int[] numcolumnsA;
-            smallMat = false;            
+            //smallMat = false;            
             //Creates the Hamiltonian matrices for linear cases            
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();

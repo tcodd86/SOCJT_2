@@ -69,15 +69,6 @@ namespace ConsoleApplication1
                 for (int i = 0; i < input.nModes; i++)
                 {
                     Modes.Add(new Mode(i, inputFile));
-                    /*
-                    Modes.Add(new Mode());
-                    Modes[i].fitOmega = false;
-                    Modes[i].fitD = false;
-                    Modes[i].fitK = false;
-                    Modes[i].fitWEXE = false;
-                    Modes[i].IsAType = false;
-                    Modes[i].setMode(Modes[i], i, inputFile);
-                    */
                 }//end for
 
                 //This sets bool isQuad = false if K is zero and fitK is false for all modes.

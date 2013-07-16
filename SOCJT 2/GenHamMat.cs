@@ -961,6 +961,8 @@ namespace ConsoleApplication1
             parOp.MaxDegreeOfParallelism = par;
             Parallel.ForEach(rangePartitioner, parOp, (range, loopState) =>
             {
+                int[] vdiff = new int[nModes];
+                int[] ldiff = new int[nModes];
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
                     for (int m = n + 1; m < matSize; m++)//changed from r + 1
@@ -969,10 +971,7 @@ namespace ConsoleApplication1
                         if(vlLambda[n, nModes *2] == vlLambda[m, nModes * 2])//Delta Lambda must be +/- 1
                         {
                             continue;
-                        }
-                        //I think these initializations can be moved outside of this for loop
-                        int[] vdiff = new int[nModes];
-                        int[] ldiff = new int[nModes];
+                        }                        
                         for (int b = 0; b < nModes; b++)
                         {
                             vdiff[b] = vlLambda[n, b] - vlLambda[m, b];
@@ -1024,7 +1023,6 @@ namespace ConsoleApplication1
                             Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                             matPos.Add(tTemp);
                             continue;
-                            //linear stuff
                         }
 
                         if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 0, possible quadratic term
@@ -1097,12 +1095,11 @@ namespace ConsoleApplication1
                                 {
                                     sign = -1;
                                 }
-                                temp = basisVectorsByJ[n].modesInVec[pos].modeOmega * (basisVectorsByJ[n].modesInVec[pos].KBasis / 2D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos].v + sign * basisVectorsByJ[n].modesInVec[pos].l + 2) * (basisVectorsByJ[n].modesInVec[pos].v - sign * basisVectorsByJ[n].modesInVec[pos].l)));
+                                temp = basisVectorsByJ[n].modesInVec[pos2].modeOmega * (basisVectorsByJ[n].modesInVec[pos2].KBasis / 2D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos2].v + sign * basisVectorsByJ[n].modesInVec[pos2].l + 2) * (basisVectorsByJ[n].modesInVec[pos2].v - sign * basisVectorsByJ[n].modesInVec[pos2].l)));
                                 Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                 matPos.Add(tTemp);
                                 continue;
                             }
-                            //quadratic stuff
                         }
 
                         #region Cross Terms
