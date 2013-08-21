@@ -374,7 +374,6 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            /*
             catch (Exception ex)
             {
                 Console.WriteLine("An exception has occurred: " + ex.Message);
@@ -382,7 +381,6 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            */
         }//end Main
     }//end class Program
 }//end namespace
