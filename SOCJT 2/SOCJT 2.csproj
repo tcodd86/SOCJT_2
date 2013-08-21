@@ -130,10 +130,10 @@
     <Compile Include="linalg.cs" />
     <Compile Include="OutputFile.cs" />
     <Compile Include="GenHamMat.cs" />
-    <Compile Include="JBasisVector.cs" />
+    <Compile Include="BasisFunction.cs" />
     <Compile Include="FileInfo.cs" />
-    <Compile Include="Mode.cs" />
-    <Compile Include="Basis.cs" />
+    <Compile Include="ModeInfo.cs" />
+    <Compile Include="BasisByMode.cs" />
     <Compile Include="Main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -28,7 +28,7 @@ namespace ConsoleApplication1
         /// boolean value so that genMatrix method could be overloaded.
         /// </param>
         /// <returns></returns>
-        public static alglib.sparsematrix genMatrix(List<JBasisVector> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, bool Large, int par)
+        public static alglib.sparsematrix genMatrix(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, bool Large, int par)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -807,7 +807,7 @@ namespace ConsoleApplication1
         /// boolean value so that genMatrix method could be overloaded.
         /// </param>
         /// <returns></returns>
-        public static alglib.sparsematrix genMatrix2(List<JBasisVector> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, bool Large, int par)
+        public static alglib.sparsematrix genMatrix2(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, bool Large, int par)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -1027,7 +1027,7 @@ namespace ConsoleApplication1
                             //linear stuff
                         }
 
-                        if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 0, possible quadratic term
+                        if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 3, possible quadratic term
                         {
                             if (Math.Abs(ldiff.Sum()) != 2)//Delta l = 2 or -2
                             {
@@ -1246,7 +1246,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Integer value of number of Basis objects not equal to one another.
         /// </returns>
-        private static int modeChangeCounter(List<JBasisVector> jList, int nModes, int n, int m)
+        private static int modeChangeCounter(List<BasisFunction> jList, int nModes, int n, int m)
         {
             int change = 0;
             for (int i = 0; i < nModes; i++)//first check to see if more than one mode changes, if so then continue outer for loop
@@ -1273,7 +1273,7 @@ namespace ConsoleApplication1
             return change;
         }//end method modeChangeCounter
 
-        private static bool modeChangeCounter(List<JBasisVector> jList, int nModes, int n, int m, out int[] change)
+        private static bool modeChangeCounter(List<BasisFunction> jList, int nModes, int n, int m, out int[] change)
         {
             bool nzero = true;
             change = new int[3];
@@ -1305,11 +1305,11 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of JBasisVectors with the specified value of j.
         /// </returns>
-        public static List<JBasisVector> sortByJ(List<JBasisVector> jVecs, decimal J)
+        public static List<BasisFunction> sortByJ(List<BasisFunction> jVecs, decimal J)
         {
-            List<JBasisVector> outList = new List<JBasisVector>();
+            List<BasisFunction> outList = new List<BasisFunction>();
             //count = 0;
-            foreach (JBasisVector vector in jVecs)
+            foreach (BasisFunction vector in jVecs)
             {
                 if (vector.J == J)
                 {

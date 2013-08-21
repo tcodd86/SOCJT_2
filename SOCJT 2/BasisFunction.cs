@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ConsoleApplication1
 {
-    class JBasisVector
+    class BasisFunction
     {
         /// <summary>
         /// Value of j
@@ -28,33 +28,20 @@ namespace ConsoleApplication1
         }//end property lambda
 
         /// <summary>
-        /// List of Basis objects to store information for each mode in input file
+        /// List of Basis objects to store information for each mode
         /// </summary>
-        public List<Basis> modesInVec = new List<Basis>();
-        
-        public void setVec(List<Basis> basis, int lam)
-        {
-            int l = 0;
-            modesInVec.Clear();
-            modesInVec.AddRange(basis);
-            for (int i = 0; i < basis.Count; i++)
-            {
-                l += basis[i].l;
-            }
-            nJ = (decimal) l + ((decimal) lam) / 2M;
-            Lambda = lam;
-        }//end method setVec
+        public List<BasisByMode> modesInVec = new List<BasisByMode>();
 
         /// <summary>
-        /// Constructor for JBasisVector
+        /// Constructor for BasisFunction
         /// </summary>
         /// <param name="basis">
-        /// List of basis objects
+        /// List of BasisByMode objects
         /// </param>
         /// <param name="lam">
         /// Lambda, the label distinguishing between the two components of the degenerate electronic state
         /// </param>
-        public JBasisVector(List<Basis> basis, int lam)
+        public BasisFunction(List<BasisByMode> basis, int lam)
         {
             int l = 0;
             modesInVec.Clear();
@@ -86,42 +73,54 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of all possible JBasisVector objects.
         /// </returns>
-        static public List<JBasisVector> genJVecs(List<List<Basis>> basisByMode, int numModes, decimal minJ, decimal maxJ)
+        static public List<BasisFunction> genJVecs(List<List<BasisByMode>> basisByMode, int numModes, decimal minJ, decimal maxJ)
         {
-            List<JBasisVector> hamBasisSet = new List<JBasisVector>();
-            List<Basis> modesInVec = new List<Basis>();
-            List<int> ints = new List<int>();
-            int[] count;
-            int nModes;
-            bool keepGoing = true;
+            //List of basis functions, to be returned
+            List<BasisFunction> hamBasisSet = new List<BasisFunction>();
+
+            //List of BasisByMode objects, this list is n long where n is the number of modes.  Contains
+            //the info for each mode's v and l values
+            List<BasisByMode> modesInVec = new List<BasisByMode>();
+
+            //this array stores the upper bounds for the countkeeper function
+            int[] maxValues = new int[numModes];
             for (int i = 0; i < numModes; i++)
             {
-                ints.Add(new int());
-                ints[i] = basisByMode[i].Count;
+                maxValues[i] = basisByMode[i].Count;
             }//end for
-            nModes = numModes;
-            count = ints.ToArray();
+            
+            //this array stores the count values for comparison agains the maxValues
+            int[] count = new int[numModes];
             for (int i = 0; i < count.Length; i++)
             {
                 count[i] = 0;
             }//end for
+            
+            //boolean value used to terminate generating BasisFunctions when all possible combinations have been generated
+            bool keepGoing = true;
+
+            //loop that runs until all possible combinations of BasisByMode values and Lambda have been generated
             while (keepGoing == true)
             {
-                //recursiveMethod(basisByMode, numModes);
+                //resets the list each iteration
                 modesInVec.Clear();
+
+                //adds the BasisByMode objects for each mode for a given set of count[] values
                 for (int n = 0; n < count.Length; n++)
                 {
-                    int temp = count[n];
-                    modesInVec.Add(basisByMode[n][temp]);
+                    modesInVec.Add(basisByMode[n][count[n]]);
                 }//end for
-                countKeeper(ref count, 0, ints, ref keepGoing);
 
+                //call to function to increase count by one
+                countKeeper(ref count, 0, maxValues, ref keepGoing);
+
+                //This generates the same basis vector with Lambda = +1 and -1
                 for (int i = -1; i < 2; i += 2)
                 {
-                    //JBasisVector vector = new JBasisVector();//moved this into the for loop so that I'm generating a new vector object for each value of lambda
-                    //vector.setVec(modesInVec, i);
-                    JBasisVector vector = new JBasisVector(modesInVec, i);
-                    if (vector.J <= maxJ & vector.J >= minJ)//flesh out this method to make it work THIS IS WHERE I PUT A BREAKPOINT
+                    BasisFunction vector = new BasisFunction(modesInVec, i);
+
+                    //checks that the value of J for 'vector' is within the bounds set in the input file.  If so the vector is added to the basis set
+                    if (vector.J <= maxJ & vector.J >= minJ)
                     {
                         hamBasisSet.Add(vector);
                     }//end if
@@ -139,11 +138,12 @@ namespace ConsoleApplication1
         /// <param name="n">
         /// Gives index of array to be incremented (corrsponds to which mode).
         /// </param>
-        static private void countKeeper(ref int[] count, int n, List<int> ints, ref bool keepGoing)
+        static private void countKeeper(ref int[] count, int n, int[] ints, ref bool keepGoing)
         {
             count[n] += 1;
             if (count[n] == ints[n])
             {
+                //checks if the count is now done.
                 if (n + 1 != count.Length)
                 {
                     count[n] = 0;

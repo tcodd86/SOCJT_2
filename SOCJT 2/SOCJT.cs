@@ -23,7 +23,7 @@ namespace ConsoleApplication1
             set { nOutput = value; }
         }
 
-        public List<string> SOCJTroutine(List<Mode> Modes, bool isQuad, string[] inputFile, FileInfo input)
+        public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input)
         {
             //Sets minimum and maximum j values.
             Stopwatch measurer = new Stopwatch();
@@ -58,19 +58,19 @@ namespace ConsoleApplication1
             }//end if
 
             //Makes a List of Lists of Basis objects with each List of Basis objects being for one mode.
-            List<List<Basis>> basisByMode = new List<List<Basis>>();
+            List<List<BasisByMode>> basisByMode = new List<List<BasisByMode>>();
             for (int i = 0; i < input.nModes; i++)
             {
-                basisByMode.Add(new List<Basis>());
-                basisByMode[i] = Basis.genBasisVectors(Modes[i], i);
+                basisByMode.Add(new List<BasisByMode>());
+                basisByMode[i] = BasisByMode.genVLCombinations(Modes[i], i);
             }//end for            
 
             //Generates all of the JBasisVectors to be used in calculation.
-            List<JBasisVector> hamiltonianVecs = JBasisVector.genJVecs(basisByMode, input.nModes, jMin, jMax);
+            List<BasisFunction> hamiltonianVecs = BasisFunction.genJVecs(basisByMode, input.nModes, jMin, jMax);
             //hamiltonianVecs are the total list of all J vectors in the Hamiltonian
 
             //Sorts the hamiltonianVecs by J and puts them into a List of Lists of JBasisVectors.
-            List<List<JBasisVector>> jBasisVecsByJ = new List<List<JBasisVector>>();            
+            List<List<BasisFunction>> jBasisVecsByJ = new List<List<BasisFunction>>();            
             for (decimal i = jMin; i <= jMax; i++)
             {
                 jBasisVecsByJ.Add(GenHamMat.sortByJ(hamiltonianVecs, i));
@@ -80,8 +80,8 @@ namespace ConsoleApplication1
             //List<double[,]> hamMatrices = new List<double[,]>(); ---moved into if statement so it's only made if it's needed.
             List<double[,]> zMatrices = new List<double[,]>();
             List<double[]> eigenvalues = new List<double[]>();
-            List<List<JBasisVector>> JvecsForOutuput = new List<List<JBasisVector>>();
-            List<JBasisVector>[] jbasisoutA = new List<JBasisVector>[0];
+            List<List<BasisFunction>> JvecsForOutuput = new List<List<BasisFunction>>();
+            List<BasisFunction>[] jbasisoutA = new List<BasisFunction>[0];
             List<int> numColumns = new List<int>();
 
  
@@ -156,7 +156,7 @@ namespace ConsoleApplication1
                 int dynVar2 = dynVar1 / 3;
                     array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                     numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                    jbasisoutA = new List<JBasisVector>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                    jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                     //this tells how much time has passed this could be used to time out different parts of code                
                 measurer.Reset();
                 measurer.Start();
@@ -165,7 +165,7 @@ namespace ConsoleApplication1
                 options.MaxDegreeOfParallelism = input.parJ;
                     Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
                     {
-                        List<JBasisVector> quadVecs = new List<JBasisVector>();
+                        List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
                         for (int v = -dynVar2; v <= dynVar2; v++)
                         {

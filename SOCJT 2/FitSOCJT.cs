@@ -8,7 +8,7 @@ namespace ConsoleApplication1
 {
     class FitSOCJT
     {
-        public static List<string> fit(List<Mode> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
+        public static List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
         {
             //string to return
             List<string> output = new List<string>();

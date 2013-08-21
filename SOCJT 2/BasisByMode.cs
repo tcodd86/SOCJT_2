@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ConsoleApplication1
 {
-    class Basis
+    class BasisByMode
     {
         #region properties
         /// <summary>
@@ -116,7 +116,7 @@ namespace ConsoleApplication1
         /// <param name="KBasis">
         /// Value of K
         /// </param>
-        public Basis(bool symmetryIsA, int modeN, int l, int v, double modeOmega, double anharmonicity, double DBasis, double KBasis)
+        public BasisByMode(bool symmetryIsA, int modeN, int l, int v, double modeOmega, double anharmonicity, double DBasis, double KBasis)
         {
             nsymmetryIsA = symmetryIsA;
             nModeN = modeN;
@@ -128,49 +128,38 @@ namespace ConsoleApplication1
             nKBasis = KBasis;
         }
 
-        public static List<Basis> genBasisVectors(Mode mode1, int modeNumber)
+        /// <summary>
+        /// Function to generate all v/l combinations for a given mode
+        /// </summary>
+        /// <param name="mode1">
+        /// The ModeInfo object for the mode who's v/l combinations are being generated.
+        /// </param>
+        /// <param name="modeNumber">
+        /// What number mode in the input file is it.
+        /// </param>
+        /// <returns>
+        /// List of all possible BasisByMode objects for a given mode.
+        /// </returns>
+        public static List<BasisByMode> genVLCombinations(ModeInfo mode1, int modeNumber)
         {
-            List<Basis> basisVectors = new List<Basis>();
-            //int basisNumber = 0;
-            for (int b = 0; b <= mode1.modeVMax; b++)//to go through vMax
+            //List to return
+            List<BasisByMode> basisVectors = new List<BasisByMode>();
+
+            for (int b = 0; b <= mode1.modeVMax; b++)//loop to go through vMax
             {
                 if (mode1.IsAType == false)//test to see if e type, if so then go to code here
                 {
-                    for (int c = b; c >= -b; c -= 2)//to iterate through all l values, changed from being Modes[i].vmax to b, this should be right
+                    for (int c = b; c >= -b; c -= 2)//to iterate through all l values, changed from being Modes[i].vmax to b
                     {
-                        basisVectors.Add(new Basis(false, modeNumber, c, b, mode1.modeOmega, mode1.wExe, mode1.D, mode1.K));
-                        /*
-                        basisVectors.Add(new Basis());
-                        basisVectors[basisNumber].symmetryIsA = false;
-                        basisVectors[basisNumber].modeN = modeNumber;                                    
-                        basisVectors[basisNumber].l = c;
-                        basisVectors[basisNumber].v = b;
-                        basisVectors[basisNumber].modeOmega = mode1.modeOmega;
-                        basisVectors[basisNumber].anharmonicity = mode1.wExe;
-                        basisVectors[basisNumber].DBasis = mode1.D;
-                        basisVectors[basisNumber].KBasis = mode1.K;
-                        basisNumber++;
-                        */
+                        basisVectors.Add(new BasisByMode(false, modeNumber, c, b, mode1.modeOmega, mode1.wExe, mode1.D, mode1.K));
                     }//end for all l
                 }//end AType false if
                 else//if not e type then it's A type and go here, only difference is l is always 0 here
                 {
-                    basisVectors.Add(new Basis(true, modeNumber, 0, b, mode1.modeOmega, mode1.wExe, mode1.D, mode1.K));
-                    /*
-                    basisVectors.Add(new Basis());
-                    basisVectors[basisNumber].symmetryIsA = true;
-                    basisVectors[basisNumber].modeN = modeNumber;
-                    basisVectors[basisNumber].l = 0;
-                    basisVectors[basisNumber].v = b;
-                    basisVectors[basisNumber].modeOmega = mode1.modeOmega;
-                    basisVectors[basisNumber].anharmonicity = mode1.wExe;
-                    basisVectors[basisNumber].DBasis = mode1.D;
-                    basisVectors[basisNumber].KBasis = mode1.K;
-                    basisNumber++;
-                    */
+                    basisVectors.Add(new BasisByMode(true, modeNumber, 0, b, mode1.modeOmega, mode1.wExe, mode1.D, mode1.K));
                 }//end else
             }//end for
             return basisVectors;
         }//end method genBasis
-    }//end class Basis
+    }//end class BasisByMode
 }

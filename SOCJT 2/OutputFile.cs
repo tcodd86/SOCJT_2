@@ -8,7 +8,7 @@ namespace ConsoleApplication1
 {
     static class OutputFile
     {
-        public static List<string> makeOutput(FileInfo input, List<double[,]> zMatrices, List<double[,]> hamMatrix, List<alglib.sparsematrix> sHamMatrix, List<List<JBasisVector>> jBasisVecsByJ, List<double[]> eigenvalues, bool isQuad, List<int> matSize, Eigenvalue[] finalList, bool isSparse, int[] IECODE, int[] ITER)
+        public static List<string> makeOutput(FileInfo input, List<double[,]> zMatrices, List<double[,]> hamMatrix, List<alglib.sparsematrix> sHamMatrix, List<List<BasisFunction>> jBasisVecsByJ, List<double[]> eigenvalues, bool isQuad, List<int> matSize, Eigenvalue[] finalList, bool isSparse, int[] IECODE, int[] ITER)
         {
             List<string> linesToWrite = new List<string>();
             StringBuilder file = new StringBuilder();
@@ -309,7 +309,7 @@ namespace ConsoleApplication1
             return linesToWrite;
         }//end method makeOutput
 
-        public static List<string> inputFileMaker(FileInfo input, List<Mode> Modes)
+        public static List<string> inputFileMaker(FileInfo input, List<ModeInfo> Modes)
         {
             List<string> linesToWrite = new List<string>();
             StringBuilder file = new StringBuilder();

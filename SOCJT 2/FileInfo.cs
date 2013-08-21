@@ -368,6 +368,14 @@ namespace ConsoleApplication1
 
         #endregion properties
 
+        /*
+        public FileInfo()
+        {
+            Scan = false;
+
+        }
+        */
+
         public static string[] fileRead(string filepath)
         {
             string[] inputF = { };

@@ -62,12 +62,6 @@ namespace ConsoleApplication1
                 for (int j = 0; j < evs[i].Length; j++)
                 {
                     eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j]));
-                    /*
-                    eigen[j + counter].pJ = J;
-                    eigen[j + counter].nJ = j + 1;
-                    eigen[j + counter].Sig = -0.5M;
-                    eigen[j + counter].Ev = evs[i][j];
-                    */
                 }
                 if (tempS < maxS)
                 {
@@ -101,7 +95,6 @@ namespace ConsoleApplication1
             {
                 int Snumb = (int)(eigenarray[i].Sig - S);
                 int j = (int)(eigenarray[i].pJ - 0.5M);
-                //j - 0.5 * SO numb + Snumb
                 int place = j * SOnumb + Snumb;
                 eigenarray[i].nJ = temp[place];
                 temp[place]++;

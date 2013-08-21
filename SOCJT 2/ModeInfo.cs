@@ -5,7 +5,10 @@ using System.Text;
 
 namespace ConsoleApplication1
 {
-    class Mode
+    /// <summary>
+    /// Stores the information for a mode in the input file.  All info in &MODE_INFO section stored here.
+    /// </summary>
+    class ModeInfo
     {
         #region properties
         private double nModeOmega;
@@ -94,7 +97,7 @@ namespace ConsoleApplication1
         #endregion properties
 
         /// <summary>
-        /// The constructor for a Mode object
+        /// The constructor for an InputMode object.
         /// </summary>
         /// <param name="modeN">
         /// What number mode is being initialized
@@ -102,7 +105,7 @@ namespace ConsoleApplication1
         /// <param name="inputF">
         /// The string array containing the parsed input file
         /// </param>
-        public Mode(int modeN, string[] inputF)
+        public ModeInfo(int modeN, string[] inputF)
         {
             int whatMode = -1;
             for (int i = 0; i < inputF.Length; i++)
@@ -111,6 +114,8 @@ namespace ConsoleApplication1
                 {
                     whatMode++;
                 }//end check to see if it's the right mode
+
+                //if it's the right mode then set the values for this ModeInfo object.
                 if (whatMode == modeN)
                 {
                     for (int u = i; ; u++)
@@ -216,120 +221,5 @@ namespace ConsoleApplication1
             }//end for
         }//end method setMode
 
-        /*
-        public void setMode(Mode thisMode, int modeN, string[] inputF)
-        {
-            int whatMode = -1;
-            for (int i = 0; i < inputF.Length; i++)
-            {
-                if (inputF[i] == "&MODE_INFO")
-                {
-                    whatMode++;
-                }//end check to see if it's the right mode
-                if (whatMode == modeN)
-                {
-                    for (int u = i; ; u++)
-                    {
-                        if (inputF[u] == "MODEOMEGA")
-                        {
-                            thisMode.modeOmega = Convert.ToDouble(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODED")
-                        {
-                            thisMode.D = Convert.ToDouble(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODEK")
-                        {
-                            thisMode.K = Convert.ToDouble(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODEWEXE")
-                        {
-                            thisMode.wExe = Convert.ToDouble(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODEVMAX")
-                        {
-                            thisMode.modeVMax = Convert.ToInt32(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODEA_OMEGA")
-                        {
-                            thisMode.modeAOmega = Convert.ToDouble(inputF[u + 1]);
-                            continue;
-                        }
-                        if (inputF[u] == "MODEZETA")
-                        {
-                            thisMode.modeZeta = Convert.ToDouble(inputF[u + 1]);
-                        }
-                        if (inputF[u] == "FIT_OMEGA")
-                        {
-                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
-                            {
-                                thisMode.fitOmega = true;
-                            }
-                            else
-                            {
-                                thisMode.fitOmega = false;
-                            }
-                        }
-                        if (inputF[u] == "FIT_D")
-                        {
-                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
-                            {
-                                thisMode.fitD = true;
-                            }
-                            else
-                            {
-                                thisMode.fitD = false;
-                            }
-                        }
-                        if (inputF[u] == "FIT_K")
-                        {
-                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
-                            {
-                                thisMode.fitK = true;
-                            }
-                            else
-                            {
-                                thisMode.fitK = false;
-                            }
-                            continue;
-                        }
-                        if (inputF[u] == "FIT_WEXE")
-                        {
-                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
-                            {
-                                thisMode.fitWEXE = true;
-                            }
-                            else
-                            {
-                                thisMode.fitWEXE = false;
-                            }
-                            continue;
-                        }
-                        if (inputF[u].ToUpper() == "ISATYPE")
-                        {
-                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
-                            {
-                                thisMode.IsAType = true;
-                            }
-                            else
-                            {
-                                thisMode.IsAType = false;
-                            }
-                            continue;
-                        }
-                        if (inputF[u] == "/")
-                        {
-                            break;
-                        }
-                    }//end u for loop
-                }//end if
-            }//end for
-        }//end method setMode
-        */
     }//end class Mode
 }

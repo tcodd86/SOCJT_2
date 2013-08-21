@@ -13,12 +13,15 @@ namespace ConsoleApplication1
         {
             try
             {
+                //prompt user for input directory.  Default value is C:\SOCJT 2
                 Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
                 string fileDirectory = Console.ReadLine();
                 if(fileDirectory == "")
                 {
                     fileDirectory = "C:\\SOCJT 2";
                 }
+
+                //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
                 if(Directory.Exists(fileDirectory) == false)
                 {
                     Console.WriteLine("The directory does not exist.  Would you like to create it? Y/N");
@@ -33,8 +36,12 @@ namespace ConsoleApplication1
                     }
                 }
                 Directory.SetCurrentDirectory(fileDirectory);
+
+                //prompt user to enter input file name
                 Console.WriteLine("Enter file name including extension:");
                 string inFileName = Console.ReadLine();
+
+                //obtain output file name.  If blank, default value of input + .out is used
                 Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
                 string outFile = Console.ReadLine();
                 if (outFile == "" || outFile == " ")
@@ -42,8 +49,11 @@ namespace ConsoleApplication1
                     outFile = string.Concat(inFileName, ".out");
                 }
 
+                //start timer for overall program execution
                 Stopwatch totalTime = new Stopwatch();
                 totalTime.Start();
+
+                //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
                 filepath = string.Concat("\\");
                 string filepathIN = string.Copy(filepath);
@@ -51,36 +61,33 @@ namespace ConsoleApplication1
                 string filepathFIT = string.Copy(filepath);
                 filepathIN = string.Concat(inFileName);
                 filepathOUT = string.Concat(outFile);
+
+                //read input file
                 string[] inputFile = FileInfo.fileRead(filepathIN);
+
+                //create new FileInfo object
                 FileInfo input = new FileInfo();
 
-                input.Scan = false;//added this
-
+                //set input object data from input file
                 input.setFileInfo(inputFile);
+
+                //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
 
+                //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
                 {
                     throw new SpinInvalidException();
                 }
 
-                //This iterates through the Mode info in the input file and initializes the modes
-                List<Mode> Modes = new List<Mode>();
+                //iterates through the Mode info in the input file and initializes the modes
+                List<ModeInfo> Modes = new List<ModeInfo>();
                 for (int i = 0; i < input.nModes; i++)
                 {
-                    Modes.Add(new Mode(i, inputFile));
-                    /*
-                    Modes.Add(new Mode());
-                    Modes[i].fitOmega = false;
-                    Modes[i].fitD = false;
-                    Modes[i].fitK = false;
-                    Modes[i].fitWEXE = false;
-                    Modes[i].IsAType = false;
-                    Modes[i].setMode(Modes[i], i, inputFile);
-                    */
+                    Modes.Add(new ModeInfo(i, inputFile));
                 }//end for
 
-                //This sets bool isQuad = false if K is zero and fitK is false for all modes.
+                //sets bool isQuad = false if K is zero and fitK is false for all modes.
                 bool isQuad = false;
                 for (int i = 0; i < Modes.Count; i++)
                 {
@@ -95,7 +102,7 @@ namespace ConsoleApplication1
                     }
                 }//end for
 
-                //this sets isQuad = true if there is a cross quartic term between an A and E mode
+                //this sets isQuad = true if there is a cross quadratic term between an A and E mode
                 if (isQuad == false)
                 {
                     for (int i = 0; i < input.nModes; i++)
@@ -122,13 +129,13 @@ namespace ConsoleApplication1
                                     {
                                         isQuad = true;
                                     }
-                                }
-                            }
-                        }
-                    }
-                }
+                                }//end else
+                            }//end if
+                        }//end inner for
+                    }//end outer for
+                }//end if isQuad == false
 
-                //This sets the fit boolean value to true if any values are to be fit
+                //Sets the fit boolean value to true if any values are to be fit
                 bool fit = false;
                 for (int i = 0; i < input.nModes; i++)
                 {
@@ -183,36 +190,51 @@ namespace ConsoleApplication1
                     input.Scan = false;
                 }
 
-
+                //main subroutine execution when not running a scan
                 if (input.Scan == false)
                 {
+                    //initialize variable to hold the output file and initialize it with input file containing original values
                     List<string> linesToWrite = new List<string>();
                     linesToWrite = OutputFile.inputFileMaker(input, Modes);
+
+                    //if not fitting anyvariables run SOCJT routine directly
                     if (fit == false)
                     {
                         SOCJT runner = new SOCJT();
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
-                    else
+                    else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
                     {
                         linesToWrite.AddRange(FitSOCJT.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
+
+                    //end stopwatch for total program time execution and appends the total run time to the output file
                     totalTime.Stop();
                     double TIME = totalTime.ElapsedMilliseconds / 1000D;
                     linesToWrite.Add(" ");
                     linesToWrite.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
+
+                    //writes all info to the output file
                     File.WriteAllLines(filepathOUT, linesToWrite);
                 }//end no scan
 
                 //means a scan is being run
                 else
                 {
+                    //create a list to store the final output eigenvalues from each iteration of SOCJT
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
+
+                    //create a List to hold the output file information
                     List<string> finalOut = new List<string>();
+
+                    //for loop to run steps of scan
                     for (int h = 0; h < input.Steps; h++)
                     {
+                        //basically run the SOCJT subroutine for each step of the scan and save the output file at the end of the loop.
                         List<string> linesToWrite = new List<string>();
                         SOCJT runner = new SOCJT();
+
+                        //run loop over each variable to be scanned and increment by step size times loop iteration.
                         for (int n = 0; n < input.scanList.Count; n++)
                         {
                             if (input.scanList[n].varToFit.ToUpper() == "OMEGA")
@@ -276,17 +298,26 @@ namespace ConsoleApplication1
                             }
                         }//end adjust each variable to fit
 
+                        //now make output file for each step
                         linesToWrite = OutputFile.inputFileMaker(input, Modes);
+
+                        //run SOCJT subroutine on this step's values
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
+
+                        //write output file for this step
                         string stepFile = filepathOUT + "_step_" + Convert.ToString(h + 1) + ".out";
                         File.WriteAllLines(stepFile, linesToWrite);
+
+                        //add this steps eigenvalues to the scan output file
                         scanList.Add(runner.finalList);
 
+                        //clear values for the next iteration
                         linesToWrite = null;
                         stepFile = null;
                         runner = null;
                     }//end of steps loop
 
+                    //write scan output file including total elapsed time
                     List<string> scanOut = OutputFile.ScanOutput(scanList);
                     totalTime.Stop();
                     double TIME = totalTime.ElapsedMilliseconds / 1000D;
