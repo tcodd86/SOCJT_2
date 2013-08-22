@@ -358,7 +358,7 @@ namespace ConsoleApplication1
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));
             file.AppendLine("TOL" + " = " + Convert.ToString(input.tol));
             file.AppendLine("GUESSES" + " = " + Convert.ToString(input.guesses));
-            //file.AppendLine("PARVEC = " + Convert.ToString(input.parVec));
+            file.AppendLine("PARVEC = " + Convert.ToString(input.parVec));
             file.AppendLine("PARMAT = " + Convert.ToString(input.parMat));
             file.AppendLine("PARJ = " + Convert.ToString(input.parJ));
             file.AppendLine("/");
@@ -430,12 +430,14 @@ namespace ConsoleApplication1
                 file.AppendLine(" ");
             }
 
+            /*
             file.AppendLine("&SPECTRA");
             file.AppendLine("UV = " + Convert.ToString(input.UV));
             file.AppendLine("NSPECTRA = " + Convert.ToString(input.NSpectra));
             file.AppendLine("/");
-            file.AppendLine("  ");
-            
+            file.AppendLine("  ");            
+            */
+
             linesToWrite.Add(file.ToString());
             return linesToWrite;
         }

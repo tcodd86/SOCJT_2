@@ -281,6 +281,7 @@ namespace ConsoleApplication1
         {
             //alglib.sparsesmv(A, true, U, ref V);
             
+            //if par == 1 then no parallelization for M*v products, use regular.  Else use parallel version.
             if (par == 1)
             {
                 alglib.sparsemv(A, U, ref V);
@@ -288,7 +289,6 @@ namespace ConsoleApplication1
             else
             {
                 alglib.sparsemvTC(A, U, ref V, par);
-                //alglib.sparse.sparsemvTC2(ridx, idx, vals, U, ref V, par);
             }
             
         }
@@ -618,15 +618,6 @@ namespace ConsoleApplication1
                 goto onehundred;
             }
 
-            /*
-            int[] ridx = A.innerobj.ridx;
-            ridx.AsParallel();
-            int[] idx = A.innerobj.idx;
-            idx.AsParallel();
-            double[] vals = A.innerobj.vals;
-            vals.AsParallel();
-            */
-
             //chooses initial values for block size P, the number of steps that the block
             //lanczos method is carried out, and chooses an initial N by P orthonormal
             //matrix X1 used to start the block lanczos method
@@ -659,7 +650,6 @@ namespace ConsoleApplication1
                 ERRC = 0.0D;
             }
 
-            //ITER = 0;
             IMM = 0;
 
             //The main body of the subroutine starts here.  IMM counts the number of 

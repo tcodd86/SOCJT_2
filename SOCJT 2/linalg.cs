@@ -3932,9 +3932,24 @@ public partial class alglib
         return;
     }
 
+    /// <summary>
+    /// Parallel sparse matrix * vector product.  Works by breaking the vector into 'par' pieces and determining their values
+    /// independently.  Only a real time saver for matrices and vectors of dimension ~500,000 or more.
+    /// </summary>
+    /// <param name="s">
+    /// Sparse matrix to be multiplied
+    /// </param>
+    /// <param name="x">
+    /// Vector to be multiplied.
+    /// </param>
+    /// <param name="y">
+    /// Vector to store product of s*x
+    /// </param>
+    /// <param name="par">
+    /// Level of parallelization to be applied.  Vector will be broken into par segments to be computed independently.
+    /// </param>
     public static void sparsemvTC(sparsematrix s, double[] x, ref double[] y, int par)
     {
-
         sparse.sparsemvTC(s.innerobj, x, ref y, par);
         return;
     }
@@ -29478,74 +29493,23 @@ public partial class alglib
           -- ALGLIB PROJECT --
              Copyright 14.10.2011 by Bochkanov Sergey
         *************************************************************************/
-        /*
-        public static void sparsemv(sparsematrix s,
-            double[] x,
-            ref double[] y)
-        {
-            //double tval = 0;
-            //int i = 0;
-            //int j = 0;
-            //int lt = 0;
-            //int rt = 0;
-            double[] z = new double[y.Length];
-
-            alglib.ap.assert(s.matrixtype == 1, "SparseMV: incorrect matrix type (convert your matrix to CRS)");
-            alglib.ap.assert(s.ninitialized == s.ridx[s.m], "SparseMV: some rows/elements of the CRS matrix were not initialized (you must initialize everything you promised to SparseCreateCRS)");
-            alglib.ap.assert(alglib.ap.len(x) >= s.n, "SparseMV: length(X)<N");
-            apserv.rvectorsetlengthatleast(ref y, s.m);
-            var rangePartitioner = Partitioner.Create(0, y.Length);
-            ParallelOptions par = new ParallelOptions();
-            par.MaxDegreeOfParallelism = 16;
-            Parallel.ForEach(rangePartitioner, par, (range, loopState) =>
-            //Parallel.ForEach(rangePartitioner, (range, loopState) =>
-                {
-                    for (int i = range.Item1; i < range.Item2; i++)
-                    {
-                        double tval = 0;
-                        int lt = s.ridx[i];
-                        int rt = s.ridx[i + 1];
-                        for (int j = lt; j <= rt - 1; j++)
-                        {
-                            tval = tval + x[s.idx[j]] * s.vals[j];
-                        }
-                        z[i] = tval;
-                    }
-                });
-            y = z;
-        }
-        */
         
-        public static void sparsemvTC2(int[] ridx, int[] idx, double[] vals,
-            double[] x,
-            ref double[] y,
-            int par)
-        {
-            int n = ridx.Length - 1;
-            double[] z = new double[y.Length];
-            z.AsParallel();
-            ridx.AsParallel();
-            idx.AsParallel();
-            vals.AsParallel();
-            Parallel.For(0, par, m =>
-            {
-                for (int i = m * n / par; i < ((m + 1) * n) / par; i++)
-                {
-                    double tval = 0;
-                    int lt = ridx[i];
-                    int rt = ridx[i + 1];
-                    for (int j = lt; j <= rt - 1; j++)
-                    {
-                        tval = tval + x[idx[j]] * vals[j];
-                    }
-                    z[i] = tval;
-                }
-            }
-            );
-            y = z;
-        }
-        
-
+        /// <summary>
+        /// Parallel sparse matrix * vector product.  Works by breaking the vector into 'par' pieces and determining their values
+        /// independently.  Only a real time saver for matrices and vectors of dimension ~500,000 or more.
+        /// </summary>
+        /// <param name="s">
+        /// Sparse matrix to be multiplied
+        /// </param>
+        /// <param name="x">
+        /// Vector to be multiplied.
+        /// </param>
+        /// <param name="y">
+        /// Vector to store product of s*x
+        /// </param>
+        /// <param name="par">
+        /// Level of parallelization to be applied.  Vector will be broken into par segments to be computed independently.
+        /// </param>
         public static void sparsemvTC(sparsematrix s,
             double[] x,
             ref double[] y,
@@ -29607,17 +29571,19 @@ public partial class alglib
             int j = 0;
             int lt = 0;
             int rt = 0;
+
+            //commented out this error handling to speed up performance
             //alglib.ap.assert(s.matrixtype==1, "SparseMV: incorrect matrix type (convert your matrix to CRS)");
             //alglib.ap.assert(s.ninitialized==s.ridx[s.m], "SparseMV: some rows/elements of the CRS matrix were not initialized (you must initialize everything you promised to SparseCreateCRS)");
             //alglib.ap.assert(alglib.ap.len(x)>=s.n, "SparseMV: length(X)<N");
             //apserv.rvectorsetlengthatleast(ref y, s.m);
+
             for(int i=0; i<=s.m-1; i++)
             {
                 tval = 0;
                 lt = s.ridx[i];
                 rt = s.ridx[i+1];
                 for(j=lt; j<=rt-1; j++)
-                //for(int j = s.ridx[i]; j < s.ridx[i + 1]; j++)
                 {
                     tval = tval+x[s.idx[j]]*s.vals[j];
                 }

@@ -192,6 +192,7 @@ namespace ConsoleApplication1
             set { nguesses = value; }
         }//end property guesses
 
+        /*
         private bool nUV;
         public bool UV
         {
@@ -205,6 +206,7 @@ namespace ConsoleApplication1
             get { return nNSpectra; }
             set { nNSpectra = value; }
         }//end property nSpectra
+        */
 
         private string nfitFile;
         public string fitFile
@@ -368,14 +370,58 @@ namespace ConsoleApplication1
 
         #endregion properties
 
-        /*
+        //initializes most values with reasonable defaults in case user forgets something
         public FileInfo()
         {
-            Scan = false;
-
+            title = "TITLE";
+            fitAzeta = false;
+            calcDeriv = false;
+            minJBool = false;
+            fitOrigin = false;
+            inclSO = false;
+            specialHam = false;
+            origin = 0.0;
+            parMat = 1;
+            nModes = 1;
+            S = 0.5M;
+            Azeta = 0.0;
+            maxJ = 7.5M;
+            minJ = 0.5M;
+            zetaE = 0.0M;
+            S1 = 0;
+            S2 = 1;
+            specialHam = false;
+            printBasis = false;
+            pMatrix = false;
+            pVector = false;
+            pMonit = false;
+            pDerivs = false;
+            vecFile = false;
+            basisFile = false;
+            evMin = 0.2;
+            guesses = false;
+            parVec = 1;
+            parMat = 1;
+            parJ = 2;
+            M = 5;
+            kFactor = 2;
+            noIts = 10000;
+            tol = 0.0001;
+            //UV = false;
+            //NSpectra = 0;
+            fitFile = "fit.fit";
+            fTol = 0.0;
+            xTol = 0.0;
+            gTol = 0.0;
+            maxFev = 25;
+            factor = 0.001;
+            nprint = 0;
+            AT = false;
+            Special = false;
+            includeCrossTerms = false;
+            beVecs = false;
         }
-        */
-
+        
         public static string[] fileRead(string filepath)
         {
             string[] inputF = { };
@@ -401,14 +447,6 @@ namespace ConsoleApplication1
                 if (inputf[i].ToUpper() == "&GENERAL")
                 {
                     #region &GENERAL
-                    fitAzeta = false;
-                    calcDeriv = false;
-                    minJBool = false;
-                    fitOrigin = false;
-                    inclSO = false;
-                    specialHam = false;
-                    origin = 0.0;
-                    parMat = 1;
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "TITLE")
@@ -503,7 +541,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u] == "/")
                         {
-                            //i += u;
                             break;
                         }
                     }//end for loop
@@ -514,14 +551,6 @@ namespace ConsoleApplication1
                 if (inputf[i].ToUpper() == "&IO_INFO")
                 {
                     #region &IO_INFO
-                    printBasis = false;
-                    pMatrix = false;
-                    pVector = false;
-                    pMonit = false;
-                    pDerivs = false;
-                    vecFile = false;
-                    basisFile = false;
-                    evMin = 0.02;
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "PRINT_BASIS")
@@ -591,7 +620,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u] == "/")
                         {
-                            //i += u;
                             break;
                         }
                     }//end for loop
@@ -601,11 +629,7 @@ namespace ConsoleApplication1
 
                 if (inputf[i].ToUpper() == "&SOLVE_INFO")
                 {
-                    #region &SOLVE_INFO
-                    guesses = false;
-                    parVec = 1;
-                    parMat = 1;
-                    parJ = 2;
+                    #region &SOLVE_INFO                    
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "M")
@@ -664,7 +688,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u] == "/")
                         {
-                            //i += u;
                             break;
                         }
                     }//end for loop                    
@@ -672,10 +695,10 @@ namespace ConsoleApplication1
                     #endregion
                 }//end SOLVE INFO if
 
+                /*
                 if (inputf[i].ToUpper() == "&SPECTRA")
                 {
                     #region &SPECTRA
-                    UV = false;
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "UV")
@@ -693,13 +716,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "/")
                         {
-                            //i += u;
                             break;
                         }
                     }//end for loop
                     continue;
                     #endregion
                 }//end SPECTRA if
+                */
 
                 if (inputf[i].ToUpper() == "&FIT_INFO")
                 {
@@ -743,7 +766,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "/")
                         {
-                            //i += u;
                             break;
                         }
                     }//end for
@@ -757,8 +779,6 @@ namespace ConsoleApplication1
                     int column;
                     int temp;
                     bool tbool;
-                    AT = false;
-                    Special = false;
                     for (int j = i; ; j++)
                     {
                         if (inputf[j].ToUpper() == "INCLUDE")
@@ -779,7 +799,6 @@ namespace ConsoleApplication1
                             }//end if
                             else
                             {
-                                includeCrossTerms = false;
                                 break;
                             }//end else
                         }//end includeCrossTerms
