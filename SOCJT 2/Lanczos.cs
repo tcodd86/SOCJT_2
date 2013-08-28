@@ -6,6 +6,24 @@ using System.Threading.Tasks;
 
 namespace ConsoleApplication1
 {
+    /// <summary>
+    /// This class contains the functions and subroutines for the block Lanczos routine.
+    /// This code was translated from FORTRAN by Terrance J. Codd in 2012.  The original
+    /// FORTRAN routine (which was translated from ALGOL) was taken from the source code 
+    /// for SOCJT (Barckholtz, T. Miller, T. Int. Rev. Phys. Chem., 1998, Vol. 17, No. 4, 435-524)
+    /// and no authorship information was provided in the source code or documentation.
+    /// 
+    /// Function summaries were taken directly from the SOCJT source code while comments
+    /// throughout the code are my own.  There are two key differences between this code
+    /// and the original: 1. arrays are indexed to 0 in C# and 1 in FORTRAN so the loop
+    /// bounds are often shifted by one as are some variables; 2. I have removed most of
+    /// the goto statements found in the original to increase the readability of the code
+    /// and replaced them by using conditional blocks of code.  I have labeled the for loops
+    /// using the same numbering found in do loops in SOCJT for easy comparison.
+    /// 
+    /// Where the FORTRAN used functions TRED and TRED2 I have used functions from ALGLIB
+    /// PROJECT by Bochkanov Sergey.
+    /// </summary>
     class Lanczos
     {
         /// <summary>
