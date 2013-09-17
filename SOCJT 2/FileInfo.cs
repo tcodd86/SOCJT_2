@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Globalization;
 
 namespace ConsoleApplication1
 {
@@ -470,7 +471,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "AZETA")
                         {
-                            Azeta = Convert.ToDouble(inputf[u + 1]);
+                            //Azeta = Convert.ToDouble(inputf[u + 1]);
+                            Azeta = parseDouble(inputf[u + 1]);
                             if (Azeta != 0D)
                             {
                                 inclSO = true;
@@ -506,7 +508,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
                         {
-                            origin = Convert.ToDouble(inputf[u + 1]);
+                            //origin = Convert.ToDouble(inputf[u + 1]);
+                            origin = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "CALC_DERIV")
@@ -649,7 +652,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "TOL")
                         {
-                            tol = Convert.ToDouble(inputf[u + 1]);
+                            //tol = Convert.ToDouble(inputf[u + 1]);
+                            tol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "GUESSES")
@@ -736,17 +740,20 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FTOL")
                         {
-                            fTol = Convert.ToDouble(inputf[u + 1]);
+                            //fTol = Convert.ToDouble(inputf[u + 1]);
+                            fTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "XTOL")
                         {
-                            xTol = Convert.ToDouble(inputf[u + 1]);
+                            //xTol = Convert.ToDouble(inputf[u + 1]);
+                            xTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "GTOL")
                         {
-                            gTol = Convert.ToDouble(inputf[u + 1]);
+                            //gTol = Convert.ToDouble(inputf[u + 1]);
+                            gTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MAXFEV")
@@ -756,7 +763,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FACTOR")
                         {
-                            factor = Convert.ToDouble(inputf[u + 1]);
+                            //factor = Convert.ToDouble(inputf[u + 1]);
+                            factor = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "NPRINT")
@@ -816,7 +824,8 @@ namespace ConsoleApplication1
                                     row = column;
                                     column = temp;
                                 }//end if
-                                crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                                //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                                crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
                                 if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                                 {
                                     tbool = true;
@@ -838,7 +847,8 @@ namespace ConsoleApplication1
                                     row = column;
                                     column = temp;
                                 }//end if
-                                crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                                //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                                crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
                                 if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                                 {
                                     tbool = true;
@@ -852,7 +862,8 @@ namespace ConsoleApplication1
                             {
                                 tbool = false;
                                 Special = true;
-                                crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
+                                //crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
+                                crossTermMatrix[0, 0] = parseDouble(inputf[j + 1]);
                                 if (inputf[j + 3].ToUpper() == "T" || inputf[j + 3].ToUpper() == "TRUE")
                                 {
                                     tbool = true;
@@ -899,8 +910,10 @@ namespace ConsoleApplication1
                             Scanner tempScan = new Scanner();
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.varToFit = inputf[u + 2];
-                            tempScan.Start = Convert.ToDouble(inputf[u + 3]);
-                            tempScan.Step = Convert.ToDouble(inputf[u + 4]);
+                            //tempScan.Start = Convert.ToDouble(inputf[u + 3]);
+                            tempScan.Start = parseDouble(inputf[u + 3]);
+                            //tempScan.Step = Convert.ToDouble(inputf[u + 4]);
+                            tempScan.Step = parseDouble(inputf[u + 4]);
                             scanList.Add(tempScan);
                             tempScan = null;
                             nScan = true;
@@ -912,8 +925,10 @@ namespace ConsoleApplication1
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.Cross = Convert.ToInt32(inputf[u + 2]);
                             tempScan.varToFit = inputf[u + 3];
-                            tempScan.Start = Convert.ToDouble(inputf[u + 4]);
-                            tempScan.Step = Convert.ToDouble(inputf[u + 5]);
+                            //tempScan.Start = Convert.ToDouble(inputf[u + 4]);
+                            tempScan.Start = parseDouble(inputf[u + 4]);
+                            //tempScan.Step = Convert.ToDouble(inputf[u + 5]);
+                            tempScan.Step = parseDouble(inputf[u + 5]);
                             scanList.Add(tempScan);
                             tempScan = null;
                             nScan = true;
@@ -928,5 +943,19 @@ namespace ConsoleApplication1
                 }
             }//end for
         }//end method setFileInfo
+
+        /// <summary>
+        /// To parse a string containing a double that may or may not have scientific notation in it.
+        /// </summary>
+        /// <param name="s">
+        /// String to be parsed
+        /// </param>
+        /// <returns>
+        /// Double value of parsed string
+        /// </returns>
+        private double parseDouble(string s)
+        {
+            return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+        }
     }//class FileInfo
 }//end namespace
