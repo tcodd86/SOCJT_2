@@ -391,7 +391,7 @@ namespace ConsoleApplication1
             zetaE = 0.0M;
             S1 = 0;
             S2 = 1;
-            specialHam = false;
+            specialHam = true;
             printBasis = false;
             pMatrix = false;
             pVector = false;
@@ -540,6 +540,10 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 specialHam = true;
+                            }
+                            else
+                            {
+                                specialHam = false;
                             }
                         }
                         if (inputf[u] == "/")
