@@ -31,6 +31,7 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
+            /*
             if (isQuad == true)
             {
                 if (input.maxJ < 7.5M)
@@ -38,6 +39,7 @@ namespace ConsoleApplication1
                     input.maxJ = 7.5M;
                 }
             }
+            */
             if (isQuad == true)
             {
                 jMax = input.maxJ;
@@ -151,60 +153,61 @@ namespace ConsoleApplication1
             //Creates the Hamiltonian matrices for quadratic cases.            
             else            
             { 
+
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
-                    array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                    numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                    jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                    //this tells how much time has passed this could be used to time out different parts of code                
+                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                //this tells how much time has passed this could be used to time out different parts of code                
                 measurer.Reset();
                 measurer.Start();
                 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
-                    Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
+                Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
+                {
+                    List<BasisFunction> quadVecs = new List<BasisFunction>();
+                    int nColumns;
+                    for (int v = -dynVar2; v <= dynVar2; v++)
                     {
-                        List<BasisFunction> quadVecs = new List<BasisFunction>();
-                        int nColumns;
-                        for (int v = -dynVar2; v <= dynVar2; v++)
-                        {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
-                        }
+                        quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                    }
 
 
-                        //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                        //replaced the line above with the conditionals below
-                        if (input.specialHam)
-                        {
-                            array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                        }
-                        else
-                        {
-                            array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                        }
+                    //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                    //replaced the line above with the conditionals below
+                    if (input.specialHam)
+                    {
+                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                    }
+                    else
+                    {
+                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                    }
 
-                        jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
-                        numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
-                        //checks to make sure that
-                        if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
-                        {
-                            a.Add(0);
-                        }
-                        numQuadMatrix++;
-                    }
-                    );
-                    measurer.Stop();                    
-                    howMuchTime = measurer.ElapsedMilliseconds;
-                    input.matGenTime = (double)howMuchTime / 1000D;
-                    if (a.Count > 0)
+                    jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
+                    numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
+                    //checks to make sure that
+                    if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
                     {
-                        throw new BasisSetTooSmallException();
+                        a.Add(0);
                     }
-                    for (int i = 0; i < 2; i++)
-                    {
-                        zMatrices.Add(new double[0, 0]);
-                        eigenvalues.Add(new double[0]);
-                    }
+                    numQuadMatrix++;
+                }
+                );
+                measurer.Stop();                    
+                howMuchTime = measurer.ElapsedMilliseconds;
+                input.matGenTime = (double)howMuchTime / 1000D;
+                if (a.Count > 0)
+                {
+                    throw new BasisSetTooSmallException();
+                }
+                for (int i = 0; i < 2; i++)
+                {
+                    zMatrices.Add(new double[0, 0]);
+                    eigenvalues.Add(new double[0]);
+                }
             }//end else
 
             //add SO stuff here
