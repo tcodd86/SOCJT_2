@@ -169,9 +169,19 @@ namespace ConsoleApplication1
                 {
                     List<BasisFunction> quadVecs = new List<BasisFunction>();
                     int nColumns;
-                    for (int v = -dynVar2; v <= dynVar2; v++)
+                    if (jMax == 2.5M)
                     {
-                        quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                        for (int v = -1; v < 1; v++)
+                        {
+                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                        }
+                    }
+                    else
+                    {
+                        for (int v = -dynVar2; v <= dynVar2; v++)
+                        {
+                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                        }
                     }
 
 

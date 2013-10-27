@@ -179,7 +179,7 @@ namespace ConsoleApplication1
                         {
                             degeneracy = 1;
                         }
-                        double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * (basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow((basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
+                        double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * ((double)basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow(((double)basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
                         alglib.sparseadd(A, n, n, temp);//changed from (A, n, m, temp)
                         //temp = 0;
                     }
@@ -187,6 +187,7 @@ namespace ConsoleApplication1
                     //cross anharmonic terms for interaction between two A modes
                     if (input.AT == true)
                     {
+                        #region CrossAnharmonic
                         for (int i = 1; i < input.nModes; i++)
                         {
                             for (int j = 0; j < i; j++)
@@ -204,6 +205,7 @@ namespace ConsoleApplication1
                                 }//end if
                             }//end j for loop
                         }//end i for loop
+                        #endregion
                     }//end if AT == true
                     continue;
                     #endregion
@@ -223,7 +225,7 @@ namespace ConsoleApplication1
                         {
                             degeneracy = 1;
                         }
-                        double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * (basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow((basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
+                        double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * ((double)basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow(((double)basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
                         alglib.sparseadd(A, n, n, temp);//changed from (A, n, m, temp)
                         //temp = 0;
                     }//end if AT == true
@@ -559,7 +561,7 @@ namespace ConsoleApplication1
                                                     ////*
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;//I think I can do this
@@ -568,7 +570,7 @@ namespace ConsoleApplication1
                                                     }//end first if
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
@@ -576,14 +578,14 @@ namespace ConsoleApplication1
                                                     //*/
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
                                                     }//end third if
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
@@ -593,14 +595,14 @@ namespace ConsoleApplication1
                                                 {
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;//I think I can do this
                                                     }//end first if
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
@@ -608,14 +610,14 @@ namespace ConsoleApplication1
                                                     ////*
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
                                                     }//end third if
                                                     if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
                                                     {
-                                                        temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
+                                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
                                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                                         matPos.Add(tTemp);
                                                         continue;
