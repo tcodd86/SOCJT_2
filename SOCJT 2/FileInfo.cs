@@ -363,6 +363,8 @@ namespace ConsoleApplication1
             set { nbeVecs = value; }
         }//end property nbeVecs
 
+        public bool useKappaEta { get; set; }//end useKappaEta
+
         public List<Scanner> scanList;
 
         public double[,] crossTermMatrix;
@@ -421,6 +423,7 @@ namespace ConsoleApplication1
             Special = false;
             includeCrossTerms = false;
             beVecs = false;
+            useKappaEta = false;
         }
         
         public static string[] fileRead(string filepath)
@@ -544,6 +547,17 @@ namespace ConsoleApplication1
                             else
                             {
                                 specialHam = false;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                useKappaEta = true;
+                            }
+                            else
+                            {
+                                useKappaEta = false;
                             }
                         }
                         if (inputf[u] == "/")

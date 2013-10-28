@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace ConsoleApplication1
 {
@@ -57,14 +58,14 @@ namespace ConsoleApplication1
         public bool fitD
         {
             get { return nfitD; }
-            //set { nfitD = value; }
+            set { nfitD = value; }
         }//end property nfitD
 
         private bool nfitK;
         public bool fitK
         {
             get { return nfitK; }
-            //set { nfitK = value; }
+            set { nfitK = value; }
         }//end property nfitK
 
         private bool nfitWEXE;
@@ -94,6 +95,15 @@ namespace ConsoleApplication1
             get { return nmodeZeta; }
             //set { nmodeZeta = value; }
         }//end property modeZeta
+                
+        public double eta { get; private set; }//end property eta
+
+        public bool fitEta { get; private set; }//end fitEta
+
+        public double kappa { get; private set; }//end property kappa
+
+        public bool fitKappa { get; private set; }//end fitKappa
+
         #endregion properties
 
         /// <summary>
@@ -105,9 +115,10 @@ namespace ConsoleApplication1
         /// <param name="inputF">
         /// The string array containing the parsed input file
         /// </param>
-        public ModeInfo(int modeN, string[] inputF)
+        public ModeInfo(int modeN, string[] inputF, out bool tReturn)
         {
             int whatMode = -1;
+            tReturn = false;
             for (int i = 0; i < inputF.Length; i++)
             {
                 if (inputF[i] == "&MODE_INFO")
@@ -212,6 +223,42 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
+                        if (inputF[u].ToUpper() == "KAPPA")
+                        {
+                            tReturn = true;
+                            kappa = parseDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u].ToUpper() == "FIT_KAPPA")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                fitKappa = true;
+                            }
+                            else
+                            {
+                                fitKappa = false;
+                            }
+                            continue;
+                        }
+                        if (inputF[u].ToUpper() == "ETA")
+                        {
+                            tReturn = true;
+                            eta = parseDouble(inputF[u + 1]);
+                            continue;
+                        }
+                        if (inputF[u].ToUpper() == "FIT_ETA")
+                        {
+                            if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
+                            {
+                                fitEta = true;
+                            }
+                            else
+                            {
+                                fitEta = false;
+                            }
+                            continue;
+                        }
                         if (inputF[u] == "/")
                         {
                             break;
@@ -221,5 +268,18 @@ namespace ConsoleApplication1
             }//end for
         }//end method setMode
 
+        /// <summary>
+        /// To parse a string containing a double that may or may not have scientific notation in it.
+        /// </summary>
+        /// <param name="s">
+        /// String to be parsed
+        /// </param>
+        /// <returns>
+        /// Double value of parsed string
+        /// </returns>
+        private double parseDouble(string s)
+        {
+            return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+        }
     }//end class Mode
 }

@@ -328,6 +328,8 @@ namespace ConsoleApplication1
             file.AppendLine("ORIGIN = " + Convert.ToString(input.origin));
             file.AppendLine("CALC_DERIV" + " = " + Convert.ToString(input.calcDeriv));
             file.AppendLine("ZETAE" + " = " + String.Format("{0,10:0.00000}", input.zetaE));
+            file.AppendLine("SPECIAL_HAM = " + Convert.ToString(input.specialHam));
+            file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.useKappaEta));
             file.AppendLine("S1" + " = " + Convert.ToString(input.S1));
             file.AppendLine("S2" + " = " + Convert.ToString(input.S2));
             file.AppendLine("/");
@@ -339,12 +341,24 @@ namespace ConsoleApplication1
                 file.AppendLine("MODEVMAX" + " = " + Convert.ToString(Modes[i].modeVMax));
                 file.AppendLine("MODEOMEGA" + " = " + String.Format("{0,10:0.00000}", Modes[i].modeOmega));
                 file.AppendLine("MODEWEXE" + " = " + String.Format("{0,10:0.00000}", Modes[i].wExe));
-                file.AppendLine("MODED" + " = " + String.Format("{0,10:0.00000}", Modes[i].D));
-                file.AppendLine("MODEK" + " = " + String.Format("{0,10:0.00000}", Modes[i].K));
+                if (input.useKappaEta)
+                {
+                    file.AppendLine("MODED" + " = " + String.Format("{0,10:0.00000}", Modes[i].D));
+                    file.AppendLine("MODEK" + " = " + String.Format("{0,10:0.00000}", Modes[i].K));
+                    file.AppendLine("KAPPA = " + String.Format("{0,10:0.00000}", Modes[i].kappa));                    
+                    file.AppendLine("ETA = " + String.Format("{0,10:0.00000}", Modes[i].eta));
+                    file.AppendLine("FIT_KAPPA = " + Convert.ToString(Modes[i].fitKappa));
+                    file.AppendLine("FIT_ETA = " + Convert.ToString(Modes[i].fitEta));                    
+                }
+                else
+                {
+                    file.AppendLine("MODED" + " = " + String.Format("{0,10:0.00000}", Modes[i].D));                    
+                    file.AppendLine("MODEK" + " = " + String.Format("{0,10:0.00000}", Modes[i].K));
+                    file.AppendLine("FIT_D" + " = " + Convert.ToString(Modes[i].fitD));
+                    file.AppendLine("FIT_K" + " = " + Convert.ToString(Modes[i].fitK));                    
+                }
                 file.AppendLine("FIT_OMEGA" + " = " + Convert.ToString(Modes[i].fitOmega));
-                file.AppendLine("FIT_WEXE" + " = " + Convert.ToString(Modes[i].fitWEXE));
-                file.AppendLine("FIT_D" + " = " + Convert.ToString(Modes[i].fitD));
-                file.AppendLine("FIT_K" + " = " + Convert.ToString(Modes[i].fitK));
+                file.AppendLine("FIT_WEXE" + " = " + Convert.ToString(Modes[i].fitWEXE));   
                 file.AppendLine("MODEZETA" + " = " + String.Format("{0,10:0.00000}", Modes[i].modeZeta));
                 file.AppendLine("MODEA_OMEGA" + " = " + String.Format("{0,10:0.00000}", Modes[i].modeAOmega));
                 file.AppendLine("ISATYPE" + " = " + Convert.ToString(Modes[i].IsAType));

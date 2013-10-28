@@ -682,6 +682,8 @@ namespace ConsoleApplication1
                     break;
                 }
 
+                //add a conditional here to be able to kill it after a certain number of Lanczos iterations
+
                 ITER++;
                 PS = P * S;
 

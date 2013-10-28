@@ -287,73 +287,74 @@ namespace ConsoleApplication1
                 alglib.sparseconverttocrs(array1[i]);
             }
 
-                int[] IECODE = new int[array1.Length];
-                int[] ITER = new int[array1.Length];
-                //actually diagonalizes the Hamiltonian matrix
-                measurer.Reset();
-                measurer.Start();
-                ParallelOptions options2 = new ParallelOptions();
-                options2.MaxDegreeOfParallelism = input.parJ;
-                Parallel.For(0, array1.Length, options2, i =>//changed to array1.count from sHamMatrix.count
-                {
-                    //this is where multithreading is needed
-                    double[] evs = new double[input.M + 1];
-                    double[,] temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
-                    IECODE[i] = -1;
+            int[] IECODE = new int[array1.Length];
+            int[] ITER = new int[array1.Length];
+            //actually diagonalizes the Hamiltonian matrix
+            measurer.Reset();
+            measurer.Start();
+            ParallelOptions options2 = new ParallelOptions();
+            options2.MaxDegreeOfParallelism = input.parJ;
+            Parallel.For(0, array1.Length, options2, i =>//changed to array1.count from sHamMatrix.count
+            {
+                //this is where multithreading is needed
+                double[] evs = new double[input.M + 1];
+                double[,] temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
+                IECODE[i] = -1;
 
-                    //call MINVAL from here                    
-                    ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
+                //add a parameter to count Lanczos iterations to set possible stopping criteria that way
+                //call MINVAL from here                    
+                ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
                                         
-                    //initialize eigenvalues to have a length.                    
-                    eigenvalues[i] = new double[evs.Length - 1];                    
-                    for (int j = 0; j < evs.Length - 1; j++)                    
-                    {                    
-                        eigenvalues[i][j] = evs[j];                        
-                    }                    
-                    zMatrices[i] = new double[numcolumnsA[i], input.M];                    
-                    if (input.pVector == true)                    
-                    {                    
-                        for (int j = 0; j < numcolumnsA[i]; j++)                        
-                        {                        
-                            for (int k = 0; k < input.M; k++)                            
-                            {                            
-                                zMatrices[i][j, k] = temp[j, k];                                
-                            }                            
-                        }                        
-                    }                    
-                    else                    
-                    {                    
-                        zMatrices[i] = null;                        
-                    }
+                //initialize eigenvalues to have a length.                    
+                eigenvalues[i] = new double[evs.Length - 1];                    
+                for (int j = 0; j < evs.Length - 1; j++)                    
+                {                    
+                    eigenvalues[i][j] = evs[j];                        
+                }                    
+                zMatrices[i] = new double[numcolumnsA[i], input.M];                    
+                if (input.pVector == true)                    
+                {                    
+                    for (int j = 0; j < numcolumnsA[i]; j++)                        
+                    {                        
+                        for (int k = 0; k < input.M; k++)                            
+                        {                            
+                            zMatrices[i][j, k] = temp[j, k];                                
+                        }                            
+                    }                        
+                }                    
+                else                    
+                {                    
+                    zMatrices[i] = null;                        
+                }
                     
-                    temp = null;                    
-                    evs = null;                    
-                }//end for
-                );
-                measurer.Stop();
-                howMuchTime = measurer.ElapsedMilliseconds;
-                input.diagTime = (double)howMuchTime / 1000D;
-                if (isQuad == false)
+                temp = null;                    
+                evs = null;                    
+            }//end for
+            );
+            measurer.Stop();
+            howMuchTime = measurer.ElapsedMilliseconds;
+            input.diagTime = (double)howMuchTime / 1000D;
+            if (isQuad == false)
+            {
+                JvecsForOutuput = jBasisVecsByJ;
+            }//end if
+            else
+            {
+                for (int i = 0; i < jbasisoutA.Length; i++)
                 {
-                    JvecsForOutuput = jBasisVecsByJ;
-                }//end if
-                else
-                {
-                    for (int i = 0; i < jbasisoutA.Length; i++)
-                    {
-                        JvecsForOutuput.Add(jbasisoutA[i]);
-                    }
-                }//end else
+                    JvecsForOutuput.Add(jbasisoutA[i]);
+                }
+            }//end else
                     
-                List<string> linesToWrite = new List<string>();
-                finalList = Eigenvalue.setAndSortEVs(eigenvalues, input.S, input.inclSO);                
-                //dummy hamiltonian matrix list for outuput file generator                
-                List<double[,]> hamMatrices = new List<double[,]>();                
-                sHamMatrix = array1.ToList();                
-                linesToWrite = OutputFile.makeOutput(input, zMatrices, hamMatrices, sHamMatrix, JvecsForOutuput, eigenvalues, isQuad, numColumns, finalList, true, IECODE, ITER);                
-                outp = linesToWrite;                
-                return linesToWrite;                
-                #endregion
+            List<string> linesToWrite = new List<string>();
+            finalList = Eigenvalue.setAndSortEVs(eigenvalues, input.S, input.inclSO);                
+            //dummy hamiltonian matrix list for outuput file generator                
+            List<double[,]> hamMatrices = new List<double[,]>();                
+            sHamMatrix = array1.ToList();                
+            linesToWrite = OutputFile.makeOutput(input, zMatrices, hamMatrices, sHamMatrix, JvecsForOutuput, eigenvalues, isQuad, numColumns, finalList, true, IECODE, ITER);                
+            outp = linesToWrite;                
+            return linesToWrite;                
+            #endregion
         }
     }
 }

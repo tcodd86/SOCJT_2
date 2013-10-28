@@ -81,11 +81,35 @@ namespace ConsoleApplication1
                 }
 
                 //iterates through the Mode info in the input file and initializes the modes
+                bool tempB = false;
                 List<ModeInfo> Modes = new List<ModeInfo>();
                 for (int i = 0; i < input.nModes; i++)
                 {
-                    Modes.Add(new ModeInfo(i, inputFile));
+                    Modes.Add(new ModeInfo(i, inputFile, out tempB));
+                    if (tempB)
+                    {
+                        Modes[i].D = 0.5 * Math.Pow(Modes[i].kappa / Modes[i].modeOmega, 2D);
+                        Modes[i].fitD = Modes[i].fitKappa;
+                        Modes[i].K = Modes[i].eta / Modes[i].modeOmega;
+                        Modes[i].fitK = Modes[i].fitEta;
+                        input.useKappaEta = true;
+                    }
                 }//end for
+
+                /*
+                //code here to convert eta and kappa to D and K for all modes if necessary
+                //do this because all matrix elements use D and K, so just make eta and kappa available to user as front ends
+                if (input.useKappaEta)
+                {
+                    for (int i = 0; i < input.nModes; i++)
+                    {
+                        Modes[i].D = 0.5 * Math.Pow(Modes[i].kappa / Modes[i].modeOmega, 2D);
+                        Modes[i].fitD = Modes[i].fitKappa;
+                        Modes[i].K = Modes[i].eta / Modes[i].modeOmega;
+                        Modes[i].fitK = Modes[i].fitEta;
+                    }
+                }
+                */
 
                 //sets bool isQuad = false if K is zero and fitK is false for all modes.
                 bool isQuad = false;
@@ -381,6 +405,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
+            
         }//end Main
     }//end class Program
 }//end namespace
