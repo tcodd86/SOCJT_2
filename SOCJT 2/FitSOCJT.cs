@@ -8,6 +8,8 @@ namespace ConsoleApplication1
 {
     class FitSOCJT
     {
+        static int count = 0;
+
         public static List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
         {
             //string to return
@@ -38,12 +40,6 @@ namespace ConsoleApplication1
             for (int i = 0; i < nToFit; i++)
             {
                 userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]));
-                /*
-                userInput[i].Ev = Convert.ToDouble(fitF[i * 4 + 1]);
-                userInput[i].pJ = Convert.ToDecimal(fitF[i * 4 + 2]);
-                userInput[i].nJ = Convert.ToInt16(fitF[i * 4 + 3]);
-                userInput[i].Sig = Convert.ToDecimal(fitF[i * 4 + 4]);
-                */
             }
             
             //initializes the X vector, boundary conditions and variable scales
@@ -437,6 +433,15 @@ namespace ConsoleApplication1
             {
                 fi[i] = temp[i];
             }
+            double rmsError = 0.0;
+            for (int w = 0; w < temp.Length; w++)
+            {
+                rmsError += Math.Pow(temp[w], 2D);
+            }
+            rmsError /= temp.Length;
+
+            Console.WriteLine("Eigenvalues have been calculated {0} times.", count++);
+            Console.WriteLine("RMS Error is {0}.", rmsError);
         }
 
         /// <summary>
