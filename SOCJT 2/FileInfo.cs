@@ -376,33 +376,44 @@ namespace ConsoleApplication1
         //initializes most values with reasonable defaults in case user forgets something
         public FileInfo()
         {
-            title = "TITLE";
+            //initialize all booleans to false by default            
             fitAzeta = false;
             calcDeriv = false;
             minJBool = false;
             fitOrigin = false;
             inclSO = false;
             specialHam = false;
+            specialHam = false;
+            printBasis = false;
+            pMatrix = false;
+            pVector = false;
+            AT = false;
+            Special = false;
+            includeCrossTerms = false;
+            beVecs = false;
+            useKappaEta = false;
+            //pMonit = false;
+            //pDerivs = false;
+            //vecFile = false;
+            //basisFile = false;
+
+            title = "TITLE";
             origin = 0.0;
             parMat = 1;
             nModes = 1;
             S = 0.5M;
             Azeta = 0.0;
-            maxJ = 7.5M;
-            minJ = 0.5M;
             zetaE = 0.0M;
+
+            //these are reasonable values of J for a basic quadratic problem
+            maxJ = 7.5M;
+            minJ = 0.5M;            
+
+            //S1 and S2 values for 3-fold symmetry
             S1 = 0;
             S2 = 1;
-            specialHam = true;
-            printBasis = false;
-            pMatrix = false;
-            pVector = false;
-            pMonit = false;
-            pDerivs = false;
-            vecFile = false;
-            basisFile = false;
-            evMin = 0.2;
-            guesses = false;
+                        
+            evMin = 0.2;            
             parVec = 1;
             parMat = 1;
             parJ = 2;
@@ -410,20 +421,13 @@ namespace ConsoleApplication1
             kFactor = 2;
             noIts = 10000;
             tol = 0.0001;
-            //UV = false;
-            //NSpectra = 0;
             fitFile = "fit.fit";
             fTol = 0.0;
             xTol = 0.0;
             gTol = 0.0;
             maxFev = 25;
             factor = 0.001;
-            nprint = 0;
-            AT = false;
-            Special = false;
-            includeCrossTerms = false;
-            beVecs = false;
-            useKappaEta = false;
+            nprint = 0;            
         }
         
         public static string[] fileRead(string filepath)
@@ -598,6 +602,7 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
+                        /*
                         if (inputf[u].ToUpper() == "PRINT_MONIT")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
@@ -630,6 +635,7 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
+                        */
                         if (inputf[u].ToUpper() == "EV_MIN")
                         {
                             evMin = Convert.ToDouble(inputf[u + 1]);
@@ -650,7 +656,7 @@ namespace ConsoleApplication1
 
                 if (inputf[i].ToUpper() == "&SOLVE_INFO")
                 {
-                    #region &SOLVE_INFO                    
+                    #region &SOLVE_INFO
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "M")
@@ -672,14 +678,6 @@ namespace ConsoleApplication1
                         {
                             //tol = Convert.ToDouble(inputf[u + 1]);
                             tol = parseDouble(inputf[u + 1]);
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "GUESSES")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                guesses = true;
-                            }
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PARVEC")
@@ -716,35 +714,6 @@ namespace ConsoleApplication1
                     continue;
                     #endregion
                 }//end SOLVE INFO if
-
-                /*
-                if (inputf[i].ToUpper() == "&SPECTRA")
-                {
-                    #region &SPECTRA
-                    for (int u = i; ; u++)
-                    {
-                        if (inputf[u].ToUpper() == "UV")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                UV = true;
-                            }
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "NSPECTRA")
-                        {
-                            NSpectra = Convert.ToInt16(inputf[u + 1]);
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "/")
-                        {
-                            break;
-                        }
-                    }//end for loop
-                    continue;
-                    #endregion
-                }//end SPECTRA if
-                */
 
                 if (inputf[i].ToUpper() == "&FIT_INFO")
                 {

@@ -371,7 +371,6 @@ namespace ConsoleApplication1
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));
             file.AppendLine("TOL" + " = " + Convert.ToString(input.tol));
-            file.AppendLine("GUESSES" + " = " + Convert.ToString(input.guesses));
             file.AppendLine("PARVEC = " + Convert.ToString(input.parVec));
             file.AppendLine("PARMAT = " + Convert.ToString(input.parMat));
             file.AppendLine("PARJ = " + Convert.ToString(input.parJ));
@@ -382,10 +381,10 @@ namespace ConsoleApplication1
             file.AppendLine("PRINT_BASIS" + " = " + Convert.ToString(input.printBasis));
             file.AppendLine("PRINT_MATRIX" + " = " + Convert.ToString(input.pMatrix));
             file.AppendLine("PRINT_VEC" + " = " + Convert.ToString(input.pVector));
-            file.AppendLine("PRINT_MONIT" + " = " + Convert.ToString(input.pMonit));
-            file.AppendLine("PRINT_DERIVS" + " = " + Convert.ToString(input.pDerivs));
-            file.AppendLine("VEC_FILE" + " = " + Convert.ToString(input.vecFile));
-            file.AppendLine("BASIS_FILE" + " = " + Convert.ToString(input.basisFile));
+            //file.AppendLine("PRINT_MONIT" + " = " + Convert.ToString(input.pMonit));
+            //file.AppendLine("PRINT_DERIVS" + " = " + Convert.ToString(input.pDerivs));
+            //file.AppendLine("VEC_FILE" + " = " + Convert.ToString(input.vecFile));
+            //file.AppendLine("BASIS_FILE" + " = " + Convert.ToString(input.basisFile));
             file.AppendLine("EV_MIN = " + Convert.ToString(input.evMin));
             file.AppendLine("/");
             file.AppendLine("  ");
@@ -397,7 +396,7 @@ namespace ConsoleApplication1
             file.AppendLine("GTOL" + " = " + Convert.ToString(input.gTol));
             file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.maxFev));
             file.AppendLine("FACTOR" + " = " + Convert.ToString(input.factor));
-            file.AppendLine("NPRINT" + " = " + Convert.ToString(input.print));
+            //file.AppendLine("NPRINT" + " = " + Convert.ToString(input.print));
             file.AppendLine("/");
             file.AppendLine("  ");
 
@@ -443,14 +442,6 @@ namespace ConsoleApplication1
                 file.AppendLine("/");
                 file.AppendLine(" ");
             }
-
-            /*
-            file.AppendLine("&SPECTRA");
-            file.AppendLine("UV = " + Convert.ToString(input.UV));
-            file.AppendLine("NSPECTRA = " + Convert.ToString(input.NSpectra));
-            file.AppendLine("/");
-            file.AppendLine("  ");            
-            */
 
             linesToWrite.Add(file.ToString());
             return linesToWrite;
