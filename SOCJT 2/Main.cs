@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace ConsoleApplication1
 {
@@ -13,28 +14,42 @@ namespace ConsoleApplication1
         {
             try
             {
-                //prompt user for input directory.  Default value is C:\SOCJT 2
-                Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
-                string fileDirectory = Console.ReadLine();
-                if(fileDirectory == "")
+                //variable to store filepath
+                string fileDirectory;
+                //check to see if running on Mono for linux cluster
+                bool runningOnMono = Type.GetType("Mono.Runtime") != null;
+                //meaning it's running .NET on a Windows system
+                if (!runningOnMono)
                 {
-                    fileDirectory = "C:\\SOCJT 2";
+                    //prompt user for input directory.  Default value is C:\SOCJT 2
+                    Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
+                    fileDirectory = Console.ReadLine();
+                    if (fileDirectory == "")
+                    {
+                        fileDirectory = "C:\\SOCJT 2";
+                    }
+
+                    //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
+                    if (Directory.Exists(fileDirectory) == false)
+                    {
+                        Console.WriteLine("The directory does not exist.  Would you like to create it? Y/N");
+                        string YN = Console.ReadLine();
+                        if (YN.ToUpper() == "Y" || YN.ToUpper() == "YES")
+                        {
+                            Directory.CreateDirectory(fileDirectory);
+                        }
+                        else
+                        {
+                            throw new DirectoryNotFoundException();
+                        }
+                    }
+                }
+                else//meaning it's running mono on the Linux cluster
+                {
+                    fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
                 }
 
-                //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
-                if(Directory.Exists(fileDirectory) == false)
-                {
-                    Console.WriteLine("The directory does not exist.  Would you like to create it? Y/N");
-                    string YN = Console.ReadLine();
-                    if (YN.ToUpper() == "Y" || YN.ToUpper() == "YES")
-                    {
-                        Directory.CreateDirectory(fileDirectory);
-                    }
-                    else
-                    {
-                        throw new DirectoryNotFoundException();
-                    }
-                }
+                //set the directory for reading and writing files
                 Directory.SetCurrentDirectory(fileDirectory);
 
                 //prompt user to enter input file name
