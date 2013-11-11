@@ -35,6 +35,9 @@ namespace ConsoleApplication1
             get { return nEv; }
             set { nEv = value; }
         }
+
+        public int symmetry { get; private set; }
+
         #endregion
 
         public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva)
@@ -45,6 +48,7 @@ namespace ConsoleApplication1
             Ev = Eva;
         }//end constructor
 
+        /*
         public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
@@ -123,6 +127,7 @@ namespace ConsoleApplication1
                 }//end for
             }//end while           
         }//end method bublleSort
+        */
 
     }//end class Eigenvalue
 }
