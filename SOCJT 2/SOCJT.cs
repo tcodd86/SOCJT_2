@@ -311,20 +311,13 @@ namespace ConsoleApplication1
                 {                    
                     eigenvalues[i][j] = evs[j];                        
                 }                    
-                zMatrices[i] = new double[numcolumnsA[i], input.M];                    
-                if (input.pVector == true)                    
-                {                    
-                    for (int j = 0; j < numcolumnsA[i]; j++)                        
-                    {                        
-                        for (int k = 0; k < input.M; k++)                            
-                        {                            
-                            zMatrices[i][j, k] = temp[j, k];                                
-                        }                            
-                    }                        
-                }                    
-                else                    
-                {                    
-                    zMatrices[i] = null;                        
+                zMatrices[i] = new double[numcolumnsA[i], input.M];
+                for (int j = 0; j < numcolumnsA[i]; j++)                        
+                {                        
+                    for (int k = 0; k < input.M; k++)                            
+                    {                            
+                        zMatrices[i][j, k] = temp[j, k];                                
+                    }                            
                 }
                     
                 temp = null;                    
@@ -347,7 +340,7 @@ namespace ConsoleApplication1
             }//end else
                     
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO);//add the eigenvectors so that the symmetry can be included as well                
+            finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well                
             //dummy hamiltonian matrix list for outuput file generator                
             List<double[,]> hamMatrices = new List<double[,]>();                
             sHamMatrix = array1.ToList();                
@@ -357,7 +350,7 @@ namespace ConsoleApplication1
             #endregion
         }//end SOCJT Routine
 
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
@@ -373,7 +366,9 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < evs[i].Length; j++)
                 {
-                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j]));
+                    //add call to symmetry checker function here.
+                    bool tbool = isA(jvecs[i], zMatrices[i], j, input);
+                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
                 }
                 if (tempS < maxS)
                 {
@@ -412,6 +407,53 @@ namespace ConsoleApplication1
                 temp[place]++;
             }
             return eigenarray;
+        }
+
+        public static bool isA(List<BasisFunction> jBasisVecsByJ, double[,] tempMat, int j, FileInfo input)
+        {
+            bool a1 = false;
+            double temp = 0.0;
+            int[] tempVL = new int[input.nModes * 2 + 1];
+            for (int m = 0; m < jBasisVecsByJ.Count; m++)
+            {
+                if (Math.Abs(tempMat[m, j]) > temp)
+                {
+                    for (int n = 0; n < input.nModes; n++)
+                    {
+                        tempVL[n * 2] = jBasisVecsByJ[m].modesInVec[n].v;
+                        tempVL[n * 2 + 1] = jBasisVecsByJ[m].modesInVec[n].l;
+                    }
+                    tempVL[input.nModes * 2] = jBasisVecsByJ[m].Lambda;
+                    temp = tempMat[m, j];
+                }
+            }
+
+            for (int m = 0; m < jBasisVecsByJ.Count; m++)
+            {
+                if (jBasisVecsByJ[m].Lambda == -1 * tempVL[input.nModes * 2])
+                {
+                    int tempInt = 0;
+                    for (int v = 0; v < input.nModes; v++)
+                    {
+                        if (jBasisVecsByJ[m].modesInVec[v].v == tempVL[v * 2])
+                        {
+                            if (jBasisVecsByJ[m].modesInVec[v].l == -1 * tempVL[v * 2 + 1])
+                            {
+                                tempInt++;
+                            }
+                        }
+                        if (tempInt == input.nModes)
+                        {
+                            if (temp / tempMat[m, j] > 0)
+                            {
+                                a1 = true;
+                            }
+                            m = jBasisVecsByJ.Count;
+                        }
+                    }
+                }
+            }
+            return a1;
         }
 
         private static void bubbleSort(ref Eigenvalue[] arr)

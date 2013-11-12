@@ -39,7 +39,7 @@ namespace ConsoleApplication1
             Eigenvalue[] userInput = new Eigenvalue[nToFit];
             for (int i = 0; i < nToFit; i++)
             {
-                userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]));
+                userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false);
             }
             
             //initializes the X vector, boundary conditions and variable scales

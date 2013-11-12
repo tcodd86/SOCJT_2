@@ -36,16 +36,17 @@ namespace ConsoleApplication1
             set { nEv = value; }
         }
 
-        public int symmetry { get; private set; }
+        public bool isa1 { get; private set; }
 
         #endregion
 
-        public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva)
+        public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva, bool isa1)
         {
             pJ = pJa;
             nJ = nJa;
             Sig = Siga;
             Ev = Eva;
+            this.isa1 = isa1;
         }//end constructor
 
         /*

@@ -45,6 +45,12 @@ namespace ConsoleApplication1
         /// quantities EJ are computed where EJ = ||A*X1J-D(M+J)*X1J||, X1J is the J-th
         /// column of X(1), and ||*|| denotes the Euclidean norm.  EJ is stored in the 
         /// E(M + J) J = 1, 2,......, P. U and V are auxilliary vectors used by OP.
+        /// 
+        /// The last two parameters, alglib.sparsematrix A and int par were added to the 
+        /// C# version of the code.  In the original FORTRAN version the sparsematrix was
+        /// stored in memory as a global variable while in C# it is passed as a parameter.
+        /// The int par is a variable added for cases of chunking the matrix vector
+        /// multiplications for parallelization.
         /// </summary>
         /// <param name="N"></param>
         /// <param name="Q"></param>
@@ -168,7 +174,8 @@ namespace ConsoleApplication1
         /// <param name="NCONV"></param>
         private static void CNVTST(int N, int Q, int M, int P, ref double ERRC, double EPS, double[] D, double[] E, ref int NCONV)
         {
-            //double CHEPS = 2.22e-16;
+            //double CHEPS = 2.22e-16;  This is the value in the original FORTRAN
+            //This should be machine epsilon.  I've estimated it here but it could just be calculated ahead of time and passed as a parameter.
             double CHEPS = 1.11e-16;//SOCJT_2 seems to converge faster no matter what
 
             int K = 0;
@@ -295,6 +302,15 @@ namespace ConsoleApplication1
         }
         //ERR done new
 
+        /// <summary>
+        /// This is the function called to perform the matrix vector multiplications.
+        /// I've here used functions from the ALGLIB library which is available at
+        /// ALGLIB.net and has both C# and C++ implementations.
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="U"></param>
+        /// <param name="V"></param>
+        /// <param name="par"></param>
         private static void OP(alglib.sparsematrix A, double[] U, ref double[] V, int par)
         {
             //alglib.sparsesmv(A, true, U, ref V);
@@ -559,8 +575,6 @@ namespace ConsoleApplication1
                     U[I] = X[I, ICOL1];
                 }//do 100
 
-                //alglib.sparsesmv(A, true, U, ref V);
-                //alglib.sparsemv(A, U, ref V);
                 OP(A, U, ref V, par);
 
                 ICOL2 = M - 1;//fixed like above
@@ -619,6 +633,7 @@ namespace ConsoleApplication1
             int IMMURN = 0;
 
             //this checks that the values are in the proper ranges
+            //need to remove these last gotos but low priority.
             if (N < 2)
             {
                 goto onehundred;

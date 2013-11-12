@@ -80,7 +80,6 @@ namespace ConsoleApplication1
                 if (input.pVector == true)
                 {
                     #region PrintVector
-                    //double[,] tempMat = zMatrices[i];
                     for (int j = 0; j < tempEvs.Length; j++)
                     {
                         file.AppendLine(" " + "\r");
@@ -88,57 +87,17 @@ namespace ConsoleApplication1
                         file.AppendLine(" " + "\r");
                         file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.evMin) + " are shown)");
                         file.AppendLine(" ");
-                            bool a1 = false;
-                            double temp = 0.0;
-                            int[] tempVL = new int[input.nModes * 2 + 1];
-                            for (int m = 0; m < jBasisVecsByJ[i].Count; m++)
-                            {
-                                if (Math.Abs(tempMat[m, j]) > temp)
-                                {
-                                    for (int n = 0; n < input.nModes; n++)
-                                    {
-                                        tempVL[n * 2] = jBasisVecsByJ[i][m].modesInVec[n].v;
-                                        tempVL[n * 2 + 1] = jBasisVecsByJ[i][m].modesInVec[n].l;
-                                    }
-                                    tempVL[input.nModes * 2] = jBasisVecsByJ[i][m].Lambda;
-                                    temp = tempMat[m, j];
-                                }
-                            }
-                            
-                            for (int m = 0; m < jBasisVecsByJ[i].Count; m++)
-                            {
-                                if (jBasisVecsByJ[i][m].Lambda == -1 * tempVL[input.nModes * 2])
-                                {
-                                    int tempInt = 0;
-                                    for (int v = 0; v < input.nModes; v++)
-                                    {
-                                        if (jBasisVecsByJ[i][m].modesInVec[v].v == tempVL[v * 2])
-                                        {
-                                            if (jBasisVecsByJ[i][m].modesInVec[v].l == -1 * tempVL[v * 2 + 1])
-                                            {
-                                                tempInt++;
-                                            }
-                                        }
-                                        if (tempInt == input.nModes)
-                                        {
-                                            if (temp / tempMat[m, j] > 0)
-                                            {
-                                                a1 = true;
-                                            }
-                                            m = jBasisVecsByJ[i].Count;
-                                        }
-                                    }
-                                }
-                            }
-                            if (a1)
-                            {
-                                file.AppendLine("Vector is Type 1");
-                            }
-                            else
-                            {
-                                file.AppendLine("Vector is Type 2");
-                            }
-                            file.AppendLine(" ");
+
+                        bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input);
+                        if (a1)
+                        {
+                            file.AppendLine("Vector is Type 1");
+                        }
+                        else
+                        {
+                            file.AppendLine("Vector is Type 2");
+                        }
+                        file.AppendLine(" ");
 
                         file.Append("Coefficient" + "\t");
                         for (int h = 0; h < input.nModes; h++)
@@ -299,10 +258,10 @@ namespace ConsoleApplication1
             }//writes all evs to the file object
             
             file.AppendLine("#" + "\t" + "Final results showing all eigenvalues found");
-            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j");
+            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + "Symm");
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(i + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ));
+                file.AppendLine(Convert.ToString(i + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
             }
             linesToWrite.Add(file.ToString());
             
