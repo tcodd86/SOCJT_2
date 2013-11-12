@@ -6,7 +6,7 @@ using System.IO;
 
 namespace ConsoleApplication1
 {
-    class FitSOCJT
+    static class FitSOCJT
     {
         static int count = 0;
 
@@ -513,6 +513,6 @@ namespace ConsoleApplication1
                 }
             }
             return RMS;
-        }
+        }//end function Comparer
     }
 }

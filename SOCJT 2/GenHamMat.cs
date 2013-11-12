@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace ConsoleApplication1
 {
-    class GenHamMat
+    static class GenHamMat
     {
         /// <summary>
         /// Generates an alglib sparsematrix object to be used in Lanczos diagonalization.

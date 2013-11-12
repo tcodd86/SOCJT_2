@@ -133,22 +133,22 @@ namespace ConsoleApplication1
                     {
                         if (inputF[u] == "MODEOMEGA")
                         {
-                            nModeOmega = Convert.ToDouble(inputF[u + 1]);
+                            nModeOmega = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODED")
                         {
-                            nD = Convert.ToDouble(inputF[u + 1]);
+                            nD = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEK")
                         {
-                            nK = Convert.ToDouble(inputF[u + 1]);
+                            nK = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEWEXE")
                         {
-                            nwExe = Convert.ToDouble(inputF[u + 1]);
+                            nwExe = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEVMAX")
@@ -158,12 +158,12 @@ namespace ConsoleApplication1
                         }
                         if (inputF[u] == "MODEA_OMEGA")
                         {
-                            nmodeAOmega = Convert.ToDouble(inputF[u + 1]);
+                            nmodeAOmega = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEZETA")
                         {
-                            nmodeZeta = Convert.ToDouble(inputF[u + 1]);
+                            nmodeZeta = FileInfo.parseDouble(inputF[u + 1]);
                         }
                         if (inputF[u] == "FIT_OMEGA")
                         {
@@ -226,7 +226,7 @@ namespace ConsoleApplication1
                         if (inputF[u].ToUpper() == "KAPPA")
                         {
                             tReturn = true;
-                            kappa = parseDouble(inputF[u + 1]);
+                            kappa = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u].ToUpper() == "FIT_KAPPA")
@@ -244,7 +244,7 @@ namespace ConsoleApplication1
                         if (inputF[u].ToUpper() == "ETA")
                         {
                             tReturn = true;
-                            eta = parseDouble(inputF[u + 1]);
+                            eta = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u].ToUpper() == "FIT_ETA")
@@ -267,19 +267,5 @@ namespace ConsoleApplication1
                 }//end if
             }//end for
         }//end method setMode
-
-        /// <summary>
-        /// To parse a string containing a double that may or may not have scientific notation in it.
-        /// </summary>
-        /// <param name="s">
-        /// String to be parsed
-        /// </param>
-        /// <returns>
-        /// Double value of parsed string
-        /// </returns>
-        private double parseDouble(string s)
-        {
-            return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
-        }
     }//end class Mode
 }

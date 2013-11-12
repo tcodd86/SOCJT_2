@@ -944,12 +944,12 @@ namespace ConsoleApplication1
         /// <returns>
         /// Double value of parsed string
         /// </returns>
-        private double parseDouble(string s)
+        public static double parseDouble(string s)
         {
             return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
         }
 
-        private decimal parseDecimal(string s)
+        public static decimal parseDecimal(string s)
         {
             return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
         }

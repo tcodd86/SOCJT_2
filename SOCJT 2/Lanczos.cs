@@ -24,7 +24,7 @@ namespace ConsoleApplication1
     /// Where the FORTRAN used functions TRED and TRED2 I have used functions from ALGLIB
     /// PROJECT by Bochkanov Sergey.
     /// </summary>
-    class Lanczos
+    static class Lanczos
     {
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
