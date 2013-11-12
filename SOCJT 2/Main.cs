@@ -16,11 +16,16 @@ namespace ConsoleApplication1
             {
                 //variable to store filepath
                 string fileDirectory;
+
                 //check to see if running on Mono for linux cluster
-                bool runningOnMono = Type.GetType("Mono.Runtime") != null;
-                //meaning it's running .NET on a Windows system
-                if (!runningOnMono)
-                {
+                //bool runningOnMono = Type.GetType("Mono.Runtime") != null;
+                //commented this out and just made it the default method for Release operation
+                
+                //meaning it's running .NET on a Windows system -- UPDATE: meaning it's running in DEBUG mode
+                //consider making this the default for Release jobs  -- done
+                //if (!runningOnMono)
+#if DEBUG
+                //{
                     //prompt user for input directory.  Default value is C:\SOCJT 2
                     Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
                     fileDirectory = Console.ReadLine();
@@ -32,6 +37,8 @@ namespace ConsoleApplication1
                     //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
                     if (Directory.Exists(fileDirectory) == false)
                     {
+                        //Commenting this out unless I add an input file maker helper method
+                        /*
                         Console.WriteLine("The directory does not exist.  Would you like to create it? Y/N");
                         string YN = Console.ReadLine();
                         if (YN.ToUpper() == "Y" || YN.ToUpper() == "YES")
@@ -40,14 +47,17 @@ namespace ConsoleApplication1
                         }
                         else
                         {
-                            throw new DirectoryNotFoundException();
-                        }
+                            */
+                        throw new DirectoryNotFoundException();
+                        //}
                     }
-                }
-                else//meaning it's running mono on the Linux cluster
-                {
+                //}
+#else
+                //else//meaning it's running mono on the Linux cluster
+                //{
                     fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                }
+                //}
+#endif
 
                 //set the directory for reading and writing files
                 Directory.SetCurrentDirectory(fileDirectory);
@@ -398,6 +408,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
+#if !DEBUG
             catch (Exception ex)
             {
                 Console.WriteLine("An exception has occurred: " + ex.Message);
@@ -405,6 +416,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
+#endif
         }//end Main
     }//end class Program
 }//end namespace
