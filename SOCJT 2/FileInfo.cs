@@ -469,7 +469,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "S")
                         {
-                            S = Convert.ToDecimal(inputf[u + 1]);
+                            //S = Convert.ToDecimal(inputf[u + 1]);
+                            S = parseDecimal(inputf[u + 1]);
                             if (S < 0M)
                             {
                                 S = S * -1M;
@@ -496,12 +497,14 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "MAXJ")
                         {
-                            maxJ = Convert.ToDecimal(inputf[u + 1]);
+                            //maxJ = Convert.ToDecimal(inputf[u + 1]);
+                            maxJ = parseDecimal(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MINJ")
                         {
-                            minJ = Convert.ToDecimal(inputf[u + 1]);
+                            //minJ = Convert.ToDecimal(inputf[u + 1]);
+                            minJ = parseDecimal(inputf[u + 1]);
                             minJBool = true;
                             continue;
                         }
@@ -529,7 +532,8 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "ZETAE")
                         {
-                            zetaE = Convert.ToDecimal(inputf[u + 1]);
+                            //zetaE = Convert.ToDecimal(inputf[u + 1]);
+                            zetaE = parseDecimal(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "S1")
@@ -873,7 +877,7 @@ namespace ConsoleApplication1
                     eVecs = new List<Tuple<decimal,int,int>>();
                     for (int u = i + 1; ; u += 3)
                     {
-                        eVecs.Add(new Tuple<decimal, int, int>(Convert.ToDecimal(inputf[u]), Convert.ToInt16(inputf[u + 1]),  Convert.ToInt16(inputf[u + 2])));
+                        eVecs.Add(new Tuple<decimal, int, int>(parseDecimal(inputf[u]), Convert.ToInt16(inputf[u + 1]),  Convert.ToInt16(inputf[u + 2])));
                         if (inputf[u + 3].ToUpper() == "/")
                         {
                             break;
@@ -943,6 +947,11 @@ namespace ConsoleApplication1
         private double parseDouble(string s)
         {
             return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+        }
+
+        private decimal parseDecimal(string s)
+        {
+            return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
         }
     }//class FileInfo
 }//end namespace

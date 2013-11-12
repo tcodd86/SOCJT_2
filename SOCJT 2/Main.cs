@@ -404,8 +404,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Check your input file and try again.");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
-            }
-            
+            }            
         }//end Main
     }//end class Program
 }//end namespace
