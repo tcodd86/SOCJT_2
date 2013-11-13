@@ -26,6 +26,9 @@ namespace ConsoleApplication1
     /// </summary>
     static class Lanczos
     {
+#if DEBUG
+        public static long reorthogTime = 0;
+#endif
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
         /// BKLANC computes a block tridiagonal matrix MS which it stores in rows and 
@@ -71,6 +74,7 @@ namespace ConsoleApplication1
             int IT;
             int KP1;
             int IL;
+            System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             //I need to pay special attention to this routines loops and their bounds
             for (int L = 0; L < S; L++)//do 90
             {
@@ -142,7 +146,15 @@ namespace ConsoleApplication1
                 }
                 if (L < S - 1)//changed from L != S - 1 to L < S - 1
                 {
+#if DEBUG
+                    orthogTimer.Start();
                     ORTHG(N, Q, LU, P, ref C, ref X);
+                    orthogTimer.Stop();
+                    reorthogTime += orthogTimer.ElapsedMilliseconds;
+                    orthogTimer.Reset();
+#else
+                    ORTHG(N, Q, LU, P, ref C, ref X);
+#endif
                     IL = LU;//took off + 1
                     int Ir = LU - 1;//changed back to original
                     for (int J = 0; J < P; J++)

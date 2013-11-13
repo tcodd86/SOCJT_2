@@ -238,7 +238,7 @@ namespace ConsoleApplication1
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
                     else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
-                    {
+                    { 
                         linesToWrite.AddRange(FitSOCJT.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
 
@@ -247,6 +247,9 @@ namespace ConsoleApplication1
                     double TIME = totalTime.ElapsedMilliseconds / 1000D;
                     linesToWrite.Add(" ");
                     linesToWrite.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
+#if DEBUG
+                    linesToWrite.Add("Orthog took " + Lanczos.reorthogTime / 1000L + " seconds");
+#endif
 
                     //writes all info to the output file
                     File.WriteAllLines(filepathOUT, linesToWrite);
