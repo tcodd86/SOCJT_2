@@ -29,7 +29,7 @@ namespace ConsoleApplication1
 #if DEBUG
         public static long reorthogTime = 0;
 #endif
-        private static double machEps = 2.22E-16;
+        //private static double machEps = 2.22E-16;
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
         /// BKLANC computes a block tridiagonal matrix MS which it stores in rows and 
@@ -191,8 +191,8 @@ namespace ConsoleApplication1
         {
             //double CHEPS = 2.22e-16;  This is the value in the original FORTRAN
             //This should be machine epsilon.  I've estimated it here but it could just be calculated ahead of time and passed as a parameter.
-            //double CHEPS = 1.11e-16;//SOCJT_2 seems to converge faster no matter what
-            double CHEPS = machEps;
+            double CHEPS = 1.11e-16;//SOCJT_2 seems to converge faster no matter what
+            //double CHEPS = machEps;
             int K = 0;
             double T;
             for (int I = 0; I < P; I++)
@@ -479,8 +479,7 @@ namespace ConsoleApplication1
         //PCH done new
         
         private static void RANDOM(int N, int Q, int L, ref double[,] X)
-        {
-            /*
+        {            
             double[] T = new double[100];
             int X1;
             int F1 = 71416;
@@ -520,14 +519,15 @@ namespace ConsoleApplication1
                 X0 = X1;
             }//do 200
             T = null;
-            */
+            
 
+            /*
             Random randy = new Random(6821);
             double norm = 0.0;
             var randVec = new double[N];
             for (int i = 0; i < N; i++)
             {
-                randVec[i] = randy.NextDouble();
+                randVec[i] = Math.Abs(randy.NextDouble());
                 norm += randVec[i] * randVec[i];
             }
             norm = Math.Sqrt(norm);
@@ -536,6 +536,7 @@ namespace ConsoleApplication1
                 randVec[i] /= norm;
                 X[i, L] = randVec[i];
             }
+            */
         }
 
         /// <summary>
@@ -664,6 +665,7 @@ namespace ConsoleApplication1
             int IMM;
             int IMMURN = 0;
 
+            /*
             double temp = 2.22E-16;
             for (; ; )
             {
@@ -678,6 +680,7 @@ namespace ConsoleApplication1
                     break;
                 }
             }
+            */
 
             //this checks that the values are in the proper ranges
             //need to remove these last gotos but low priority.
