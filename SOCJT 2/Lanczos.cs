@@ -960,5 +960,29 @@ namespace ConsoleApplication1
             }
             return product;
         }//end betavplusone
+
+        private static void gsOrthog(ref List<double[]> lVecs, double[] v, int prev)
+        {
+
+        }
+
+        /// <summary>
+        /// Computes the projection of v onto u.
+        /// </summary>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private static double[] projection(double[] u, double[] v)
+        {
+            double uv = vxv(u, v);
+            double uu = vxv(u, u);
+            uv /= uu;
+            double[] proj = new double[u.Length];
+            for (int i = 0; i < u.Length; i++)
+            {
+                proj[i] = uv * u[i];
+            }
+            return proj;
+        }//end projection
     }
 }
