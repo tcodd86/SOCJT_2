@@ -371,6 +371,8 @@ namespace ConsoleApplication1
 
         public bool[,] crossTermFit;
 
+        public bool naiveLanczos { get; private set; }//end naiveLanczos
+
         #endregion properties
 
         //initializes most values with reasonable defaults in case user forgets something
@@ -392,6 +394,7 @@ namespace ConsoleApplication1
             includeCrossTerms = false;
             beVecs = false;
             useKappaEta = false;
+            naiveLanczos = false;
             //pMonit = false;
             //pDerivs = false;
             //vecFile = false;
@@ -708,6 +711,13 @@ namespace ConsoleApplication1
                             if (parJ < 1)
                             {
                                 parJ = 1;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "NAIVE_LANCZOS")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                naiveLanczos = true;
                             }
                         }
                         if (inputf[u] == "/")

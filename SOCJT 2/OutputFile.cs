@@ -259,9 +259,21 @@ namespace ConsoleApplication1
             
             file.AppendLine("#" + "\t" + "Final results showing all eigenvalues found");
             file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + "Symm");
+            int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(i + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
+                if (input.naiveLanczos)
+                {
+                    if (i > 0)
+                    {
+                        if (finalList[i].Ev - finalList[i - 1].Ev < 0.00001)
+                        {
+                            continue;
+                        }
+                    }
+                }
+                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
+                l++;
             }
             linesToWrite.Add(file.ToString());
             
@@ -326,6 +338,7 @@ namespace ConsoleApplication1
             }
 
             file.AppendLine("&SOLVE_INFO");
+            file.AppendLine("NAIVE_LANCZOS = " + Convert.ToString(input.naiveLanczos));
             file.AppendLine("M" + " = " + Convert.ToString(input.M));
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));

@@ -539,6 +539,73 @@ namespace ConsoleApplication1
             */
         }
 
+        private static double[] RANDOM(int N)
+        {
+            /*
+            var X = new double[N];
+            double[] T = new double[100];
+            int X1;
+            int F1 = 71416;
+            int F2 = 27183;
+            int FT;
+            int K;
+            int A = 6821;
+            int C = 5327;
+            int X0 = 5328;
+            for (int I = 0; I < 100; I++)//do 100
+            {
+                X1 = A * X0 + C;//added + 1
+                if (X1 >= 10000)
+                {
+                    X1 -= 10000;
+                }
+                T[I] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 100
+            for (int I = 0; I < N; I++)//do 200
+            {
+                FT = F1 + F2;
+                if (FT >= 1000000)
+                {
+                    FT -= 1000000;
+                }
+                F1 = F2;
+                F2 = FT;
+                K = FT / 10000;//probably should not have the + 1 but does better with it.
+                X[I] = T[K];
+                X1 = A * X0 + C;//try a + 1 here too
+                if (X1 >= 10000)
+                {
+                    X1 -= 10000;
+                }
+                T[K] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 200
+            T = null;
+            //*/
+
+            //*
+            var X = new double[N];
+            Random randy = new Random(6821);
+            double norm = 0.0;
+            var randVec = new double[N];
+            for (int i = 0; i < N; i++)
+            {
+                //randVec[i] = Math.Abs(randy.NextDouble());
+                randVec[i] = randy.NextDouble();
+                norm += randVec[i] * randVec[i];
+            }
+            norm = Math.Sqrt(norm);
+            for (int i = 0; i < N; i++)
+            {
+                randVec[i] /= norm;
+                X[i] = randVec[i];
+            }
+            //*/
+
+            return X;
+        }
+
         /// <summary>
         /// Rotate computes the first L columns of the matrix XS*QS where XS is an
         /// N by PS orthonormal matrix stored in columns M + 1 through M + PS of the
@@ -817,5 +884,81 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its)
+        {
+            int N = A.innerobj.m;
+            int M = evs.Length;
+            var vi = RANDOM(N);
+            var alphas = new double[its];
+            var betas = new double[its];
+            betas[0] = 0.0;
+            var viminusone = new double[N];
+            var viplusone = new double[N];
+            double[] Axvi = new double[N];
+            for(int i = 0; i < its; i++)
+            {
+                //do Lanczos iterations here
+                //Axvi will contain the product of A and vi                
+                OP(A, vi, ref Axvi, 1);
+                
+                //assign alpha value for this iteration
+                alphas[i] = vxv(vi, Axvi);
+
+                //conditional to keep from calculating meaningless values for beta and vi
+                if (i == its - 1)
+                {
+                    Console.WriteLine("Lanczos iterations completed. Entering diagonalization.");
+                    break;
+                }
+
+                //calculate viplusone and beta i + 1.
+                viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
+                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                for (int j = 0; j < viplusone.Length; j++)
+                {
+                    viplusone[j] /= betas[i + 1];
+                }
+
+                //now reassign vi vectors for next iteration.
+                viminusone = vi;
+                vi = viplusone;
+
+                //let the user know things are happening
+                Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
+            }
+
+            //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
+            double[] nBetas = new double[its - 1];
+            for (int i = 0; i < nBetas.Length; i++)
+            {
+                nBetas[i] = betas[i + 1];
+            }
+
+            //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
+            //double[,] z = new double[N, M];
+            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, 0, 0, M, ref z);
+            int u = 1;
+            evs = alphas;
+        }//end NaiveLanczos
+
+        private static double vxv(double[] v, double[] u)
+        {
+            double product = 0.0;
+            for (int i = 0; i < v.Length; i++)
+            {
+                product += v[i] * u[i];
+            }
+            return product;
+        }//end vxv
+
+        private static double[] betavplusone(double[] avi, double alphai, double[] vi, double betai, double[] viminusone)
+        {
+            var product = new double[avi.Length];
+            for (int i = 0; i < product.Length; i++)
+            {
+                product[i] = avi[i] - alphai * vi[i] - betai * viminusone[i];
+            }
+            return product;
+        }//end betavplusone
     }
 }

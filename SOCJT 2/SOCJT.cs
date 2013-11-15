@@ -297,14 +297,27 @@ namespace ConsoleApplication1
             Parallel.For(0, array1.Length, options2, i =>//changed to array1.count from sHamMatrix.count
             {
                 //this is where multithreading is needed
-                double[] evs = new double[input.M + 1];
-                double[,] temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
+                double[] evs;
+                double[,] temp;//changed here to numcolumnsA
                 IECODE[i] = -1;
 
                 //add a parameter to count Lanczos iterations to set possible stopping criteria that way
-                //call MINVAL from here                    
-                ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
-                                        
+                //call MINVAL from here
+                if (input.naiveLanczos)//means use naiveLanczos routine
+                {
+                    ITER[i] = input.noIts;
+                    evs = new double[input.M];
+                    temp = new double[numcolumnsA[i], input.M];
+                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts);
+                }
+                else//means use block Lanczos from SOCJT
+                {
+                    evs = new double[input.M + 1];
+                    temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
+                    IECODE[i] = -1;
+                    ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
+                }
+                 
                 //initialize eigenvalues to have a length.                    
                 eigenvalues[i] = new double[evs.Length - 1];                    
                 for (int j = 0; j < evs.Length - 1; j++)                    
