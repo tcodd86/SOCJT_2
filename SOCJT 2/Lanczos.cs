@@ -940,14 +940,14 @@ namespace ConsoleApplication1
                 {
                     break;
                 }
-                tBetas[i] = nBetas[i + 2];
+                tBetas[i] = betas[i + 2];
             }
 
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
             //double[,] z = new double[N, M];
             var ZZ = new double[0,0];
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, 0, 0, M, ref z);
-            bool test2 = alglib.smatrixtdevdi(ref tAlphas, nBetas, tAlphas.Length, 0, 0, M, ref ZZ);
+            bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
 
             //here I run test from Lanczos book to see if evs are good.  Briefly, 
             //there are 3 cases to consider:
@@ -964,7 +964,7 @@ namespace ConsoleApplication1
                 bool temp = checkInTT(alphas[i], tAlphas);
                 //loop through and check and see if there is a repeat ev in alphas
                 //this evaluates to true if the ev is not a repeat by checking nearest neighbors, this is condition 3.
-                if (!(alphas[i] - alphas[i + 1] < tol))
+                if (!(alphas[i + 1] - alphas[i] < tol))
                 {
                     //loop over elements of tAlphas to see if this ev is also in tAlphas, if so add it to the output list
                     if (temp)
@@ -981,7 +981,7 @@ namespace ConsoleApplication1
                     //i + 2 because i + 1 has been tested to get to this else
                     for (int j = i + 2; j < alphas.Length - 1; j++)
                     {
-                        if (alphas[i] - alphas[j] < tol)
+                        if (alphas[j] - alphas[i] < tol)
                         {
                             continue;
                         }

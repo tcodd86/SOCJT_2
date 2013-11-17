@@ -262,6 +262,7 @@ namespace ConsoleApplication1
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
+                /*
                 if (input.naiveLanczos)
                 {
                     if (i > 0)
@@ -272,6 +273,7 @@ namespace ConsoleApplication1
                         }
                     }
                 }
+                */
                 file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
                 l++;
             }
