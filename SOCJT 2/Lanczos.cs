@@ -958,39 +958,43 @@ namespace ConsoleApplication1
             //evs evaluated as correct will be stored in this list
             List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
             //this is the tolerance for an ev being identical
-            double tol = 0.00000001;
+            //double tol = 0.00000000001;
+            double tol = 1.0;
+            double temptol = 1.0;
+            for (; ; )
+            {
+                if (1.0 + temptol != 1.0)
+                {
+                    tol = temptol;
+                    temptol /= 2.0;
+                }
+                else
+                {
+                    break;
+                }
+            }
             for (int i = 0; i < tAlphas.Length - 1; i++)
             {
-                bool temp = checkInTT(alphas[i], tAlphas);
-                //loop through and check and see if there is a repeat ev in alphas
-                //this evaluates to true if the ev is not a repeat by checking nearest neighbors, this is condition 3.
-                if (!(alphas[i + 1] - alphas[i] < tol))
+                bool temp = checkInTT(alphas[i], tAlphas, tol);
+                //tells how many times alphas[i] is in alphas, always at least 1
+                int repeater = repeat(i, alphas, tol);
+                //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
+                if (repeater == 1)
                 {
-                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if so add it to the output list
-                    if (temp)
+                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
+                    if (!temp)
                     {
                         correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
                         continue;
                     }
                 }//end if
-                else//means this evalue has a repeat somewhere.
+                else//means this evalue has a repeat.
                 {         
                     correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
                     //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
                     //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
-                    //i + 2 because i + 1 has been tested to get to this else
-                    for (int j = i + 2; j < alphas.Length - 1; j++)
-                    {
-                        if (alphas[j] - alphas[i] < tol)
-                        {
-                            continue;
-                        }
-                        else
-                        {
-                            i = j;
-                            break;
-                        }
-                    }
+                    //add repeater to i, subtract 1 because i += 1 for each loop anyway.
+                    i += repeater;
                     //first check to see if this ev is in T^2 and if so, reject, if not accept
                 }//end else
             }
@@ -1061,18 +1065,31 @@ namespace ConsoleApplication1
         /// <returns>
         /// bool. True if alphas is in tAlphas, false if not.
         /// </returns>
-        private static bool checkInTT(double alphas, double[] tAlphas)
+        private static bool checkInTT(double alphas, double[] tAlphas, double tol)
         {
             bool temp = false;
             for (int j = 0; j < tAlphas.Length; j++)
             {
-                if (alphas - tAlphas[j] < 0.00000001)
+                if (Math.Abs(alphas - tAlphas[j]) < tol)
                 {
                     temp = true;
                     return temp;
                 }
             }
             return temp;
-        }
+        }//end checkInTT
+
+        private static int repeat(int j, double[] alphvec, double tol)
+        {
+            int count = 0;
+            for (int i = 0; i < alphvec.Length; i++)
+            {
+                if (Math.Abs(alphvec[j] - alphvec[i]) < tol)
+                {
+                    count++;
+                }//end if < tol
+            }//end for
+            return count;
+        }//end repeat
     }
 }
