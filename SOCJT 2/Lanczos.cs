@@ -929,16 +929,80 @@ namespace ConsoleApplication1
 
             //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
             double[] nBetas = new double[its - 1];
+            //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
+            double[] tAlphas = new double[its - 1];
+            double[] tBetas = new double[its - 2];
             for (int i = 0; i < nBetas.Length; i++)
             {
                 nBetas[i] = betas[i + 1];
+                tAlphas[i] = alphas[i + 1];
+                if (i == nBetas.Length - 1)
+                {
+                    break;
+                }
+                tBetas[i] = nBetas[i + 2];
             }
 
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
             //double[,] z = new double[N, M];
+            var ZZ = new double[0,0];
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, 0, 0, M, ref z);
-            int u = 1;
-            evs = alphas;
+            bool test2 = alglib.smatrixtdevdi(ref tAlphas, nBetas, tAlphas.Length, 0, 0, M, ref ZZ);
+
+            //here I run test from Lanczos book to see if evs are good.  Briefly, 
+            //there are 3 cases to consider:
+            //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
+            //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
+            //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
+            //As presently implemented this test may miss evs.
+            //evs evaluated as correct will be stored in this list
+            List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
+            //this is the tolerance for an ev being identical
+            double tol = 0.00000001;
+            for (int i = 0; i < tAlphas.Length - 1; i++)
+            {
+                bool temp = checkInTT(alphas[i], tAlphas);
+                //loop through and check and see if there is a repeat ev in alphas
+                //this evaluates to true if the ev is not a repeat by checking nearest neighbors, this is condition 3.
+                if (!(alphas[i] - alphas[i + 1] < tol))
+                {
+                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if so add it to the output list
+                    if (temp)
+                    {
+                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                        continue;
+                    }
+                }//end if
+                else//means this evalue has a repeat somewhere.
+                {         
+                    correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
+                    //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
+                    //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
+                    //i + 2 because i + 1 has been tested to get to this else
+                    for (int j = i + 2; j < alphas.Length - 1; j++)
+                    {
+                        if (alphas[i] - alphas[j] < tol)
+                        {
+                            continue;
+                        }
+                        else
+                        {
+                            i = j;
+                            break;
+                        }
+                    }
+                    //first check to see if this ev is in T^2 and if so, reject, if not accept
+                }//end else
+            }
+
+            double[] checkedEvs = new double[correctEvs.Count];
+            for (int i = 0; i < checkedEvs.Length; i++)
+            {
+                checkedEvs[i] = correctEvs[i].Item2;
+            }
+
+            //evs = alphas;
+            evs = checkedEvs;
         }//end NaiveLanczos
 
         private static double vxv(double[] v, double[] u)
@@ -984,5 +1048,31 @@ namespace ConsoleApplication1
             }
             return proj;
         }//end projection
+
+        /// <summary>
+        /// Checks if alphas is in tAlphas.
+        /// </summary>
+        /// <param name="alphas">
+        /// Value to check against.
+        /// </param>
+        /// <param name="tAlphas">
+        /// Array to look in for value.
+        /// </param>
+        /// <returns>
+        /// bool. True if alphas is in tAlphas, false if not.
+        /// </returns>
+        private static bool checkInTT(double alphas, double[] tAlphas)
+        {
+            bool temp = false;
+            for (int j = 0; j < tAlphas.Length; j++)
+            {
+                if (alphas - tAlphas[j] < 0.00000001)
+                {
+                    temp = true;
+                    return temp;
+                }
+            }
+            return temp;
+        }
     }
 }
