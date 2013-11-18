@@ -85,8 +85,8 @@ namespace ConsoleApplication1
             List<BasisFunction>[] jbasisoutA = new List<BasisFunction>[0];
             List<int> numColumns = new List<int>();
 
- 
-            #region LargeMatrix                
+
+            #region Hamiltonian
             List<alglib.sparsematrix> sHamMatrix = new List<alglib.sparsematrix>();            
             alglib.sparsematrix[] array1;            
             int[] numcolumnsA;
@@ -219,7 +219,9 @@ namespace ConsoleApplication1
                     eigenvalues.Add(new double[0]);
                 }
             }//end else
+            #endregion
 
+            #region Spin Orbit
             //add SO stuff here
             if (input.inclSO == true)
             {
@@ -281,12 +283,14 @@ namespace ConsoleApplication1
                     eigenvalues.Add(new double[0]);
                 }
             }//end if inclSO == true
+            #endregion
 
             for (int i = 0; i < array1.Length; i++)
             {
                 alglib.sparseconverttocrs(array1[i]);
             }
 
+            #region Lanczos
             int[] IECODE = new int[array1.Length];
             int[] ITER = new int[array1.Length];
             //actually diagonalizes the Hamiltonian matrix
@@ -308,7 +312,7 @@ namespace ConsoleApplication1
                     ITER[i] = input.noIts;
                     evs = new double[input.M];
                     temp = new double[numcolumnsA[i], input.M];
-                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag);
+                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol);
                 }
                 else//means use block Lanczos from SOCJT
                 {
@@ -340,6 +344,8 @@ namespace ConsoleApplication1
             measurer.Stop();
             howMuchTime = measurer.ElapsedMilliseconds;
             input.diagTime = (double)howMuchTime / 1000D;
+#endregion
+
             if (isQuad == false)
             {
                 JvecsForOutuput = jBasisVecsByJ;
@@ -359,8 +365,7 @@ namespace ConsoleApplication1
             sHamMatrix = array1.ToList();                
             linesToWrite = OutputFile.makeOutput(input, zMatrices, hamMatrices, sHamMatrix, JvecsForOutuput, eigenvalues, isQuad, numColumns, finalList, true, IECODE, ITER);                
             outp = linesToWrite;                
-            return linesToWrite;                
-            #endregion
+            return linesToWrite;   
         }//end SOCJT Routine
 
         public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)

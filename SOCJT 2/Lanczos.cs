@@ -884,7 +884,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -967,6 +967,7 @@ namespace ConsoleApplication1
                 //this is the tolerance for an ev being identical
                 //double tol = 0.00000000001;
                 double tol = 1.0;
+                /*
                 double temptol = 1.0;
                 for (; ; )
                 {
@@ -980,9 +981,10 @@ namespace ConsoleApplication1
                         break;
                     }
                 }
+                */
                 for (int i = 0; i < tAlphas.Length - 1; i++)
                 {
-                    tol *= 2.0;
+                    tol = 1E-6;
                     //checks to see if the value is in T^2 eigenvalues
                     bool temp = checkInTT(alphas[i], tAlphas, tol);
                     //tells how many times alphas[i] is in alphas, always at least 1
@@ -1003,7 +1005,7 @@ namespace ConsoleApplication1
                         //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
                         //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
                         //add repeater to i, subtract 1 because i += 1 for each loop anyway.
-                        i += repeater;
+                        i += repeater - 1;
                         //first check to see if this ev is in T^2 and if so, reject, if not accept
                     }//end else
                 }
