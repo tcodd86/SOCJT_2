@@ -373,6 +373,8 @@ namespace ConsoleApplication1
 
         public bool naiveLanczos { get; private set; }//end naiveLanczos
 
+        public bool debugFlag { get; private set; }//end debugFlag
+
         #endregion properties
 
         //initializes most values with reasonable defaults in case user forgets something
@@ -395,6 +397,7 @@ namespace ConsoleApplication1
             beVecs = false;
             useKappaEta = false;
             naiveLanczos = false;
+            debugFlag = false;
             //pMonit = false;
             //pDerivs = false;
             //vecFile = false;
@@ -569,6 +572,13 @@ namespace ConsoleApplication1
                             else
                             {
                                 useKappaEta = false;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "DEBUG_FLAG")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                debugFlag = true;
                             }
                         }
                         if (inputf[u] == "/")

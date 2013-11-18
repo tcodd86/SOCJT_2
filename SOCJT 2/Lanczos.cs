@@ -884,7 +884,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -918,6 +918,9 @@ namespace ConsoleApplication1
                 {
                     viplusone[j] /= betas[i + 1];
                 }
+                //do John's recommended reorthogonalization here.
+                //He says he first orthogonalizes n to n-2 and then n-2 to n, could make it three or 5 or whatever to see if it helps.
+
 
                 //now reassign vi vectors for next iteration.
                 viminusone = vi;
@@ -947,66 +950,72 @@ namespace ConsoleApplication1
             //double[,] z = new double[N, M];
             var ZZ = new double[0,0];
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, 0, 0, M, ref z);
-            bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
+            evs = alphas;
 
-            //here I run test from Lanczos book to see if evs are good.  Briefly, 
-            //there are 3 cases to consider:
-            //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
-            //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
-            //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
-            //As presently implemented this test may miss evs.
-            //evs evaluated as correct will be stored in this list
-            List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
-            //this is the tolerance for an ev being identical
-            //double tol = 0.00000000001;
-            double tol = 1.0;
-            double temptol = 1.0;
-            for (; ; )
+            if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out
             {
-                if (1.0 + temptol != 1.0)
+                bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
+
+                //here I run test from Lanczos book to see if evs are good.  Briefly, 
+                //there are 3 cases to consider:
+                //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
+                //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
+                //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
+                //As presently implemented this test may miss evs.
+                //evs evaluated as correct will be stored in this list
+                List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
+                //this is the tolerance for an ev being identical
+                //double tol = 0.00000000001;
+                double tol = 1.0;
+                double temptol = 1.0;
+                for (; ; )
                 {
-                    tol = temptol;
-                    temptol /= 2.0;
-                }
-                else
-                {
-                    break;
-                }
-            }
-            for (int i = 0; i < tAlphas.Length - 1; i++)
-            {
-                bool temp = checkInTT(alphas[i], tAlphas, tol);
-                //tells how many times alphas[i] is in alphas, always at least 1
-                int repeater = repeat(i, alphas, tol);
-                //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
-                if (repeater == 1)
-                {
-                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
-                    if (!temp)
+                    if (1.0 + temptol != 1.0)
                     {
-                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                        continue;
+                        tol = temptol;
+                        temptol /= 2.0;
                     }
-                }//end if
-                else//means this evalue has a repeat.
-                {         
-                    correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
-                    //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
-                    //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
-                    //add repeater to i, subtract 1 because i += 1 for each loop anyway.
-                    i += repeater;
-                    //first check to see if this ev is in T^2 and if so, reject, if not accept
-                }//end else
-            }
+                    else
+                    {
+                        break;
+                    }
+                }
+                for (int i = 0; i < tAlphas.Length - 1; i++)
+                {
+                    tol *= 2.0;
+                    //checks to see if the value is in T^2 eigenvalues
+                    bool temp = checkInTT(alphas[i], tAlphas, tol);
+                    //tells how many times alphas[i] is in alphas, always at least 1
+                    int repeater = repeat(i, alphas, tol);
+                    //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
+                    if (repeater == 1)
+                    {
+                        //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
+                        if (!temp)
+                        {
+                            correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                            continue;
+                        }
+                    }//end if
+                    else//means this evalue has a repeat.
+                    {         
+                        correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
+                        //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
+                        //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
+                        //add repeater to i, subtract 1 because i += 1 for each loop anyway.
+                        i += repeater;
+                        //first check to see if this ev is in T^2 and if so, reject, if not accept
+                    }//end else
+                }
 
-            double[] checkedEvs = new double[correctEvs.Count];
-            for (int i = 0; i < checkedEvs.Length; i++)
-            {
-                checkedEvs[i] = correctEvs[i].Item2;
-            }
+                double[] checkedEvs = new double[correctEvs.Count];
+                for (int i = 0; i < checkedEvs.Length; i++)
+                {
+                    checkedEvs[i] = correctEvs[i].Item2;
+                }            
+                evs = checkedEvs;
+            }//end if flags = false
 
-            //evs = alphas;
-            evs = checkedEvs;
         }//end NaiveLanczos
 
         private static double vxv(double[] v, double[] u)
