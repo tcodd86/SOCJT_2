@@ -375,6 +375,10 @@ namespace ConsoleApplication1
 
         public bool debugFlag { get; private set; }//end debugFlag
 
+        public bool newRandom { get; private set; }//end newRandom
+
+        public bool normalize { get; private set; }//end normalize
+
         #endregion properties
 
         //initializes most values with reasonable defaults in case user forgets something
@@ -398,6 +402,9 @@ namespace ConsoleApplication1
             useKappaEta = false;
             naiveLanczos = false;
             debugFlag = false;
+            newRandom = false;
+            normalize = false;
+
             //pMonit = false;
             //pDerivs = false;
             //vecFile = false;
@@ -728,6 +735,20 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 naiveLanczos = true;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "NEW_RANDOM")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                newRandom = true;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "NORMALIZE")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                normalize = true;
                             }
                         }
                         if (inputf[u] == "/")

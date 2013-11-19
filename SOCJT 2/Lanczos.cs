@@ -539,70 +539,81 @@ namespace ConsoleApplication1
             */
         }
 
-        private static double[] RANDOM(int N)
+        private static double[] RANDOM(int N, bool normalizeB, bool newRandom)
         {
-            /*
+            //initialize vector to be returned
             var X = new double[N];
-            double[] T = new double[100];
-            int X1;
-            int F1 = 71416;
-            int F2 = 27183;
-            int FT;
-            int K;
-            int A = 6821;
-            int C = 5327;
-            int X0 = 5328;
-            for (int I = 0; I < 100; I++)//do 100
+            //if not using new Random routine use old one
+            if (!newRandom)
             {
-                X1 = A * X0 + C;//added + 1
-                if (X1 >= 10000)
+                double[] T = new double[100];
+                int X1;
+                int F1 = 71416;
+                int F2 = 27183;
+                int FT;
+                int K;
+                int A = 6821;
+                int C = 5327;
+                int X0 = 5328;
+                for (int I = 0; I < 100; I++)//do 100
                 {
-                    X1 -= 10000;
-                }
-                T[I] = (double)X1 / 9999.0 - 0.5;
-                X0 = X1;
-            }//do 100
-            for (int I = 0; I < N; I++)//do 200
-            {
-                FT = F1 + F2;
-                if (FT >= 1000000)
+                    X1 = A * X0 + C;//added + 1
+                    if (X1 >= 10000)
+                    {
+                        X1 -= 10000;
+                    }
+                    T[I] = (double)X1 / 9999.0 - 0.5;
+                    X0 = X1;
+                }//do 100
+                for (int I = 0; I < N; I++)//do 200
                 {
-                    FT -= 1000000;
-                }
-                F1 = F2;
-                F2 = FT;
-                K = FT / 10000;//probably should not have the + 1 but does better with it.
-                X[I] = T[K];
-                X1 = A * X0 + C;//try a + 1 here too
-                if (X1 >= 10000)
-                {
-                    X1 -= 10000;
-                }
-                T[K] = (double)X1 / 9999.0 - 0.5;
-                X0 = X1;
-            }//do 200
-            T = null;
-            //*/
-
-            //*
-            var X = new double[N];
-            Random randy = new Random(6821);
-            double norm = 0.0;
-            var randVec = new double[N];
-            for (int i = 0; i < N; i++)
-            {
-                //randVec[i] = Math.Abs(randy.NextDouble());
-                randVec[i] = randy.NextDouble();
-                norm += randVec[i] * randVec[i];
+                    FT = F1 + F2;
+                    if (FT >= 1000000)
+                    {
+                        FT -= 1000000;
+                    }
+                    F1 = F2;
+                    F2 = FT;
+                    K = FT / 10000;//probably should not have the + 1 but does better with it.
+                    X[I] = T[K];
+                    X1 = A * X0 + C;//try a + 1 here too
+                    if (X1 >= 10000)
+                    {
+                        X1 -= 10000;
+                    }
+                    T[K] = (double)X1 / 9999.0 - 0.5;
+                    X0 = X1;
+                }//do 200
+                T = null;
+                //normalize(ref X);
             }
-            norm = Math.Sqrt(norm);
-            for (int i = 0; i < N; i++)
+            //if using new random routine go here
+            else
             {
-                randVec[i] /= norm;
-                X[i] = randVec[i];
+                //var X = new double[N];
+                Random randy = new Random(6821);
+                //double norm = 0.0;
+                //var randVec = new double[N];
+                for (int i = 0; i < N; i++)
+                {
+                    //randVec[i] = Math.Abs(randy.NextDouble());
+                    //randVec[i] = randy.NextDouble();
+                    //norm += randVec[i] * randVec[i];
+                    X[i] = randy.NextDouble();
+                }
+                //norm = Math.Sqrt(norm);
+                //for (int i = 0; i < N; i++)
+                //{
+                //    randVec[i] /= norm;
+                //    X[i] = randVec[i];
+                //}
             }
-            //*/
-
+            //if X should be normalized
+            if (normalizeB)
+            {
+                normalize(ref X);
+            }
+            //return X
             return X;
         }
 
@@ -884,11 +895,11 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool normalizeB, bool newRandom)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
-            var vi = RANDOM(N);
+            var vi = RANDOM(N, normalizeB, newRandom);
             var alphas = new double[its];
             var betas = new double[its];
             betas[0] = 0.0;
@@ -964,32 +975,19 @@ namespace ConsoleApplication1
                 //As presently implemented this test may miss evs.
                 //evs evaluated as correct will be stored in this list
                 List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
-                //this is the tolerance for an ev being identical
-                //double tol = 0.00000000001;
-                double tol = 1.0;
-                /*
-                double temptol = 1.0;
-                for (; ; )
-                {
-                    if (1.0 + temptol != 1.0)
-                    {
-                        tol = temptol;
-                        temptol /= 2.0;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                */
+
                 for (int i = 0; i < tAlphas.Length - 1; i++)
                 {
-                    tol = 1E-6;
+                    //tol = 1E-6;
                     //checks to see if the value is in T^2 eigenvalues
                     bool temp = checkInTT(alphas[i], tAlphas, tol);
                     //tells how many times alphas[i] is in alphas, always at least 1
                     int repeater = repeat(i, alphas, tol);
                     //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
+                    if (repeater == 0)
+                    {
+                        throw new RepeaterError();
+                    }
                     if (repeater == 1)
                     {
                         //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
@@ -1039,11 +1037,6 @@ namespace ConsoleApplication1
             }
             return product;
         }//end betavplusone
-
-        private static void gsOrthog(ref List<double[]> lVecs, double[] v, int prev)
-        {
-
-        }
 
         /// <summary>
         /// Computes the projection of v onto u.
@@ -1102,5 +1095,19 @@ namespace ConsoleApplication1
             }//end for
             return count;
         }//end repeat
+
+        private static void normalize(ref double[] X)
+        {
+            double sum = 0.0;
+            for (int i = 0; i < X.Length; i++)
+            {
+                sum += X[i] * X[i];
+            }
+            sum = Math.Sqrt(sum);
+            for (int i = 0; i < X.Length; i++)
+            {
+                X[i] /= sum;
+            }
+        }//end normalize
     }
 }

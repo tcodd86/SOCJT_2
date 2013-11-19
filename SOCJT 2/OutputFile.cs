@@ -341,6 +341,8 @@ namespace ConsoleApplication1
 
             file.AppendLine("&SOLVE_INFO");
             file.AppendLine("NAIVE_LANCZOS = " + Convert.ToString(input.naiveLanczos));
+            file.AppendLine("NEW_RANDOM = " + Convert.ToString(input.newRandom));
+            file.AppendLine("NORMALIZE = " + Convert.ToString(input.normalize));
             file.AppendLine("M" + " = " + Convert.ToString(input.M));
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));
