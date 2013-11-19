@@ -478,7 +478,7 @@ namespace ConsoleApplication1
         }
         //PCH done new
         
-        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool normalizeB, bool newRandom)
+        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool newRandom)
         {
             if (!newRandom)
             {
@@ -530,10 +530,7 @@ namespace ConsoleApplication1
                 {
                     randVec[i] = Math.Abs(randy.NextDouble());
                 }
-                if (normalizeB)
-                {
-                    normalize(ref randVec);
-                }
+                normalize(ref randVec);
                 for (int i = 0; i < N; i++)
                 {
                     X[i, L] = randVec[i];
@@ -541,7 +538,7 @@ namespace ConsoleApplication1
             }
         }
 
-        private static double[] RANDOM(int N, bool normalizeB, bool newRandom)
+        private static double[] RANDOM(int N, bool newRandom)
         {
             //initialize vector to be returned
             var X = new double[N];
@@ -587,35 +584,18 @@ namespace ConsoleApplication1
                     X0 = X1;
                 }//do 200
                 T = null;
-                //normalize(ref X);
             }
             //if using new random routine go here
             else
             {
-                //var X = new double[N];
                 Random randy = new Random(6821);
-                //double norm = 0.0;
-                //var randVec = new double[N];
                 for (int i = 0; i < N; i++)
                 {
-                    //randVec[i] = Math.Abs(randy.NextDouble());
-                    //randVec[i] = randy.NextDouble();
-                    //norm += randVec[i] * randVec[i];
                     X[i] = randy.NextDouble();
-                }
-                //norm = Math.Sqrt(norm);
-                //for (int i = 0; i < N; i++)
-                //{
-                //    randVec[i] /= norm;
-                //    X[i] = randVec[i];
-                //}
+                }                
             }
-            //if X should be normalized
-            if (normalizeB)
-            {
-                normalize(ref X);
-            }
-            //return X
+            //naiveLanczos requires a normalized vector
+            normalize(ref X);
             return X;
         }
 
@@ -732,7 +712,7 @@ namespace ConsoleApplication1
         /// array.  Also used as working storage while computing.</param>
         /// <param name="IECODE"></param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
-        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool newRandom, bool normalizeB)
+        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool newRandom)
         {
             double[] E = new double[Q];
             double[,] C = new double[Q, Q];
@@ -744,23 +724,6 @@ namespace ConsoleApplication1
             double ERRC = 0.0;
             int IMM;
             int IMMURN = 0;
-
-            /*
-            double temp = 2.22E-16;
-            for (; ; )
-            {
-                if (1 + machEps != 1.0)
-                {
-                    temp = machEps;
-                    machEps /= 2.0;
-                }
-                else
-                {
-                    machEps = temp;
-                    break;
-                }
-            }
-            */
 
             //this checks that the values are in the proper ranges
             //need to remove these last gotos but low priority.
@@ -801,7 +764,7 @@ namespace ConsoleApplication1
             {
                 for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
                 {
-                    RANDOM(N, Q, K, ref X, normalizeB, newRandom);
+                    RANDOM(N, Q, K, ref X, newRandom);
                 }
             }
                         
@@ -896,11 +859,11 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool normalizeB, bool newRandom)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool newRandom)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
-            var vi = RANDOM(N, normalizeB, newRandom);
+            var vi = RANDOM(N, newRandom);
             var alphas = new double[its];
             var betas = new double[its];
             betas[0] = 0.0;

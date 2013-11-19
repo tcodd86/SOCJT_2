@@ -377,8 +377,6 @@ namespace ConsoleApplication1
 
         public bool newRandom { get; private set; }//end newRandom
 
-        public bool normalize { get; private set; }//end normalize
-
         #endregion properties
 
         //initializes most values with reasonable defaults in case user forgets something
@@ -403,7 +401,6 @@ namespace ConsoleApplication1
             naiveLanczos = false;
             debugFlag = false;
             newRandom = false;
-            normalize = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -742,13 +739,6 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 newRandom = true;
-                            }
-                        }
-                        if (inputf[u].ToUpper() == "NORMALIZE")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                normalize = true;
                             }
                         }
                         if (inputf[u] == "/")

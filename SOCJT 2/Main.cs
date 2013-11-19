@@ -416,8 +416,9 @@ namespace ConsoleApplication1
             }
             catch (RepeaterError)
             {
-                Console.WriteLine("Repeater Error in Naive Lanczos routine.");
-                Console.WriteLine("Try using Block Lanczos instead.");
+                Console.WriteLine("NaN Error in Naive Lanczos routine.");
+                Console.WriteLine("Try decreasing NOITS or using Block Lanczos instead.");
+                Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
 #if !DEBUG

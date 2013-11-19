@@ -165,47 +165,65 @@ namespace ConsoleApplication1
                 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
-                Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
+                try
                 {
-                    List<BasisFunction> quadVecs = new List<BasisFunction>();
-                    int nColumns;
-                    if (jMax == 2.5M)
+                    Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
                     {
-                        for (int v = -1; v < 1; v++)
+                        List<BasisFunction> quadVecs = new List<BasisFunction>();
+                        int nColumns;
+                        if (jMax == 2.5M)
                         {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            for (int v = -1; v < 1; v++)
+                            {
+                                quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            }
                         }
-                    }
-                    else
-                    {
-                        for (int v = -dynVar2; v <= dynVar2; v++)
+                        else
                         {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            for (int v = -dynVar2; v <= dynVar2; v++)
+                            {
+                                quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            }
                         }
-                    }
 
 
-                    //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    //replaced the line above with the conditionals below
-                    if (input.specialHam)
-                    {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
-                    else
-                    {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
+                        //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                        //replaced the line above with the conditionals below
+                        if (input.specialHam)
+                        {
+                            array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                        }
+                        else
+                        {
+                            array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                        }
 
-                    jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
-                    numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
-                    //checks to make sure that
-                    if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
-                    {
-                        a.Add(0);
+                        jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
+                        numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
+                        //checks to make sure that
+                        if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
+                        {
+                            a.Add(0);
+                        }
+                        numQuadMatrix++;
                     }
-                    numQuadMatrix++;
+                    );
                 }
-                );
+                catch (AggregateException ae)
+                {
+                    foreach (var e in ae.InnerExceptions)
+                    {
+                        if (e is RepeaterError)
+                        {
+                            throw new RepeaterError();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                }
                 measurer.Stop();                    
                 howMuchTime = measurer.ElapsedMilliseconds;
                 input.matGenTime = (double)howMuchTime / 1000D;
@@ -312,14 +330,14 @@ namespace ConsoleApplication1
                     ITER[i] = input.noIts;
                     evs = new double[input.M];
                     temp = new double[numcolumnsA[i], input.M];
-                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol, input.normalize, input.newRandom);
+                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol, input.newRandom);
                 }
                 else//means use block Lanczos from SOCJT
                 {
                     evs = new double[input.M + 1];
                     temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
                     IECODE[i] = -1;
-                    ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec, input.newRandom, input.normalize);
+                    ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec, input.newRandom);
                 }
                  
                 //initialize eigenvalues to have a length.                    
