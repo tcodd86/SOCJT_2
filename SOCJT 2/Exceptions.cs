@@ -36,4 +36,12 @@ namespace ConsoleApplication1
             //empty body
         }
     }
+
+    class RepeaterError : ApplicationException
+    {
+        public RepeaterError()
+        { 
+            //empty body
+        }
+    }
 }
