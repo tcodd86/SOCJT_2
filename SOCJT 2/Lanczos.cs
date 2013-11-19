@@ -859,17 +859,20 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool newRandom)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool newRandom, bool evsNeeded)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
-            var vi = RANDOM(N, newRandom);
+            
             var alphas = new double[its];
             var betas = new double[its];
             betas[0] = 0.0;
+
+            var vi = RANDOM(N, newRandom);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
+            var lanczosVecs = new List<double[]>();
             for(int i = 0; i < its; i++)
             {
                 //do Lanczos iterations here
@@ -878,6 +881,12 @@ namespace ConsoleApplication1
                 
                 //assign alpha value for this iteration
                 alphas[i] = vxv(vi, Axvi);
+
+                //if calculating the eigenvectors then store the lanczos vectors here
+                if (evsNeeded)
+                {
+                    lanczosVecs.Add(vi);
+                }
 
                 //conditional to keep from calculating meaningless values for beta and vi
                 if (i == its - 1)
@@ -893,10 +902,6 @@ namespace ConsoleApplication1
                 {
                     viplusone[j] /= betas[i + 1];
                 }
-                //do John's recommended reorthogonalization here.
-                //He says he first orthogonalizes n to n-2 and then n-2 to n, could make it three or 5 or whatever to see if it helps.
-
-
                 //now reassign vi vectors for next iteration.
                 viminusone = vi;
                 vi = viplusone;
@@ -922,12 +927,19 @@ namespace ConsoleApplication1
             }
 
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
-            //double[,] z = new double[N, M];
+            //double[,] z = new double[N, M];//use this line when ready to implement eigenvectors as well.
             var ZZ = new double[0,0];
-            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, 0, 0, M, ref z);
+            //set flag for eigenvalues
+            int zz = 0;
+            if (evsNeeded)
+            {
+                zz = 2;
+                z = new double[alphas.Length, alphas.Length];
+            }
+            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M, ref z);
             evs = alphas;
 
-            if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out
+            if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
             {
                 bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
 
@@ -938,6 +950,7 @@ namespace ConsoleApplication1
                 //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
                 //As presently implemented this test may miss evs.
                 //evs evaluated as correct will be stored in this list
+                //Tuple so that proper eigenvectors can be pulled when that is implemented
                 List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
 
                 for (int i = 0; i < tAlphas.Length - 1; i++)
@@ -962,16 +975,15 @@ namespace ConsoleApplication1
                         }
                     }//end if
                     else//means this evalue has a repeat.
-                    {         
-                        correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
-                        //check to see how many repeats it has and where they are.  Only take first ev.  Add to i as necessary
+                    {
                         //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
+                        correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
                         //add repeater to i, subtract 1 because i += 1 for each loop anyway.
                         i += repeater - 1;
-                        //first check to see if this ev is in T^2 and if so, reject, if not accept
                     }//end else
                 }
 
+                //build array of final eigenvalues to return
                 double[] checkedEvs = new double[correctEvs.Count];
                 for (int i = 0; i < checkedEvs.Length; i++)
                 {
@@ -979,6 +991,9 @@ namespace ConsoleApplication1
                 }            
                 evs = checkedEvs;
             }//end if flags = false
+
+            //code here to calculate the eigenvectors
+            //first put list of lanczos vectors into matrix form and then call ALGLIB function ramtrixmv: file:///X:/tcodd/Programs/ALGLIB/csharp/manual.csharp.html#sub_cmatrixmv
 
         }//end NaiveLanczos
 

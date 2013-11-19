@@ -330,7 +330,7 @@ namespace ConsoleApplication1
                     ITER[i] = input.noIts;
                     evs = new double[input.M];
                     temp = new double[numcolumnsA[i], input.M];
-                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol, input.newRandom);
+                    Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol, input.newRandom, input.pVector);
                 }
                 else//means use block Lanczos from SOCJT
                 {
