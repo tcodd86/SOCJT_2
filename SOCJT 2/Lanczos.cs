@@ -478,65 +478,67 @@ namespace ConsoleApplication1
         }
         //PCH done new
         
-        private static void RANDOM(int N, int Q, int L, ref double[,] X)
-        {            
-            double[] T = new double[100];
-            int X1;
-            int F1 = 71416;
-            int F2 = 27183;
-            int FT;
-            int K;
-            int A = 6821;
-            int C = 5327;
-            int X0 = 5328;
-            for (int I = 0; I < 100; I++)//do 100
+        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool normalizeB, bool newRandom)
+        {
+            if (!newRandom)
             {
-                X1 = A * X0 + C;//added + 1
-                if (X1 >= 10000)
+                double[] T = new double[100];
+                int X1;
+                int F1 = 71416;
+                int F2 = 27183;
+                int FT;
+                int K;
+                int A = 6821;
+                int C = 5327;
+                int X0 = 5328;
+                for (int I = 0; I < 100; I++)//do 100
                 {
-                    X1 -= 10000;
-                }
-                T[I] = (double) X1 / 9999.0 - 0.5;
-                X0 = X1;
-            }//do 100
-            for (int I = 0; I < N; I++)//do 200
-            {
-                FT = F1 + F2;
-                if (FT >= 1000000)
+                    X1 = A * X0 + C;//added + 1
+                    if (X1 >= 10000)
+                    {
+                        X1 -= 10000;
+                    }
+                    T[I] = (double)X1 / 9999.0 - 0.5;
+                    X0 = X1;
+                }//do 100
+                for (int I = 0; I < N; I++)//do 200
                 {
-                    FT -= 1000000;
-                }
-                F1 = F2;
-                F2 = FT;
-                K = FT / 10000;//probably should not have the + 1 but does better with it.
-                X[I, L] = T[K];
-                X1 = A * X0 + C;//try a + 1 here too
-                if (X1 >= 10000)
-                {
-                    X1 -= 10000;
-                }
-                T[K] = (double)X1 / 9999.0 - 0.5;
-                X0 = X1;
-            }//do 200
-            T = null;
-            
-
-            /*
-            Random randy = new Random(6821);
-            double norm = 0.0;
-            var randVec = new double[N];
-            for (int i = 0; i < N; i++)
-            {
-                randVec[i] = Math.Abs(randy.NextDouble());
-                norm += randVec[i] * randVec[i];
+                    FT = F1 + F2;
+                    if (FT >= 1000000)
+                    {
+                        FT -= 1000000;
+                    }
+                    F1 = F2;
+                    F2 = FT;
+                    K = FT / 10000;//probably should not have the + 1 but does better with it.
+                    X[I, L] = T[K];
+                    X1 = A * X0 + C;//try a + 1 here too
+                    if (X1 >= 10000)
+                    {
+                        X1 -= 10000;
+                    }
+                    T[K] = (double)X1 / 9999.0 - 0.5;
+                    X0 = X1;
+                }//do 200
+                T = null;
             }
-            norm = Math.Sqrt(norm);
-            for (int i = 0; i < N; i++)
+            else
             {
-                randVec[i] /= norm;
-                X[i, L] = randVec[i];
+                Random randy = new Random(6821);
+                var randVec = new double[N];
+                for (int i = 0; i < N; i++)
+                {
+                    randVec[i] = Math.Abs(randy.NextDouble());
+                }
+                if (normalizeB)
+                {
+                    normalize(ref randVec);
+                }
+                for (int i = 0; i < N; i++)
+                {
+                    X[i, L] = randVec[i];
+                }
             }
-            */
         }
 
         private static double[] RANDOM(int N, bool normalizeB, bool newRandom)
@@ -730,7 +732,7 @@ namespace ConsoleApplication1
         /// array.  Also used as working storage while computing.</param>
         /// <param name="IECODE"></param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
-        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par)
+        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool newRandom, bool normalizeB)
         {
             double[] E = new double[Q];
             double[,] C = new double[Q, Q];
@@ -799,8 +801,7 @@ namespace ConsoleApplication1
             {
                 for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
                 {
-
-                    RANDOM(N, Q, K, ref X);
+                    RANDOM(N, Q, K, ref X, normalizeB, newRandom);
                 }
             }
                         
