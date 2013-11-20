@@ -345,11 +345,11 @@ namespace ConsoleApplication1
                 for (int j = 0; j < evs.Length - 1; j++)                    
                 {                    
                     eigenvalues[i][j] = evs[j];                        
-                }                    
-                zMatrices[i] = new double[numcolumnsA[i], input.M];
+                }
+                zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                 for (int j = 0; j < numcolumnsA[i]; j++)                        
-                {                        
-                    for (int k = 0; k < input.M; k++)                            
+                {
+                    for (int k = 0; k < evs.Length - 1; k++)//changed input.M to evs.Length - 1                            
                     {                            
                         zMatrices[i][j, k] = temp[j, k];                                
                     }                            

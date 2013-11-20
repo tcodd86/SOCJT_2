@@ -891,7 +891,7 @@ namespace ConsoleApplication1
                 {
                     for (int j = 0; j < N; j++)
                     {
-                        lanczosVecs[j, i] = vi[i];
+                        lanczosVecs[j, i] = vi[j];
                     }
                 }
 
@@ -943,13 +943,16 @@ namespace ConsoleApplication1
                 zz = 2;
                 z = new double[its, M];
             }
-            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M, ref z);
+            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M - 1, ref z);//put in M - 1 for # of eigenpairs to request because for some reason it returns one more than requested
             evs = alphas;
             //now generate the eigenvectors by matrix multiplication
+            double[,] transEvecs = new double[0,0];
             if (evsNeeded)
             {
-                double[,] transEvecs = new double[N, evs.Length];
-                alglib.rmatrixgemm(N, its, evs.Length, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 1.0, ref transEvecs, 0, 0);
+                transEvecs = new double[N, evs.Length];
+                alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
+                //alglib keeps throwing an error, indices seem to be off.  Try my own function
+
             }
             if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
             {
@@ -1006,12 +1009,14 @@ namespace ConsoleApplication1
                 //if needed, build array of eigenvectors to return
                 if (evsNeeded)
                 {
+                    //temporary storage for eigenvectors
                     var tempEvecs = new double[N, correctEvs.Count];
                     for (int i = 0; i < correctEvs.Count; i++)
                     {
                         for (int j = 0; j < N; j++)
                         {
-                            tempEvecs[j, i] = z[j, correctEvs[i].Item1];
+                            //pull only eigenvectors which correspond to a true eigenvalue
+                            tempEvecs[j, i] = transEvecs[j, correctEvs[i].Item1];
                         }
                     }
                     //then normalize
@@ -1019,14 +1024,22 @@ namespace ConsoleApplication1
 
                     //then set equal to z
                     z = tempEvecs;
-                }
+                }//end if evsNeeded
             }//end if flags = false
-
-            //code here to calculate the eigenvectors
-            //first put list of lanczos vectors into matrix form and then call ALGLIB function ramtrixmv: file:///X:/tcodd/Programs/ALGLIB/csharp/manual.csharp.html#sub_cmatrixmv
-
         }//end NaiveLanczos
 
+        /// <summary>
+        /// Dot product of two vectors
+        /// </summary>
+        /// <param name="v">
+        /// Vector 1
+        /// </param>
+        /// <param name="u">
+        /// Vector 2
+        /// </param>
+        /// <returns>
+        /// Scalar product of vectors v and u
+        /// </returns>
         private static double vxv(double[] v, double[] u)
         {
             double product = 0.0;
@@ -1092,6 +1105,21 @@ namespace ConsoleApplication1
             return temp;
         }//end checkInTT
 
+        /// <summary>
+        /// Checks a certain entry in an array to see how many times that same value, to within the tolerance, is in the array.
+        /// </summary>
+        /// <param name="j">
+        /// Index of array value to be checked for repeats
+        /// </param>
+        /// <param name="alphvec">
+        /// Vector being checked
+        /// </param>
+        /// <param name="tol">
+        /// Tolerance to define a repeat so that if value1 - value2 is less than tol it is treated as a repeat
+        /// </param>
+        /// <returns>
+        /// Number of times the value in alphvec[j] is repeated.  Always at least 1.
+        /// </returns>
         private static int repeat(int j, double[] alphvec, double tol)
         {
             int count = 0;
@@ -1105,6 +1133,12 @@ namespace ConsoleApplication1
             return count;
         }//end repeat
 
+        /// <summary>
+        /// Normalizes the vector X
+        /// </summary>
+        /// <param name="X">
+        /// Vector to be normalized.
+        /// </param>
         private static void normalize(ref double[] X)
         {
             double sum = 0.0;
@@ -1119,6 +1153,12 @@ namespace ConsoleApplication1
             }
         }//end normalize
 
+        /// <summary>
+        /// Normalizes a collection of vectors stored as a 2D array.
+        /// </summary>
+        /// <param name="X">
+        /// 2D array containing the vectors to be normalized
+        /// </param>
         private static void normalize(ref double[,] X)
         {
             for (int j = 0; j < X.GetLength(1); j++)
