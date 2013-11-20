@@ -872,7 +872,11 @@ namespace ConsoleApplication1
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
-            var lanczosVecs = new List<double[]>();
+            var lanczosVecs = new double[0,0];
+            if(evsNeeded)
+            {
+                lanczosVecs = new double[N, its];
+            }
             for(int i = 0; i < its; i++)
             {
                 //do Lanczos iterations here
@@ -885,7 +889,10 @@ namespace ConsoleApplication1
                 //if calculating the eigenvectors then store the lanczos vectors here
                 if (evsNeeded)
                 {
-                    lanczosVecs.Add(vi);
+                    for (int j = 0; j < N; j++)
+                    {
+                        lanczosVecs[j, i] = vi[i];
+                    }
                 }
 
                 //conditional to keep from calculating meaningless values for beta and vi
@@ -934,11 +941,16 @@ namespace ConsoleApplication1
             if (evsNeeded)
             {
                 zz = 2;
-                z = new double[alphas.Length, alphas.Length];
+                z = new double[its, M];
             }
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M, ref z);
             evs = alphas;
-
+            //now generate the eigenvectors by matrix multiplication
+            if (evsNeeded)
+            {
+                double[,] transEvecs = new double[N, evs.Length];
+                alglib.rmatrixgemm(N, its, evs.Length, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 1.0, ref transEvecs, 0, 0);
+            }
             if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
             {
                 bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
@@ -990,6 +1002,24 @@ namespace ConsoleApplication1
                     checkedEvs[i] = correctEvs[i].Item2;
                 }            
                 evs = checkedEvs;
+
+                //if needed, build array of eigenvectors to return
+                if (evsNeeded)
+                {
+                    var tempEvecs = new double[N, correctEvs.Count];
+                    for (int i = 0; i < correctEvs.Count; i++)
+                    {
+                        for (int j = 0; j < N; j++)
+                        {
+                            tempEvecs[j, i] = z[j, correctEvs[i].Item1];
+                        }
+                    }
+                    //then normalize
+                    normalize(ref tempEvecs);
+
+                    //then set equal to z
+                    z = tempEvecs;
+                }
             }//end if flags = false
 
             //code here to calculate the eigenvectors
@@ -1086,6 +1116,23 @@ namespace ConsoleApplication1
             for (int i = 0; i < X.Length; i++)
             {
                 X[i] /= sum;
+            }
+        }//end normalize
+
+        private static void normalize(ref double[,] X)
+        {
+            for (int j = 0; j < X.GetLength(1); j++)
+            {
+                double sum = 0.0;
+                for (int i = 0; i < X.GetLength(0); i++)
+                {
+                    sum += X[i, j] * X[i, j];
+                }
+                sum = Math.Sqrt(sum);
+                for (int i = 0; i < X.GetLength(0); i++)
+                {
+                    X[i, j] /= sum;
+                }
             }
         }//end normalize
     }
