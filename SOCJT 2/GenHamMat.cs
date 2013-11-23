@@ -1006,6 +1006,10 @@ namespace ConsoleApplication1
                             {
                                 continue;
                             }
+                            if (vlprod.Sum() != 1)//this means |Delta V| = |Delta l| = 1 for only 1 mode, the same mode
+                            {
+                                continue;
+                            }
                             #region Bilinear
                             //means possible bilinear term since Delta v = +/- 1 for both A and E mode and Delta l = 1 for E mode and bilinear = true
                             if (vabs.Sum() == 2 && labs.Sum() == 1 && bilinear)
@@ -1024,6 +1028,78 @@ namespace ConsoleApplication1
                                 }
                                 //now go through AVal + 1 and AVal - 1 which will have different contributions from AVec
                                 //after that put in bilinear matrix element
+
+                                for (int a = 0; a < biAVecPos.Count; a++)
+                                {
+                                    for (int e = 0; e < biEVecPos.Count; e++)
+                                    {
+                                        int row;
+                                        int column;
+                                        if (biAVecPos[a] > biEVecPos[e])
+                                        {
+                                            column = biAVecPos[a];
+                                            row = biEVecPos[e];
+                                        }
+                                        else
+                                        {
+                                            column = biEVecPos[e];
+                                            row = biAVecPos[a];
+                                        }
+                                        if (input.crossTermMatrix[row, column] == 0D)
+                                        {
+                                            continue;
+                                        }
+                                        int nl = vlLambda[n, nModes + biEVecPos[e]];
+                                        int ml = vlLambda[m, nModes + biEVecPos[e]];
+                                        int sl = (int)Math.Pow(-1D, (double)input.S1);
+                                        double oneORnone = 0.0;
+                                        if (vdiff[biAVecPos[a]] == -1)
+                                        {
+                                            oneORnone = 1.0;
+                                        }
+                                        //can use this later if I want to cut down on code a little
+                                        /*
+                                        double twoORnone = 0.0;
+                                        double slPre = 1.0;
+                                        if (vdiff[biEVecPos[e]] == -1)
+                                        {
+                                            twoORnone = 2.0;
+                                        }
+                                        if (nl - sl == ml)
+                                        {
+                                            slPre = 1.0 * vdiff[biEVecPos[e]];
+                                        }
+                                        */
+                                        if (vdiff[biEVecPos[e]] == -1 && nl - sl == ml)
+                                        {
+                                            temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - (double)sl * (double)nl + 2D));
+                                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                            matPos.Add(tTemp);
+                                            continue;
+                                        }//end first if
+                                        if (vdiff[biEVecPos[e]] == -1 && nl + sl == ml)
+                                        {
+                                            temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] + (double)sl * (double)nl + 2D));
+                                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                            matPos.Add(tTemp);
+                                            continue;
+                                        }//end second if
+                                        if (vdiff[biEVecPos[e]] == 1 && nl - sl == ml)
+                                        {
+                                            temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] + (double)sl * (double)nl));
+                                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                            matPos.Add(tTemp);
+                                            continue;
+                                        }//end third if
+                                        if (vdiff[biEVecPos[e]] == 1 && nl + sl == ml)
+                                        {
+                                            temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - (double)sl * (double)nl));
+                                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                            matPos.Add(tTemp);
+                                            continue;
+                                        }//end fourth if
+                                    }//end for loop over evec positions
+                                }//end for loop over a vec positions
                             }//end bilinear if
                             #endregion
                             if (vabs.Sum() != 1)//Delta v = +/- 1 in only one mode for linear only
@@ -1050,8 +1126,8 @@ namespace ConsoleApplication1
                                 }
                             }
                             temp = basisVectorsByJ[n].modesInVec[mode].modeOmega * Math.Sqrt(basisVectorsByJ[n].modesInVec[mode].DBasis * ((double)basisVectorsByJ[n].modesInVec[mode].v + lval * (double)basisVectorsByJ[n].modesInVec[mode].l + 2D));
-                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                            matPos.Add(tTemp);
+                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);
+                            matPos.Add(ttTemp);
                             continue;
                         }
 
