@@ -817,7 +817,7 @@ namespace ConsoleApplication1
             alglib.sparsematrix A = new alglib.sparsematrix();
             alglib.sparsecreate(matSize, matSize, 10, out A);
             bool containsAVecs = false;
-            //bool bilinear = true;
+            bool bilinear = false;
             int nModes = input.nModes;
             List<int> AVecPos = new List<int>();
             List<int> EVecPos = new List<int>();
@@ -836,6 +836,7 @@ namespace ConsoleApplication1
                     {
                         AVecPos.Add(i);
                         containsAVecs = true;
+                        bilinear = true;
                         continue;
                     }
                     else
@@ -847,9 +848,7 @@ namespace ConsoleApplication1
                 //for bilinear coupling
                 if (containsAVecs == true)
                 {
-                    //new lists just for bilinear coupling
-                    //biAVecPos = AVecPos;
-                    //biEVecPos = EVecPos;
+                    //these lists contain all postions of A and E modes
                     for (int i = 0; i < AVecPos.Count; i++)
                     {
                         biAVecPos.Add(AVecPos[i]);
@@ -859,13 +858,16 @@ namespace ConsoleApplication1
                         biEVecPos.Add(EVecPos[i]);
                     }
 
-                    //loop to eliminate any A vectors that have no cross-coupling
+                    //loop to eliminate any A modes that have no cross-coupling from the lists
+                    //after this and the following loops there should be no evecs or avecs in these lists which do not have bilinear coupling
                     for (int i = 0; i < biAVecPos.Count; i++)
                     {
                         for (int j = 0; j < biEVecPos.Count; j++)
                         {
+                            //to make sure to only use the correct positions in the cross-term matrix
                             if (biAVecPos[i] > biEVecPos[j])
                             {
+                                //if the coupling element is nonzero then no need to remove position so break and skip
                                 if (input.crossTermMatrix[biEVecPos[j], biAVecPos[i]] != 0)
                                 {
                                     break;
@@ -878,8 +880,10 @@ namespace ConsoleApplication1
                                     break;
                                 }
                             }
+                            //means it's reached the end of the evec list and has not found a coupling term between it and an A vector
                             if (j == biEVecPos.Count - 1)
                             {
+                                //remove the A vector from the list if there's no coupling term
                                 biAVecPos.RemoveAt(i);
                                 i--;
                                 break;
@@ -914,50 +918,53 @@ namespace ConsoleApplication1
                             }
                         }
                     }
-                    /*
+                    //if there's no A or E modes left then bilinear = false;
                     if (biAVecPos.Count == 0 || biEVecPos.Count == 0)
                     {
                         bilinear = false;
                     }
-                    */
                 }
             }//end if CrossTerms == true
             #endregion
 
             //generates the Hamiltonian Matrix
             //just the HO terms
-                for (int n = 0; n < matSize; n++)
+            for (int n = 0; n < matSize; n++)
+            {
+                #region HO Terms
+                //one mode harmonic and anharmonic terms
+                for (int i = 0; i < input.nModes; i++)
                 {
-                    #region HO Terms
-                    //one mode harmonic and anharmonic terms
-                    for (int i = 0; i < input.nModes; i++)
+                    int degeneracy = 2;
+                    if (basisVectorsByJ[n].modesInVec[i].symmetryIsA)
                     {
-                        int degeneracy = 2;
-                        if (basisVectorsByJ[n].modesInVec[i].symmetryIsA)
-                        {
-                            degeneracy = 1;
-                        }
-                        double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * (basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow((basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
-                        alglib.sparseadd(A, n, n, temp);
-                    }//end if AT == true
-                    continue;
-                    #endregion                
-                }
-
-                int[,] vlLambda = new int[matSize, nModes * 2 + 2];
-                vlLambda.AsParallel();
-                for (int i = 0; i < matSize; i++)
-                {
-                    for (int j = 0; j < nModes; j++)
-                    {
-                        vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].v;
-                        vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].l;
+                        degeneracy = 1;
                     }
-                    vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
-                    vlLambda[i, nModes * 2 + 1] = (int) (basisVectorsByJ[i].J - 0.5M);
-                }
-                //indexes n and m are for the rows and columns of the matrix respectively
+                    double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * (basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow((basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
+                    alglib.sparseadd(A, n, n, temp);
+                }//end if AT == true
+                continue;
+                #endregion                
+            }
 
+            //this array stores the v and l values for each mode for each basis function as well as Lambda and J
+            //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
+            //Lambda is stored in element 2*nmodes and J is stored as an int as (J - 0.5) in 2 * nmodes + 1
+            int[,] vlLambda = new int[matSize, nModes * 2 + 2];
+            //vlLambda.AsParallel();
+            for (int i = 0; i < matSize; i++)
+            {
+                for (int j = 0; j < nModes; j++)
+                {
+                    vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].v;
+                    vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].l;
+                }
+                vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
+                vlLambda[i, nModes * 2 + 1] = (int) (basisVectorsByJ[i].J - 0.5M);
+            }
+            //indexes n and m are for the rows and columns of the matrix respectively
+
+            //set up the settings for the parallel foreach loop
             var rangePartitioner = Partitioner.Create(0, matSize);
             ParallelOptions parOp = new ParallelOptions();
             parOp.MaxDegreeOfParallelism = par;
@@ -981,7 +988,7 @@ namespace ConsoleApplication1
                         }
 
                         //Linear JT elements
-                        if (vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1] == 0)//means Delta J = 0, possible linear term
+                        if (vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1] == 0)//means Delta J = 0, possible linear or bilinear term
                         {
                             int[] vabs = new int[nModes];
                             int[] labs = new int[nModes];
@@ -990,23 +997,44 @@ namespace ConsoleApplication1
                                 vabs[h] = Math.Abs(vdiff[h]);
                                 labs[h] = Math.Abs(ldiff[h]);
                             }
-                            if (vabs.Sum() != 1)//Delta v = +/- 1 in only one mode
-                            {
-                                continue;
-                            }
-                            if (labs.Sum() != 1)//Delta l = +/- 1 in only one mode
-                            {
-                                continue;
-                            }
                             int[] vlprod = new int[nModes];
                             for (int h = 0; h < nModes; h++)
                             {
                                 vlprod[h] = vabs[h] * labs[h];
                             }
-                            if (vlprod.Sum() != 1)
+                            if (vlprod.Sum() != 1)//this means |Delta V| = |Delta l| = 1 for only 1 mode, the same mode
                             {
                                 continue;
                             }
+                            #region Bilinear
+                            //means possible bilinear term since Delta v = +/- 1 for both A and E mode and Delta l = 1 for E mode and bilinear = true
+                            if (vabs.Sum() == 2 && labs.Sum() == 1 && bilinear)
+                            {
+                                //next check that the changes are in A and E vec positions
+                                int ASum = 0;
+                                int AVal = 0;
+                                for (int u = 0; u < biAVecPos.Count; u++)
+                                {
+                                    ASum += vabs[biAVecPos[u]];
+                                    AVal += vdiff[biAVecPos[u]];
+                                }
+                                if (ASum != 1)//means that one change is in Avec and other must be in Evec
+                                {
+                                    continue;
+                                }
+                                //now go through AVal + 1 and AVal - 1 which will have different contributions from AVec
+                                //after that put in bilinear matrix element
+                            }//end bilinear if
+                            #endregion
+                            if (vabs.Sum() != 1)//Delta v = +/- 1 in only one mode for linear only
+                            {
+                                continue;
+                            }
+                            if (labs.Sum() != 1)//Delta l = +/- 1 in only one mode for linear only
+                            {
+                                continue;
+                            }
+                            
                             int lval = ldiff.Sum() * -1;
                             int mode = 0;
                             for (int h = 0; h < nModes; h++)
