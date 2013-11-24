@@ -1158,6 +1158,7 @@ namespace ConsoleApplication1
                             #endregion
                         }
 
+                        #region Quadratic Terms
                         if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 3, possible quadratic term
                         {
                             if (Math.Abs(ldiff.Sum()) != 2)//Delta l = 2 or -2
@@ -1236,7 +1237,8 @@ namespace ConsoleApplication1
                                 matPos.Add(tTemp);
                                 continue;
                             }
-                        }//end quadratic elements if                        
+                        }//end quadratic elements if    
+                        #endregion
                     }//column for loop
                 }//row for loop
             }//end anonymous function in paralle for loop
