@@ -927,26 +927,6 @@ namespace ConsoleApplication1
             }//end if CrossTerms == true
             #endregion
 
-            //generates the Hamiltonian Matrix
-            //just the HO terms
-            for (int n = 0; n < matSize; n++)
-            {
-                #region HO Terms
-                //one mode harmonic and anharmonic terms
-                for (int i = 0; i < input.nModes; i++)
-                {
-                    int degeneracy = 2;
-                    if (basisVectorsByJ[n].modesInVec[i].symmetryIsA)
-                    {
-                        degeneracy = 1;
-                    }
-                    double temp = basisVectorsByJ[n].modesInVec[i].modeOmega * (basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2D) - basisVectorsByJ[n].modesInVec[i].anharmonicity * Math.Pow((basisVectorsByJ[n].modesInVec[i].v + (double)degeneracy / 2), 2);//I deleted the (double) from the degeneracy / 2
-                    alglib.sparseadd(A, n, n, temp);
-                }//end if AT == true
-                continue;
-                #endregion                
-            }
-
             //this array stores the v and l values for each mode for each basis function as well as Lambda and J
             //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
             //Lambda is stored in element 2*nmodes and J is stored as an int as (J - 0.5) in 2 * nmodes + 1
@@ -960,9 +940,38 @@ namespace ConsoleApplication1
                     vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].l;
                 }
                 vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
-                vlLambda[i, nModes * 2 + 1] = (int) (basisVectorsByJ[i].J - 0.5M);
-            }
-            //indexes n and m are for the rows and columns of the matrix respectively
+                vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
+            }//end loop to make vlLambda
+
+            //generate an array for omega, omegaExe, D, K and degeneracy
+            var modeVals = new double[nModes, 5];
+            for (int i = 0; i < nModes; i++)
+            {
+                modeVals[i, 0] = basisVectorsByJ[0].modesInVec[i].modeOmega;
+                modeVals[i, 1] = basisVectorsByJ[0].modesInVec[i].anharmonicity;
+                modeVals[i, 2] = basisVectorsByJ[0].modesInVec[i].DBasis;
+                modeVals[i, 3] = basisVectorsByJ[0].modesInVec[i].KBasis;
+                modeVals[i, 4] = 2.0;//degeneracy = 2 by default
+                if(basisVectorsByJ[0].modesInVec[i].symmetryIsA)
+                {
+                    modeVals[i, 4] = 1.0;
+                }                
+            }//end loop to make modeVals[,] array
+
+            //generates the Hamiltonian Matrix
+            #region HO Terms
+            //just the HO terms
+            for (int n = 0; n < matSize; n++)
+            {                
+                //one mode harmonic and anharmonic terms
+                for (int i = 0; i < input.nModes; i++)
+                {
+                    double temp = modeVals[i, 0] * ((double)vlLambda[n, i] + (double)modeVals[i, 4] / 2.0) - modeVals[i, 1] * Math.Pow((vlLambda[n, i] + (double)modeVals[i, 1] / 2.0), 2.0);
+                    alglib.sparseadd(A, n, n, temp);
+                }//end loop over modes
+                continue;
+            }//end HO loop
+            #endregion
 
             //set up the settings for the parallel foreach loop
             var rangePartitioner = Partitioner.Create(0, matSize);
@@ -972,6 +981,7 @@ namespace ConsoleApplication1
             {
                 int[] vdiff = new int[nModes];
                 int[] ldiff = new int[nModes];
+                //indexes n and m are for the rows and columns of the matrix respectively
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
                     for (int m = n + 1; m < matSize; m++)//changed from r + 1
@@ -1125,8 +1135,8 @@ namespace ConsoleApplication1
                                     break;
                                 }
                             }
-                            temp = basisVectorsByJ[n].modesInVec[mode].modeOmega * Math.Sqrt(basisVectorsByJ[n].modesInVec[mode].DBasis * ((double)basisVectorsByJ[n].modesInVec[mode].v + lval * (double)basisVectorsByJ[n].modesInVec[mode].l + 2D));
-                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);
+                            temp = basisVectorsByJ[n].modesInVec[mode].modeOmega * Math.Sqrt(basisVectorsByJ[n].modesInVec[mode].DBasis * ((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
+                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
                             matPos.Add(ttTemp);
                             continue;
                         }
@@ -1206,120 +1216,10 @@ namespace ConsoleApplication1
                                 matPos.Add(tTemp);
                                 continue;
                             }
-                        }
-
-                        #region Cross Terms
-                        /*
-                        if (input.includeCrossTerms == true && numberOfChanges == 2)
-                        {
-                            //A-E interaction terms
-                            if (containsAVecs == true)
-                            {
-                                if (bilinear == true)
-                                {
-                                    #region Bilinear
-                                    //Delta J = 0
-                                    //lambdas not equal
-                                    //only v + 1 for both
-                                    //make loop that checks the column row positions of vlLambda for correct changes in v and l
-                                    //check v for v4, l for v4 and v for v1 
-                                    for (int a = 0; a < biAVecPos.Count; a++)
-                                    {
-                                        for (int e = 0; e < biEVecPos.Count; e++)
-                                        {
-                                            int row;
-                                            int column;
-                                            if (biAVecPos[a] > biEVecPos[e])
-                                            {
-                                                column = biAVecPos[a];
-                                                row = biEVecPos[e];
-                                            }
-                                            else
-                                            {
-                                                column = biEVecPos[e];
-                                                row = biAVecPos[a];
-                                            }
-                                            if (input.crossTermMatrix[row, column] == 0D)
-                                            {
-                                                continue;
-                                            }
-                                            if (basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1 == basisVectorsByJ[m].modesInVec[biAVecPos[a]].v)
-                                            {
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;//I think I can do this
-                                                    //Math.Sqrt(basisVectorsByJ[n].modesInVec[biAVecPos[a]].modeOmega * basisVectorsByJ[n].modesInVec[biEVecPos[e]].modeOmega) * 
-                                                    //this is what was removed from these matrix elements
-                                                }//end first if
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end second if
-                                                //
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end third if
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v + 1D) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end fourth if
-                                            }
-                                            if (basisVectorsByJ[n].modesInVec[biAVecPos[a]].v - 1 == basisVectorsByJ[m].modesInVec[biAVecPos[a]].v)
-                                            {
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;//I think I can do this
-                                                }//end first if
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + 2D));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end second if
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l - (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v + Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end third if
-                                                if (basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - 1 == basisVectorsByJ[m].modesInVec[biEVecPos[e]].v && basisVectorsByJ[n].modesInVec[biEVecPos[e]].l + (int)Math.Pow(-1D, (double)input.S1) == basisVectorsByJ[m].modesInVec[biEVecPos[e]].l)
-                                                {
-                                                    temp = input.crossTermMatrix[row, column] * Math.Sqrt(((double)basisVectorsByJ[n].modesInVec[biAVecPos[a]].v) * ((double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].v - Math.Pow(-1D, (double)input.S1) * (double)basisVectorsByJ[n].modesInVec[biEVecPos[e]].l));
-                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                                    matPos.Add(tTemp);
-                                                    continue;
-                                                }//end fourth if
-                                            }
-                                        }
-                                    }
-                                    #endregion
-                                }//end bilinear if                                
-                            }//end A-E interaction
-                        }//end if CrossTerms = true
-                        */
-                        #endregion
-
+                        }//end quadratic elements if                        
                     }//column for loop
                 }//row for loop
-            }
+            }//end anonymous function in paralle for loop
             );//end parallel for
 
             foreach (Tuple<int, int, double> spot in matPos)
