@@ -1204,7 +1204,8 @@ namespace ConsoleApplication1
                                         {
                                             sign = -1;
                                         }
-                                        temp = basisVectorsByJ[n].modesInVec[pos].modeOmega * (basisVectorsByJ[n].modesInVec[pos].KBasis / 4D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos].v - sign * basisVectorsByJ[n].modesInVec[pos].l) * (basisVectorsByJ[n].modesInVec[pos].v - sign * basisVectorsByJ[n].modesInVec[pos].l - 2)));
+                                        //temp = basisVectorsByJ[n].modesInVec[pos].modeOmega * (basisVectorsByJ[n].modesInVec[pos].KBasis / 4D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos].v - sign * basisVectorsByJ[n].modesInVec[pos].l) * (basisVectorsByJ[n].modesInVec[pos].v - sign * basisVectorsByJ[n].modesInVec[pos].l - 2)));
+                                        temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] - sign * vlLambda[n, nModes + pos]) * (vlLambda[n, pos] - sign * vlLambda[n, nModes + pos] - 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matPos.Add(tTemp);
                                         continue;
@@ -1215,7 +1216,8 @@ namespace ConsoleApplication1
                                         {
                                             sign = -1;
                                         }
-                                        temp = basisVectorsByJ[n].modesInVec[pos].modeOmega * (basisVectorsByJ[n].modesInVec[pos].KBasis / 4D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos].v + sign * basisVectorsByJ[n].modesInVec[pos].l + 4D) * (basisVectorsByJ[n].modesInVec[pos].v + sign * basisVectorsByJ[n].modesInVec[pos].l + 2)));
+                                        //temp = basisVectorsByJ[n].modesInVec[pos].modeOmega * (basisVectorsByJ[n].modesInVec[pos].KBasis / 4D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos].v + sign * basisVectorsByJ[n].modesInVec[pos].l + 4D) * (basisVectorsByJ[n].modesInVec[pos].v + sign * basisVectorsByJ[n].modesInVec[pos].l + 2)));
+                                        temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 4D) * (vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matPos.Add(tTemp);
                                         continue;
@@ -1228,7 +1230,8 @@ namespace ConsoleApplication1
                                 {
                                     sign = -1;
                                 }
-                                temp = basisVectorsByJ[n].modesInVec[pos2].modeOmega * (basisVectorsByJ[n].modesInVec[pos2].KBasis / 2D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos2].v + sign * basisVectorsByJ[n].modesInVec[pos2].l + 2) * (basisVectorsByJ[n].modesInVec[pos2].v - sign * basisVectorsByJ[n].modesInVec[pos2].l)));
+                                //temp = basisVectorsByJ[n].modesInVec[pos2].modeOmega * (basisVectorsByJ[n].modesInVec[pos2].KBasis / 2D * Math.Sqrt((basisVectorsByJ[n].modesInVec[pos2].v + sign * basisVectorsByJ[n].modesInVec[pos2].l + 2) * (basisVectorsByJ[n].modesInVec[pos2].v - sign * basisVectorsByJ[n].modesInVec[pos2].l)));
+                                temp = modeVals[pos2, 0] * (modeVals[pos2, 3] / 2D * Math.Sqrt((vlLambda[n, pos2] + sign * vlLambda[n, nModes + pos2] + 2) * (vlLambda[n, pos2] - sign * vlLambda[n, pos2 + nModes])));
                                 Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                 matPos.Add(tTemp);
                                 continue;
