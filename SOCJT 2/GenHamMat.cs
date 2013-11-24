@@ -1125,6 +1125,8 @@ namespace ConsoleApplication1
                                 }//end for loop over a vec positions
                             }//end bilinear if
                             #endregion
+
+                            #region Linear Terms
                             if (vabs.Sum() != 1)//Delta v = +/- 1 in only one mode for linear only
                             {
                                 continue;
@@ -1148,10 +1150,12 @@ namespace ConsoleApplication1
                                     break;
                                 }
                             }
-                            temp = basisVectorsByJ[n].modesInVec[mode].modeOmega * Math.Sqrt(basisVectorsByJ[n].modesInVec[mode].DBasis * ((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
+                            //temp = basisVectorsByJ[n].modesInVec[mode].modeOmega * Math.Sqrt(basisVectorsByJ[n].modesInVec[mode].DBasis * ((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
+                            temp = modeVals[mode, 0] * Math.Sqrt(modeVals[mode, 2] * ((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
                             Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
                             matPos.Add(ttTemp);
                             continue;
+                            #endregion
                         }
 
                         if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 3, possible quadratic term
