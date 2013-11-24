@@ -1068,7 +1068,7 @@ namespace ConsoleApplication1
                                             oneORnone = 1.0;
                                         }
                                         //can use this later if I want to cut down on code a little
-                                        /*
+                                        
                                         double twoORnone = 0.0;
                                         double slPre = 1.0;
                                         if (vdiff[biEVecPos[e]] == -1)
@@ -1077,9 +1077,21 @@ namespace ConsoleApplication1
                                         }
                                         if (nl - sl == ml)
                                         {
-                                            slPre = 1.0 * vdiff[biEVecPos[e]];
+                                            slPre = -1.0 * vdiff[biEVecPos[e]];
                                         }
-                                        */
+                                        else if (nl + sl == ml)
+                                        {
+                                            slPre = vdiff[biEVecPos[e]];
+                                        }
+                                        else
+                                        {
+                                            continue;
+                                        }
+                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
+                                        Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                        matPos.Add(tTemp);
+                                        continue;
+                                        /*
                                         if (vdiff[biEVecPos[e]] == -1 && nl - sl == ml)
                                         {
                                             temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - (double)sl * (double)nl + 2D));
@@ -1108,6 +1120,7 @@ namespace ConsoleApplication1
                                             matPos.Add(tTemp);
                                             continue;
                                         }//end fourth if
+                                        */
                                     }//end for loop over evec positions
                                 }//end for loop over a vec positions
                             }//end bilinear if
