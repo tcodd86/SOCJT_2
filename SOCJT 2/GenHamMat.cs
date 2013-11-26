@@ -825,108 +825,10 @@ namespace ConsoleApplication1
             List<int> biEVecPos = new List<int>();
             ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
             int[] change = new int[3];
-
-            #region CrossTermInitializationStuff
-            if (input.includeCrossTerms == true)
-            {
-
-                for (int i = 0; i < input.nModes; i++)
-                {
-                    if (basisVectorsByJ[0].modesInVec[i].symmetryIsA == true)
-                    {
-                        AVecPos.Add(i);
-                        containsAVecs = true;
-                        bilinear = true;
-                        continue;
-                    }
-                    else
-                    {
-                        EVecPos.Add(i);
-                    }
-                }//end for
-
-                //for bilinear coupling
-                if (containsAVecs == true)
-                {
-                    //these lists contain all postions of A and E modes
-                    for (int i = 0; i < AVecPos.Count; i++)
-                    {
-                        biAVecPos.Add(AVecPos[i]);
-                    }
-                    for (int i = 0; i < EVecPos.Count; i++)
-                    {
-                        biEVecPos.Add(EVecPos[i]);
-                    }
-
-                    //loop to eliminate any A modes that have no cross-coupling from the lists
-                    //after this and the following loops there should be no evecs or avecs in these lists which do not have bilinear coupling
-                    for (int i = 0; i < biAVecPos.Count; i++)
-                    {
-                        for (int j = 0; j < biEVecPos.Count; j++)
-                        {
-                            //to make sure to only use the correct positions in the cross-term matrix
-                            if (biAVecPos[i] > biEVecPos[j])
-                            {
-                                //if the coupling element is nonzero then no need to remove position so break and skip
-                                if (input.crossTermMatrix[biEVecPos[j], biAVecPos[i]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (input.crossTermMatrix[biAVecPos[i], biEVecPos[j]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            //means it's reached the end of the evec list and has not found a coupling term between it and an A vector
-                            if (j == biEVecPos.Count - 1)
-                            {
-                                //remove the A vector from the list if there's no coupling term
-                                biAVecPos.RemoveAt(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
-
-                    //loop to eliminate any E vectors that have no cross-coupling
-                    for (int i = 0; i < biEVecPos.Count; i++)
-                    {
-                        for (int j = 0; j < biAVecPos.Count; j++)
-                        {
-                            if (biAVecPos[j] > biEVecPos[i])
-                            {
-                                if (input.crossTermMatrix[biEVecPos[i], biAVecPos[j]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (input.crossTermMatrix[biAVecPos[j], biEVecPos[i]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            if (j == biAVecPos.Count - 1)
-                            {
-                                biEVecPos.RemoveAt(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
-                    //if there's no A or E modes left then bilinear = false;
-                    if (biAVecPos.Count == 0 || biEVecPos.Count == 0)
-                    {
-                        bilinear = false;
-                    }
-                }
-            }//end if CrossTerms == true
-            #endregion
-
+            
+            //initialize cross-terms and generate biAVecPos and biEVecPos lists
+            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, AVecPos, EVecPos, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            
             //this array stores the v and l values for each mode for each basis function as well as Lambda and J
             //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
             //Lambda is stored in element 2*nmodes and J is stored as an int as (J - 0.5) in 2 * nmodes + 1
@@ -1508,7 +1410,7 @@ namespace ConsoleApplication1
                                         {
                                             continue;
                                         }
-                                        temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
+                                        temp = 0.5 * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matrixPos[2 * nModes + crossCount].Add(tTemp);
                                         //matPos.Add(tTemp);
@@ -1597,7 +1499,7 @@ namespace ConsoleApplication1
                                         {
                                             sign = -1;
                                         }
-                                        temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] - sign * vlLambda[n, nModes + pos]) * (vlLambda[n, pos] - sign * vlLambda[n, nModes + pos] - 2)));
+                                        temp = (1 / 4D * Math.Sqrt((vlLambda[n, pos] - sign * vlLambda[n, nModes + pos]) * (vlLambda[n, pos] - sign * vlLambda[n, nModes + pos] - 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matrixPos[pos * 2 + 1].Add(tTemp);
                                         //matPos.Add(tTemp);
@@ -1609,7 +1511,7 @@ namespace ConsoleApplication1
                                         {
                                             sign = -1;
                                         }
-                                        temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 4D) * (vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 2)));
+                                        temp = (1 / 4D * Math.Sqrt((vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 4D) * (vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matrixPos[pos * 2 + 1].Add(tTemp);
                                         //matPos.Add(tTemp);
@@ -1623,7 +1525,7 @@ namespace ConsoleApplication1
                                 {
                                     sign = -1;
                                 }
-                                temp = modeVals[pos2, 0] * (modeVals[pos2, 3] / 2D * Math.Sqrt((vlLambda[n, pos2] + sign * vlLambda[n, nModes + pos2] + 2) * (vlLambda[n, pos2] - sign * vlLambda[n, pos2 + nModes])));
+                                temp = (1D / 2D * Math.Sqrt((vlLambda[n, pos2] + sign * vlLambda[n, nModes + pos2] + 2) * (vlLambda[n, pos2] - sign * vlLambda[n, pos2 + nModes])));
                                 Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                 matrixPos[pos2 * 2 + 1].Add(tTemp);
                                 //matPos.Add(tTemp);
