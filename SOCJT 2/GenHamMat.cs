@@ -1280,8 +1280,6 @@ namespace ConsoleApplication1
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
-                        
-            alglib.sparsecreate(matSize, matSize, 10, out A);
             bool containsAVecs = false;
             bool bilinear = false;
             int nModes = input.nModes;
@@ -1291,7 +1289,8 @@ namespace ConsoleApplication1
             List<int> biEVecPos = new List<int>();
             //List to store the matrix elements in parallel bags for each matrix generated
             var matList = new List<alglib.sparsematrix>();
-            ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
+            //ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
+            List<ConcurrentBag<Tuple<int, int, double>>> matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>();
             int[] change = new int[3];
 
             
@@ -1330,6 +1329,8 @@ namespace ConsoleApplication1
             #region HO Terms
             //just the HO terms
             var diag = new alglib.sparsematrix();
+            alglib.sparsecreate(matSize, matSize, matSize, out diag);
+            
             for (int n = 0; n < matSize; n++)
             {
                 //one mode harmonic and anharmonic terms
@@ -1347,119 +1348,35 @@ namespace ConsoleApplication1
             {                
                 return matList;
             }
-
-            #region CrossTermInitializationStuff            
-            if (input.includeCrossTerms == true)
-            {
-
-                for (int i = 0; i < input.nModes; i++)
-                {
-                    if (basisVectorsByJ[0].modesInVec[i].symmetryIsA == true)
-                    {
-                        AVecPos.Add(i);
-                        containsAVecs = true;
-                        bilinear = true;
-                        continue;
-                    }
-                    else
-                    {
-                        EVecPos.Add(i);
-                    }
-                }//end for
-
-                //for bilinear coupling
-                if (containsAVecs == true)
-                {
-                    //these lists contain all postions of A and E modes
-                    for (int i = 0; i < AVecPos.Count; i++)
-                    {
-                        biAVecPos.Add(AVecPos[i]);
-                    }
-                    for (int i = 0; i < EVecPos.Count; i++)
-                    {
-                        biEVecPos.Add(EVecPos[i]);
-                    }
-
-                    //loop to eliminate any A modes that have no cross-coupling from the lists
-                    //after this and the following loops there should be no evecs or avecs in these lists which do not have bilinear coupling
-                    for (int i = 0; i < biAVecPos.Count; i++)
-                    {
-                        for (int j = 0; j < biEVecPos.Count; j++)
-                        {
-                            //to make sure to only use the correct positions in the cross-term matrix
-                            if (biAVecPos[i] > biEVecPos[j])
-                            {
-                                //if the coupling element is nonzero then no need to remove position so break and skip
-                                if (input.crossTermMatrix[biEVecPos[j], biAVecPos[i]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (input.crossTermMatrix[biAVecPos[i], biEVecPos[j]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            //means it's reached the end of the evec list and has not found a coupling term between it and an A vector
-                            if (j == biEVecPos.Count - 1)
-                            {
-                                //remove the A vector from the list if there's no coupling term
-                                biAVecPos.RemoveAt(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
-
-                    //loop to eliminate any E vectors that have no cross-coupling
-                    for (int i = 0; i < biEVecPos.Count; i++)
-                    {
-                        for (int j = 0; j < biAVecPos.Count; j++)
-                        {
-                            if (biAVecPos[j] > biEVecPos[i])
-                            {
-                                if (input.crossTermMatrix[biEVecPos[i], biAVecPos[j]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            else
-                            {
-                                if (input.crossTermMatrix[biAVecPos[j], biEVecPos[i]] != 0)
-                                {
-                                    break;
-                                }
-                            }
-                            if (j == biAVecPos.Count - 1)
-                            {
-                                biEVecPos.RemoveAt(i);
-                                i--;
-                                break;
-                            }
-                        }
-                    }
-                    //if there's no A or E modes left then bilinear = false;
-                    if (biAVecPos.Count == 0 || biEVecPos.Count == 0)
-                    {
-                        bilinear = false;
-                    }
-                }
-            }//end if CrossTerms == true
-            #endregion
-
+            
             //loop through each mode to see if a sparse matrix is needed for D and K
             for (int i = 0; i < nModes; i++)
             {
                 if (!basisVectorsByJ[0].modesInVec[i].symmetryIsA)
                 { 
                     //means this mode is degenerate, add matrices for D and K
-                    matList.Add(new alglib.sparsematrix());
-                    matList.Add(new alglib.sparsematrix());
+                    alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                    alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);
+                    matList.Add(tempMat);
+                    alglib.sparsematrix tempMat2 = new alglib.sparsematrix();
+                    alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat2);
+                    matList.Add(tempMat2);
+                }
+                else
+                {
+                    //add empty matrices for D and K for non degenerate modes
+                    alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                    alglib.sparsecreate(matSize, matSize, 0, out tempMat);
+                    matList.Add(tempMat);
+                    alglib.sparsematrix tempMat2 = new alglib.sparsematrix();
+                    alglib.sparsecreate(matSize, matSize, 0, out tempMat2);
+                    matList.Add(tempMat2);
                 }
             }
 
+            //initialize cross-terms and generate biAVecPos and biEVecPos lists
+            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, AVecPos, EVecPos, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            
             //add any matrices needed for cross-terms
             for (int i = 0; i < nModes; i++)
             {
@@ -1468,10 +1385,15 @@ namespace ConsoleApplication1
                     //add a new sparsematrix for each nonzero cross-term element
                     if (input.crossTermMatrix[i, j] != 0.0)
                     {
-                        matList.Add(new alglib.sparsematrix());
+                        alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                        alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);
+                        matList.Add(tempMat);
                     }
                 }
             }
+
+            //initialize the List for Positions
+            matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>(matList.Count - 1);
 
             //set up the settings for the parallel foreach loop
             var rangePartitioner = Partitioner.Create(0, matSize);
@@ -1536,7 +1458,7 @@ namespace ConsoleApplication1
                                 {
                                     continue;
                                 }
-                              
+
                                 for (int a = 0; a < biAVecPos.Count; a++)
                                 {
                                     for (int e = 0; e < biEVecPos.Count; e++)
@@ -1588,7 +1510,8 @@ namespace ConsoleApplication1
                                         }
                                         temp = 0.5 * input.crossTermMatrix[row, column] * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matPos.Add(tTemp);
+                                        matrixPos[2 * nModes + crossCount].Add(tTemp);
+                                        //matPos.Add(tTemp);
                                         continue;
                                     }//end for loop over evec positions
                                 }//end for loop over a vec positions
@@ -1619,9 +1542,10 @@ namespace ConsoleApplication1
                                     break;
                                 }
                             }
-                            temp = modeVals[mode, 0] * Math.Sqrt(modeVals[mode, 2] * ((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
+                            temp = Math.Sqrt(((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
                             Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                            matPos.Add(ttTemp);
+                            matrixPos[2 * mode].Add(ttTemp);
+                            //matPos.Add(ttTemp);
                             continue;
                             #endregion
                         }
@@ -1675,7 +1599,8 @@ namespace ConsoleApplication1
                                         }
                                         temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] - sign * vlLambda[n, nModes + pos]) * (vlLambda[n, pos] - sign * vlLambda[n, nModes + pos] - 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matPos.Add(tTemp);
+                                        matrixPos[pos * 2 + 1].Add(tTemp);
+                                        //matPos.Add(tTemp);
                                         continue;
                                     }
                                     else if (vdiff.Sum() == -2)//bottom matrix elements on Ham page
@@ -1686,7 +1611,8 @@ namespace ConsoleApplication1
                                         }
                                         temp = modeVals[pos, 0] * (modeVals[pos, 3] / 4D * Math.Sqrt((vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 4D) * (vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 2)));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matPos.Add(tTemp);
+                                        matrixPos[pos * 2 + 1].Add(tTemp);
+                                        //matPos.Add(tTemp);
                                         continue;
                                     }
                                 }
@@ -1699,7 +1625,8 @@ namespace ConsoleApplication1
                                 }
                                 temp = modeVals[pos2, 0] * (modeVals[pos2, 3] / 2D * Math.Sqrt((vlLambda[n, pos2] + sign * vlLambda[n, nModes + pos2] + 2) * (vlLambda[n, pos2] - sign * vlLambda[n, pos2 + nModes])));
                                 Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                matPos.Add(tTemp);
+                                matrixPos[pos2 * 2 + 1].Add(tTemp);
+                                //matPos.Add(tTemp);
                                 continue;
                             }
                         }//end quadratic elements if    
@@ -1709,12 +1636,16 @@ namespace ConsoleApplication1
             }//end anonymous function in paralle for loop
             );//end parallel for
 
-            foreach (Tuple<int, int, double> spot in matPos)
+            //actually add all of the matrix elements to the matrices
+            for (int i = 0; i < matrixPos.Count; i++)
             {
-                alglib.sparseadd(A, spot.Item1, spot.Item2, spot.Item3);
-                alglib.sparseadd(A, spot.Item2, spot.Item1, spot.Item3);
+                foreach (Tuple<int, int, double> spot in matrixPos[i])
+                {
+                    alglib.sparseadd(matList[i], spot.Item1, spot.Item2, spot.Item3);
+                    alglib.sparseadd(matList[i], spot.Item2, spot.Item1, spot.Item3);
+                }
             }
-            return A;
+            return matList;
         }//end method genMatrix
 
         public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, List<int> AVecPos, List<int> EVecPos, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
