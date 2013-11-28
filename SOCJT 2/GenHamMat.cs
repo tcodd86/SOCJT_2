@@ -1155,7 +1155,7 @@ namespace ConsoleApplication1
         }//end method genMatrix
 
         /// <summary>
-        /// Generates an alglib sparsematrix object to be used in Lanczos diagonalization.
+        /// Generates an alglib sparsematrix list to be used in Lanczos diagonalization.
         /// </summary>
         /// <param name="basisVectorsByJ">
         /// List of JBasisVectors sorted by J.
@@ -1194,8 +1194,7 @@ namespace ConsoleApplication1
             //ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
             List<ConcurrentBag<Tuple<int, int, double>>> matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>();
             int[] change = new int[3];
-
-            
+                        
             //this array stores the v and l values for each mode for each basis function as well as Lambda and J
             //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
             //Lambda is stored in element 2*nmodes and J is stored as an int as (J - 0.5) in 2 * nmodes + 1
@@ -1213,6 +1212,11 @@ namespace ConsoleApplication1
             }//end loop to make vlLambda
 
             //generate an array for omega, omegaExe, D, K and degeneracy
+            //modeVals[0] = omega
+            //modeVals[1] = anharmonicity
+            //modeVals[2] = D (0 for nondegenerate modes)
+            //modeVals[3] = K (0 for nondegenerate modes)
+            //modeVals[4] = degeneracy, 1 for nondegenerate modes.  2 for degenerate modes
             var modeVals = new double[nModes, 5];
             for (int i = 0; i < nModes; i++)
             {

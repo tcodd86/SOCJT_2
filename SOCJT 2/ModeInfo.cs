@@ -104,6 +104,8 @@ namespace ConsoleApplication1
 
         public bool fitKappa { get; private set; }//end fitKappa
 
+        public double[] modeVals { get; private set; }//end modeValse
+
         #endregion properties
 
         /// <summary>
@@ -121,6 +123,10 @@ namespace ConsoleApplication1
             tReturn = false;
             for (int i = 0; i < inputF.Length; i++)
             {
+                //initialize array for values
+                modeVals = new double[5];
+                modeVals[4] = 2.0;
+
                 if (inputF[i] == "&MODE_INFO")
                 {
                     whatMode++;
@@ -134,21 +140,25 @@ namespace ConsoleApplication1
                         if (inputF[u] == "MODEOMEGA")
                         {
                             nModeOmega = FileInfo.parseDouble(inputF[u + 1]);
+                            modeVals[0] = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODED")
                         {
                             nD = FileInfo.parseDouble(inputF[u + 1]);
+                            modeVals[2] = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEK")
                         {
                             nK = FileInfo.parseDouble(inputF[u + 1]);
+                            modeVals[3] = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEWEXE")
                         {
                             nwExe = FileInfo.parseDouble(inputF[u + 1]);
+                            modeVals[1] = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEVMAX")
@@ -216,6 +226,7 @@ namespace ConsoleApplication1
                             if (inputF[u + 1].ToUpper() == "T" || inputF[u + 1].ToUpper() == "TRUE")
                             {
                                 nIsAType = true;
+                                modeVals[4] = 1.0;
                             }
                             else
                             {
