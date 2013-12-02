@@ -1535,11 +1535,12 @@ namespace ConsoleApplication1
                         #endregion
                     }//column for loop
                 }//row for loop
-            }//end anonymous function in paralle for loop
+            }//end anonymous function in parallel for loop
             );//end parallel for
 
             //actually add all of the matrix elements to the matrices
-            for (int i = 0; i < matrixPos.Count; i++)
+            //I think this should start at 1 because 0 is the diagonal elements
+            for (int i = 1; i < matrixPos.Count; i++)
             {
                 foreach (Tuple<int, int, double> spot in matrixPos[i])
                 {

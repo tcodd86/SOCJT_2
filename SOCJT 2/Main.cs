@@ -248,7 +248,7 @@ namespace ConsoleApplication1
                     linesToWrite.Add(" ");
                     linesToWrite.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
 #if DEBUG
-                    if (!input.naiveLanczos)
+                    if (!input.blockLanczos)
                     {
                         linesToWrite.Add("Orthog took " + Lanczos.reorthogTime / 1000L + " seconds");
                     }
