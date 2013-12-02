@@ -9,6 +9,8 @@ namespace ConsoleApplication1
 {
     class SOCJT
     {
+        private static bool matricesMade = false;
+
         private Eigenvalue[] nfinalList;
         public Eigenvalue[] finalList
         {
@@ -92,24 +94,32 @@ namespace ConsoleApplication1
             //Creates the Hamiltonian matrices for linear cases            
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();
+            var fitHamList = new List<List<alglib.sparsematrix>>();
             
           
             if (isQuad == false)            
             {            
                 int h = 0;                
-                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];                
+                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];   
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
                 measurer.Start();
                 ParallelOptions options = new ParallelOptions();
-                options.MaxDegreeOfParallelism = input.parJ;
-                //for (decimal i = jMin; i <= jMax; i++)                
+                options.MaxDegreeOfParallelism = input.parJ;          
                 Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
                 {                
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
-                        array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
+                        if (input.debugFlag && !matricesMade)
+                        { 
+                            fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
+                            matricesMade = true;
+                        }
+                        else
+                        {
+                            array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
+                        }
                         numcolumnsA[i] = nColumns;
                         if (numcolumnsA[i] < input.M)
                         {
@@ -174,7 +184,15 @@ namespace ConsoleApplication1
                     }
 
                     //made specialHam matrix the default and not optional
-                    array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                    if (input.debugFlag && !matricesMade)
+                    {
+                        fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
+                        matricesMade = true;
+                    }
+                    else
+                    {
+                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                    }
 
                     jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
                     numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
@@ -208,48 +226,27 @@ namespace ConsoleApplication1
                 decimal minS = input.S * -1M;
                 List<alglib.sparsematrix> tempMatList = new List<alglib.sparsematrix>();
                 List<int> tempNumbColumns = new List<int>();
-                if (isQuad == true)
+
+                for (int i = 0; i < array1.Length; i++)
                 {
-                    for (int i = 0; i < array1.Length; i++)
+                    for (decimal j = minS; j <= input.S; j++)
                     {
-                        for (decimal j = minS; j <= input.S; j++)
+                        alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                        alglib.sparsecopy(array1[i], out tempMat);
+                        tempMatList.Add(tempMat);
+                        for (int k = 0; k < numcolumnsA[i]; k++)
                         {
-                            alglib.sparsematrix tempMat = new alglib.sparsematrix();
-                            alglib.sparsecopy(array1[i], out tempMat);
-                            tempMatList.Add(tempMat);
-                            for (int k = 0; k < numcolumnsA[i]; k++)
-                            {
-                                double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
-                                //double temp2 = alglib.sparseget(array1[i], k, k);
-                                //alglib.sparseset(tempMatList[tempMatList.Count - 1], k, k, temp + temp2);
-                                alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
-                            }//end loop over diagonal matrix elements
-                            tempNumbColumns.Add(numcolumnsA[i]);
-                            if (i > 0)
-                            {
-                                break;
-                            }
-                        }//end loop over values of S
-                    }//end loop over all previouly made sparseMatrices               
-                }//end if
-                else
-                {
-                    for (int i = 0; i < array1.Length; i++)
-                    {
-                        for (decimal j = minS; j <= input.S; j++)
+                            double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
+                            alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
+                        }//end loop over diagonal matrix elements
+                        tempNumbColumns.Add(numcolumnsA[i]);
+                        //means SO only in j = 0.5 block for quadratic cases
+                        if (i > 0 && isQuad)
                         {
-                            alglib.sparsematrix tempMat = new alglib.sparsematrix();
-                            alglib.sparsecopy(array1[i], out tempMat);
-                            tempMatList.Add(tempMat);
-                            for (int k = 0; k < numcolumnsA[i]; k++)
-                            {
-                                double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
-                                alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
-                            }//end loop over diagonal matrix elements
-                            tempNumbColumns.Add(numcolumnsA[i]);
-                        }//end loop over values of S
-                    }//end loop over all previouly made sparseMatrices
-                }//end else
+                            break;
+                        }
+                    }//end loop over values of S
+                }//end loop over all previouly made sparseMatrices
 
                 numcolumnsA = null;
                 numcolumnsA = tempNumbColumns.ToArray();

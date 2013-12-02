@@ -954,7 +954,7 @@ namespace ConsoleApplication1
                 //alglib keeps throwing an error, indices seem to be off.  Try my own function
 
             }
-            if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
+            //if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
             {
                 bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
 

@@ -1182,7 +1182,6 @@ namespace ConsoleApplication1
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
-            bool containsAVecs = false;
             bool bilinear = false;
             int nModes = input.nModes;
             List<int> AVecPos = new List<int>();
