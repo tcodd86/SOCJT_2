@@ -31,7 +31,6 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
-            /*
             if (isQuad == true)
             {
                 if (input.maxJ < 7.5M)
@@ -39,7 +38,6 @@ namespace ConsoleApplication1
                     input.maxJ = 7.5M;
                 }
             }
-            */
             if (isQuad == true)
             {
                 jMax = input.maxJ;
@@ -110,17 +108,8 @@ namespace ConsoleApplication1
                 {                
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
-                    {   
-                        //array1[i] = GenHamMat.genMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
-                        //replaced line above with conditionals below
-                        if (input.specialHam)
-                        {
-                            array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
-                        }
-                        else
-                        {
-                            array1[i] = GenHamMat.genMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
-                        }
+                    {
+                        array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
                         numcolumnsA[i] = nColumns;
                         if (numcolumnsA[i] < input.M)
                         {
@@ -184,16 +173,8 @@ namespace ConsoleApplication1
                         }
                     }
 
-                    //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    //replaced the line above with the conditionals below
-                    if (input.specialHam)
-                    {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
-                    else
-                    {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
+                    //made specialHam matrix the default and not optional
+                    array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
 
                     jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
                     numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
@@ -308,7 +289,7 @@ namespace ConsoleApplication1
 
                     //add a parameter to count Lanczos iterations to set possible stopping criteria that way
                     //call MINVAL from here
-                    if (input.naiveLanczos)//means use naiveLanczos routine
+                    if (!input.blockLanczos)//means use naiveLanczos routine
                     {
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
