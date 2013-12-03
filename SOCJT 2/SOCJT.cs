@@ -118,6 +118,10 @@ namespace ConsoleApplication1
                             fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
                             matricesMade = true;
                         }
+                        else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+	                    {
+                            fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+	                    }
                         else
                         {
                             array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
@@ -191,7 +195,11 @@ namespace ConsoleApplication1
                         fitHamList = new List<List<alglib.sparsematrix>>();
                         fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
                         matricesMade = true;
-                    }
+                    }                        
+                    else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+	                {
+                        fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+	                }
                     else
                     {
                         array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
@@ -267,10 +275,33 @@ namespace ConsoleApplication1
 
             if (input.debugFlag)
             {
+                var mat = new List<List<alglib.sparsematrix>>();
                 //code here to convert the alglib matrices to matrices for each j block
                 for (int i = 0; i < fitHamList.Count; i++)
-                { 
+                {
+                    mat.Add(new List<alglib.sparsematrix>());
+                    int count;
+                    int DorK;
+                    double val = 0.0;
                     //go through each member of the list and multiply it by the appropriate value, combine them all
+                    //skip the first one which is the diagonal elements and isn't multiplied by anything.
+                    for (int j = 1; j < fitHamList[i].Count; j++)
+                    { 
+                        count = (j - 1) / 2;
+                        DorK = (j - 1) % 2;
+                        if (count < input.nModes)
+                        {
+                            if (DorK == 0)
+                            {
+                                val = Modes[count].D;
+                            }
+                            else
+                            {
+                                val = Modes[count].K;
+                            }
+                        }
+                        mat[i].Add(cTimesSparse(fitHamList[i][j], val));
+                    }
                 }
                 //here convert the alglib matrices to the appropriate things.
             }
@@ -505,5 +536,34 @@ namespace ConsoleApplication1
                 }//end for
             }//end while           
         }//end method bublleSort
+
+        /// <summary>
+        /// Used to multiply all elements in a sparse matrix A by the value val
+        /// </summary>
+        /// <param name="A">
+        /// Sparse matrix to be multiplied.
+        /// </param>
+        /// <param name="val">
+        /// Value to be multiplied
+        /// </param>
+        /// <returns>
+        /// Sparesmatrix containing the original matrix A times the double val.
+        /// </returns>
+        private static alglib.sparsematrix cTimesSparse(alglib.sparsematrix A, double val)
+        {
+            int i;
+            int j;
+            double oldVal;
+            int t0 = 0;
+            int t1 = 0;
+            alglib.sparsematrix B = new alglib.sparsematrix();
+            while(alglib.sparseenumerate(A, ref t0, ref t1, out i, out j, out oldVal))
+            {
+                alglib.sparseadd(B, i, j, oldVal * val);                
+            }
+            return B;
+        }//end method cTimesSparse
+
+        
     }//end class SOCJT
 }
