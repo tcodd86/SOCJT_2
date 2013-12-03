@@ -11,6 +11,9 @@ namespace ConsoleApplication1
     {
         private static bool matricesMade = false;
 
+        //keep this so that on concurrent calls the matrix does not need to be regenerated
+        private static List<List<alglib.sparsematrix>> fitHamList;
+
         private Eigenvalue[] nfinalList;
         public Eigenvalue[] finalList
         {
@@ -94,8 +97,6 @@ namespace ConsoleApplication1
             //Creates the Hamiltonian matrices for linear cases            
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();
-            var fitHamList = new List<List<alglib.sparsematrix>>();
-            
           
             if (isQuad == false)            
             {            
@@ -112,7 +113,8 @@ namespace ConsoleApplication1
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
                         if (input.debugFlag && !matricesMade)
-                        { 
+                        {
+                            fitHamList = new List<List<alglib.sparsematrix>>();
                             fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
                             matricesMade = true;
                         }
@@ -186,6 +188,7 @@ namespace ConsoleApplication1
                     //made specialHam matrix the default and not optional
                     if (input.debugFlag && !matricesMade)
                     {
+                        fitHamList = new List<List<alglib.sparsematrix>>();
                         fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
                         matricesMade = true;
                     }
@@ -262,9 +265,21 @@ namespace ConsoleApplication1
             }//end if inclSO == true
             #endregion
 
-            for (int i = 0; i < array1.Length; i++)
+            if (input.debugFlag)
             {
-                alglib.sparseconverttocrs(array1[i]);
+                //code here to convert the alglib matrices to matrices for each j block
+                for (int i = 0; i < fitHamList.Count; i++)
+                { 
+                    //go through each member of the list and multiply it by the appropriate value, combine them all
+                }
+                //here convert the alglib matrices to the appropriate things.
+            }
+            else
+            {
+                for (int i = 0; i < array1.Length; i++)
+                {
+                    alglib.sparseconverttocrs(array1[i]);
+                }
             }
 
             #region Lanczos
