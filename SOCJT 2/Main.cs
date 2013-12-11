@@ -380,17 +380,18 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
+            catch (FitFileNotFoundException)
+            {
+                Console.WriteLine("The fit file does not exist.");
+                Console.WriteLine("Press enter to terminate the program.");
+                Console.ReadLine();
+            }
+#if !DEBUG 
             catch (IndexOutOfRangeException)
             {
                 Console.WriteLine("An index out of range exception has occurred");
                 Console.WriteLine("Check to make sure that NMODES is correct and");
                 Console.WriteLine("that any CROSS_TERM arguments are correct.");
-                Console.WriteLine("Press enter to terminate the program.");
-                Console.ReadLine();
-            }
-            catch (FitFileNotFoundException)
-            {
-                Console.WriteLine("The fit file does not exist.");
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
@@ -421,7 +422,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-#if !DEBUG
+
             catch (Exception ex)
             {
                 Console.WriteLine("An exception has occurred: " + ex.Message);

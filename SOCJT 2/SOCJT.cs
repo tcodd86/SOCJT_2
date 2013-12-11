@@ -101,7 +101,12 @@ namespace ConsoleApplication1
             if (isQuad == false)            
             {            
                 int h = 0;                
-                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];   
+                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
+                fitHamList = new List<List<alglib.sparsematrix>>();
+                for (int m = 0; m < jBasisVecsByJ.Count; m++)
+                {
+                    fitHamList.Add(new List<alglib.sparsematrix>());
+                }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
                 measurer.Start();
@@ -114,8 +119,7 @@ namespace ConsoleApplication1
                     {
                         if (input.debugFlag && !matricesMade)
                         {
-                            fitHamList = new List<List<alglib.sparsematrix>>();
-                            fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
+                            fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
                             matricesMade = true;
                         }
                         else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
@@ -161,6 +165,11 @@ namespace ConsoleApplication1
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                fitHamList = new List<List<alglib.sparsematrix>>();
+                for (int m = 0; m < jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2; m++)
+                {
+                    fitHamList.Add(new List<alglib.sparsematrix>());
+                }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 //this tells how much time has passed this could be used to time out different parts of code                
@@ -192,13 +201,12 @@ namespace ConsoleApplication1
                     //made specialHam matrix the default and not optional
                     if (input.debugFlag && !matricesMade)
                     {
-                        fitHamList = new List<List<alglib.sparsematrix>>();
-                        fitHamList.Add(GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false));
+                        fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
                         matricesMade = true;
                     }                        
                     else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
 	                {
-                        fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+                        fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                }
                     else
                     {
@@ -508,6 +516,11 @@ namespace ConsoleApplication1
             bool a1 = false;
             double temp = 0.0;
             int[] tempVL = new int[input.nModes * 2 + 1];
+            //this conditional is because if naive lanczos is used and eigenvectors are not calculated the tempMat actually contains the eigenvectors of the the lanczos matrix, not the Hamiltonian
+            if (!input.blockLanczos && !input.pVector)
+            {
+                return false;
+            }
             for (int m = 0; m < jBasisVecsByJ.Count; m++)
             {
                 if (Math.Abs(tempMat[m, j]) > temp)
@@ -592,6 +605,7 @@ namespace ConsoleApplication1
             int t0 = 0;
             int t1 = 0;
             alglib.sparsematrix B = new alglib.sparsematrix();
+            alglib.sparsecreate(A.innerobj.m, A.innerobj.n, out B);
             while(alglib.sparseenumerate(A, ref t0, ref t1, out i, out j, out oldVal))
             {
                 alglib.sparseadd(B, i, j, oldVal * val);                
@@ -614,6 +628,7 @@ namespace ConsoleApplication1
             int j;
             double oldVal;            
             alglib.sparsematrix B = new alglib.sparsematrix();
+            alglib.sparsecreate(mat[0].innerobj.m, mat[0].innerobj.n, out B);
             for (int m = 0; m < mat.Count; m++)
             {
                 int t0 = 0;
