@@ -1184,8 +1184,8 @@ namespace ConsoleApplication1
             nColumns = matSize;
             bool bilinear = false;
             int nModes = input.nModes;
-            List<int> AVecPos = new List<int>();
-            List<int> EVecPos = new List<int>();
+            //List<int> AVecPos = new List<int>();
+            //List<int> EVecPos = new List<int>();
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
             //List to store the matrix elements in parallel bags for each matrix generated
@@ -1276,7 +1276,7 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, AVecPos, EVecPos, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
             
             //add any matrices needed for cross-terms
             for (int i = 0; i < nModes; i++)
@@ -1550,10 +1550,12 @@ namespace ConsoleApplication1
             return matList;
         }//end method genMatrix
 
-        public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, List<int> AVecPos, List<int> EVecPos, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
+        public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
         {
             bool containsAVecs = false;
             bilinear = false;
+            List<int> AVecPos = new List<int>();
+            List<int> EVecPos = new List<int>();
             biAVecPos = new List<int>();
             biEVecPos = new List<int>();
             for (int i = 0; i < nModes; i++)
