@@ -1379,10 +1379,13 @@ namespace ConsoleApplication1
                                             column = biEVecPos[e];
                                             row = biAVecPos[a];
                                         }
+                                        //take this out because it should already be handled by initialization function
+                                        /*
                                         if (input.crossTermMatrix[row, column] == 0D)
                                         {
                                             continue;
                                         }
+                                        */
                                         int nl = vlLambda[n, nModes + biEVecPos[e]];
                                         int ml = vlLambda[m, nModes + biEVecPos[e]];
                                         int sl = (int)Math.Pow(-1D, (double)input.S1);
