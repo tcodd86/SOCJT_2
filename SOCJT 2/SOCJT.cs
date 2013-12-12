@@ -253,6 +253,8 @@ namespace ConsoleApplication1
                     int count;
                     int DorK;
                     double val = 0.0;
+                    //this adds the diagonal elements to the list
+                    mat[i].Add(fitHamList[i][0]);
                     //go through each member of the list and multiply it by the appropriate value, combine them all
                     //skip the first one which is the diagonal elements and isn't multiplied by anything.
                     for (int j = 1; j < fitHamList[i].Count; j++)
@@ -263,11 +265,11 @@ namespace ConsoleApplication1
                         {
                             if (DorK == 0)
                             {
-                                val = Modes[count].D;
+                                val = Math.Sqrt(Modes[count].D) * Modes[count].modeOmega;
                             }
                             else
                             {
-                                val = Modes[count].K;
+                                val = Modes[count].K * Modes[count].modeOmega;
                             }
                         }
                         else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
