@@ -1155,7 +1155,7 @@ namespace ConsoleApplication1
         }//end method genMatrix
 
         /// <summary>
-        /// Generates an alglib sparsematrix object to be used in Lanczos diagonalization.
+        /// Generates a list of alglib sparsematrix objects where the first is the diagonal elements and the remaining ones are for D and K for each mode and then the matrices for the cross terms.
         /// </summary>
         /// <param name="basisVectorsByJ">
         /// List of JBasisVectors sorted by J.

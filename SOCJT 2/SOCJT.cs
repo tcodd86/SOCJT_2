@@ -201,12 +201,11 @@ namespace ConsoleApplication1
                     //made specialHam matrix the default and not optional
                     if (input.debugFlag && !matricesMade)
                     {
-                        fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                        matricesMade = true;
+                        fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
                     }                        
                     else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
 	                {
-                        fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+                        fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                }
                     else
                     {
@@ -223,6 +222,7 @@ namespace ConsoleApplication1
                     numQuadMatrix++;
                 }
                 );
+                matricesMade = true;
                 measurer.Stop();                    
                 howMuchTime = measurer.ElapsedMilliseconds;
                 input.matGenTime = (double)howMuchTime / 1000D;
