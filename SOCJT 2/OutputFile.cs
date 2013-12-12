@@ -61,6 +61,11 @@ namespace ConsoleApplication1
                     file.AppendLine("Number of basis functions: " + Convert.ToString(numRows));
                 }
 
+                if (isSparse)
+                { 
+                    file.AppendLine("Number of non-zero matrix elements: " + Convert.ToString(sHamMatrix[i].innerobj.vals.Length));
+                }
+
                 file.AppendLine(" ");
                 switch (IECODE[i])
                 { 
