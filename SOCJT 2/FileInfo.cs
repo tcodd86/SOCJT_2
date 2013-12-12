@@ -342,12 +342,14 @@ namespace ConsoleApplication1
             set { nInclSO = value; }
         }//end property inclSO
 
+        /*
         private bool nspecialHam;
         public bool specialHam
         {
             get { return nspecialHam; }
             set { nspecialHam = value; }
         }//end property specialHam
+        */
 
         private List<Tuple<decimal, int, int>> neVecs;
         public List<Tuple<decimal, int, int>> eVecs
@@ -371,11 +373,13 @@ namespace ConsoleApplication1
 
         public bool[,] crossTermFit;
 
-        public bool naiveLanczos { get; private set; }//end naiveLanczos
+        public bool blockLanczos { get; private set; }//end naiveLanczos
 
         public bool debugFlag { get; private set; }//end debugFlag
 
         public bool newRandom { get; private set; }//end newRandom
+
+        public bool fitMatrix { get; private set; }//end fitMatrix
 
         #endregion properties
 
@@ -388,8 +392,7 @@ namespace ConsoleApplication1
             minJBool = false;
             fitOrigin = false;
             inclSO = false;
-            specialHam = false;
-            specialHam = false;
+            //specialHam = false;
             printBasis = false;
             pMatrix = false;
             pVector = false;
@@ -398,9 +401,10 @@ namespace ConsoleApplication1
             includeCrossTerms = false;
             beVecs = false;
             useKappaEta = false;
-            naiveLanczos = false;
+            blockLanczos = false;
             debugFlag = false;
             newRandom = false;
+            fitMatrix = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -556,6 +560,7 @@ namespace ConsoleApplication1
                             S2 = Convert.ToInt16(inputf[u + 1]);
                             continue;
                         }
+                        /*
                         if (inputf[u].ToUpper() == "SPECIAL_HAM")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
@@ -567,6 +572,7 @@ namespace ConsoleApplication1
                                 specialHam = false;
                             }
                         }
+                        */ 
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
@@ -727,11 +733,11 @@ namespace ConsoleApplication1
                                 parJ = 1;
                             }
                         }
-                        if (inputf[u].ToUpper() == "NAIVE_LANCZOS")
+                        if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
-                                naiveLanczos = true;
+                                blockLanczos = true;
                             }
                         }
                         if (inputf[u].ToUpper() == "NEW_RANDOM")

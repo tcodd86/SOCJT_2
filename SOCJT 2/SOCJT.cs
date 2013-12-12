@@ -9,6 +9,11 @@ namespace ConsoleApplication1
 {
     class SOCJT
     {
+        private static bool matricesMade = false;
+
+        //keep this so that on concurrent calls the matrix does not need to be regenerated
+        private static List<List<alglib.sparsematrix>> fitHamList;
+
         private Eigenvalue[] nfinalList;
         public Eigenvalue[] finalList
         {
@@ -31,7 +36,6 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
-            /*
             if (isQuad == true)
             {
                 if (input.maxJ < 7.5M)
@@ -39,7 +43,6 @@ namespace ConsoleApplication1
                     input.maxJ = 7.5M;
                 }
             }
-            */
             if (isQuad == true)
             {
                 jMax = input.maxJ;
@@ -94,32 +97,38 @@ namespace ConsoleApplication1
             //Creates the Hamiltonian matrices for linear cases            
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();
-            
           
             if (isQuad == false)            
             {            
                 int h = 0;                
-                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];                
+                array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
+                fitHamList = new List<List<alglib.sparsematrix>>();
+                for (int m = 0; m < jBasisVecsByJ.Count; m++)
+                {
+                    fitHamList.Add(new List<alglib.sparsematrix>());
+                }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
                 measurer.Start();
                 ParallelOptions options = new ParallelOptions();
-                options.MaxDegreeOfParallelism = input.parJ;
-                //for (decimal i = jMin; i <= jMax; i++)                
+                options.MaxDegreeOfParallelism = input.parJ;          
                 Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
                 {                
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
-                    {   
-                        //array1[i] = GenHamMat.genMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
-                        //replaced line above with conditionals below
-                        if (input.specialHam)
+                    {
+                        if (input.debugFlag && !matricesMade)
                         {
-                            array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
+                            fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
+                            matricesMade = true;
                         }
+                        else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+	                    {
+                            fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+	                    }
                         else
                         {
-                            array1[i] = GenHamMat.genMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
+                            array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
                         }
                         numcolumnsA[i] = nColumns;
                         if (numcolumnsA[i] < input.M)
@@ -156,6 +165,11 @@ namespace ConsoleApplication1
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
+                fitHamList = new List<List<alglib.sparsematrix>>();
+                for (int m = 0; m < jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2; m++)
+                {
+                    fitHamList.Add(new List<alglib.sparsematrix>());
+                }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 //this tells how much time has passed this could be used to time out different parts of code                
@@ -184,15 +198,19 @@ namespace ConsoleApplication1
                         }
                     }
 
-                    //array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    //replaced the line above with the conditionals below
-                    if (input.specialHam)
+                    //made specialHam matrix the default and not optional
+                    if (input.debugFlag && !matricesMade)
                     {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
+                        fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
+                        matricesMade = true;
+                    }                        
+                    else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+	                {
+                        fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
+	                }
                     else
                     {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix(quadVecs, isQuad, input, out nColumns, true, input.parMat);
+                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
                     }
 
                     jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
@@ -218,8 +236,75 @@ namespace ConsoleApplication1
                     eigenvalues.Add(new double[0]);
                 }
             }//end else
-            #endregion
+            #endregion            
 
+            if (input.debugFlag)
+            {
+                //list where each element of mat is a list of alglib.sparsematrix objects.  One for each off-diagonal parameter (D, K, B)
+                var mat = new List<List<alglib.sparsematrix>>();
+                bool bilinear = false;
+                var biAVecPos = new List<int>();
+                var biEVecPos = new List<int>();
+                GenHamMat.crossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+                //code here to convert the alglib matrices to matrices for each j block
+                for (int i = 0; i < fitHamList.Count; i++)
+                {
+                    mat.Add(new List<alglib.sparsematrix>());
+                    int count;
+                    int DorK;
+                    double val = 0.0;
+                    //go through each member of the list and multiply it by the appropriate value, combine them all
+                    //skip the first one which is the diagonal elements and isn't multiplied by anything.
+                    for (int j = 1; j < fitHamList[i].Count; j++)
+                    { 
+                        count = (j - 1) / 2;
+                        DorK = (j - 1) % 2;
+                        if (count < input.nModes)
+                        {
+                            if (DorK == 0)
+                            {
+                                val = Modes[count].D;
+                            }
+                            else
+                            {
+                                val = Modes[count].K;
+                            }
+                        }
+                        else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
+                        {
+                            for (int aa = 0; aa < biAVecPos.Count; aa++)
+                            {
+                                for (int e = 0; e < biEVecPos.Count; e++)
+                                {
+                                    int crossCount = aa + e;
+                                    int row;
+                                    int column;
+                                    if (biAVecPos[aa] > biEVecPos[e])
+                                    {
+                                        column = biAVecPos[aa];
+                                        row = biEVecPos[e];
+                                    }
+                                    else
+                                    {
+                                        column = biEVecPos[e];
+                                        row = biAVecPos[aa];
+                                    }
+                                    val = input.crossTermMatrix[row, column];
+                                }//end loop over e elements
+                            }//end loop over a elements
+                        }//end else for counting if it's D / K or cross-Term
+                        mat[i].Add(cTimesSparse(fitHamList[i][j], val));
+                    }//end loop over fitHamList
+                }
+                //now need to convert the lists of matrices in each mat element into a single object
+                //here convert the alglib matrices to the appropriate things.
+                for (int i = 0; i < array1.Length; i++)
+                {
+                    array1[i] = aggregator(mat[i]);//some functio to put in aggregate of mat[i] sparsematrices
+                }
+            }//end if input.debugflag, region to create proper matrix lists from genFitMatrix functions
+
+            //move this to after genFitMatricss are treated so that SO code does not need to be changed
             #region Spin Orbit
             //add SO stuff here
             if (input.inclSO == true)
@@ -227,48 +312,27 @@ namespace ConsoleApplication1
                 decimal minS = input.S * -1M;
                 List<alglib.sparsematrix> tempMatList = new List<alglib.sparsematrix>();
                 List<int> tempNumbColumns = new List<int>();
-                if (isQuad == true)
+
+                for (int i = 0; i < array1.Length; i++)
                 {
-                    for (int i = 0; i < array1.Length; i++)
+                    for (decimal j = minS; j <= input.S; j++)
                     {
-                        for (decimal j = minS; j <= input.S; j++)
+                        alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                        alglib.sparsecopy(array1[i], out tempMat);
+                        tempMatList.Add(tempMat);
+                        for (int k = 0; k < numcolumnsA[i]; k++)
                         {
-                            alglib.sparsematrix tempMat = new alglib.sparsematrix();
-                            alglib.sparsecopy(array1[i], out tempMat);
-                            tempMatList.Add(tempMat);
-                            for (int k = 0; k < numcolumnsA[i]; k++)
-                            {
-                                double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
-                                //double temp2 = alglib.sparseget(array1[i], k, k);
-                                //alglib.sparseset(tempMatList[tempMatList.Count - 1], k, k, temp + temp2);
-                                alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
-                            }//end loop over diagonal matrix elements
-                            tempNumbColumns.Add(numcolumnsA[i]);
-                            if (i > 0)
-                            {
-                                break;
-                            }
-                        }//end loop over values of S
-                    }//end loop over all previouly made sparseMatrices               
-                }//end if
-                else
-                {
-                    for (int i = 0; i < array1.Length; i++)
-                    {
-                        for (decimal j = minS; j <= input.S; j++)
+                            double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
+                            alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
+                        }//end loop over diagonal matrix elements
+                        tempNumbColumns.Add(numcolumnsA[i]);
+                        //means SO only in j = 0.5 block for quadratic cases
+                        if (i > 0 && isQuad)
                         {
-                            alglib.sparsematrix tempMat = new alglib.sparsematrix();
-                            alglib.sparsecopy(array1[i], out tempMat);
-                            tempMatList.Add(tempMat);
-                            for (int k = 0; k < numcolumnsA[i]; k++)
-                            {
-                                double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
-                                alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
-                            }//end loop over diagonal matrix elements
-                            tempNumbColumns.Add(numcolumnsA[i]);
-                        }//end loop over values of S
-                    }//end loop over all previouly made sparseMatrices
-                }//end else
+                            break;
+                        }
+                    }//end loop over values of S
+                }//end loop over all previouly made sparseMatrices
 
                 numcolumnsA = null;
                 numcolumnsA = tempNumbColumns.ToArray();
@@ -284,9 +348,12 @@ namespace ConsoleApplication1
             }//end if inclSO == true
             #endregion
 
-            for (int i = 0; i < array1.Length; i++)
+            else
             {
-                alglib.sparseconverttocrs(array1[i]);
+                for (int i = 0; i < array1.Length; i++)
+                {
+                    alglib.sparseconverttocrs(array1[i]);
+                }
             }
 
             #region Lanczos
@@ -308,7 +375,7 @@ namespace ConsoleApplication1
 
                     //add a parameter to count Lanczos iterations to set possible stopping criteria that way
                     //call MINVAL from here
-                    if (input.naiveLanczos)//means use naiveLanczos routine
+                    if (!input.blockLanczos)//means use naiveLanczos routine
                     {
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
@@ -449,6 +516,11 @@ namespace ConsoleApplication1
             bool a1 = false;
             double temp = 0.0;
             int[] tempVL = new int[input.nModes * 2 + 1];
+            //this conditional is because if naive lanczos is used and eigenvectors are not calculated the tempMat actually contains the eigenvectors of the the lanczos matrix, not the Hamiltonian
+            if (!input.blockLanczos && !input.pVector)
+            {
+                return false;
+            }
             for (int m = 0; m < jBasisVecsByJ.Count; m++)
             {
                 if (Math.Abs(tempMat[m, j]) > temp)
@@ -512,5 +584,63 @@ namespace ConsoleApplication1
                 }//end for
             }//end while           
         }//end method bublleSort
+
+        /// <summary>
+        /// Used to multiply all elements in a sparse matrix A by the value val
+        /// </summary>
+        /// <param name="A">
+        /// Sparse matrix to be multiplied.
+        /// </param>
+        /// <param name="val">
+        /// Value to be multiplied
+        /// </param>
+        /// <returns>
+        /// Sparesmatrix containing the original matrix A times the double val.
+        /// </returns>
+        private static alglib.sparsematrix cTimesSparse(alglib.sparsematrix A, double val)
+        {
+            int i;
+            int j;
+            double oldVal;
+            int t0 = 0;
+            int t1 = 0;
+            alglib.sparsematrix B = new alglib.sparsematrix();
+            alglib.sparsecreate(A.innerobj.m, A.innerobj.n, out B);
+            while(alglib.sparseenumerate(A, ref t0, ref t1, out i, out j, out oldVal))
+            {
+                alglib.sparseadd(B, i, j, oldVal * val);                
+            }
+            return B;
+        }//end method cTimesSparse
+
+        /// <summary>
+        /// Takes a list of alglib.sparsematrix objects and combines them.
+        /// </summary>
+        /// <param name="mat">
+        /// List of alglib.sparsematrix objects to be combined
+        /// </param>
+        /// <returns>
+        /// alglib.sparsematrix object which contains all elements of all alglib.sparsematrix objects in the List mat.
+        /// </returns>
+        private static alglib.sparsematrix aggregator(List<alglib.sparsematrix> mat)
+        {
+            int i;
+            int j;
+            double oldVal;            
+            alglib.sparsematrix B = new alglib.sparsematrix();
+            alglib.sparsecreate(mat[0].innerobj.m, mat[0].innerobj.n, out B);
+            for (int m = 0; m < mat.Count; m++)
+            {
+                int t0 = 0;
+                int t1 = 0;
+                while (alglib.sparseenumerate(mat[m], ref t0, ref t1, out i, out j, out oldVal))
+                {
+                    alglib.sparseadd(B, i, j, oldVal);
+                }
+            }
+            return B;
+        }
+
+        
     }//end class SOCJT
 }

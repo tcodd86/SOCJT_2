@@ -816,18 +816,18 @@ namespace ConsoleApplication1
 
             alglib.sparsematrix A = new alglib.sparsematrix();
             alglib.sparsecreate(matSize, matSize, 10, out A);
-            bool containsAVecs = false;
+            //bool containsAVecs = false;
             bool bilinear = false;
             int nModes = input.nModes;
-            List<int> AVecPos = new List<int>();
-            List<int> EVecPos = new List<int>();
+            //List<int> AVecPos = new List<int>();
+            //List<int> EVecPos = new List<int>();
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
             ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
             int[] change = new int[3];
             
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, AVecPos, EVecPos, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
             
             //this array stores the v and l values for each mode for each basis function as well as Lambda and J
             //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
@@ -1182,11 +1182,10 @@ namespace ConsoleApplication1
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
-            bool containsAVecs = false;
             bool bilinear = false;
             int nModes = input.nModes;
-            List<int> AVecPos = new List<int>();
-            List<int> EVecPos = new List<int>();
+            //List<int> AVecPos = new List<int>();
+            //List<int> EVecPos = new List<int>();
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
             //List to store the matrix elements in parallel bags for each matrix generated
@@ -1281,25 +1280,32 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, AVecPos, EVecPos, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
             
             //add any matrices needed for cross-terms
-            for (int i = 0; i < nModes; i++)
+            if (input.crossTermMatrix != null)
             {
-                for (int j = 0; j < nModes; j++)
+                for (int i = 0; i < nModes; i++)
                 {
-                    //add a new sparsematrix for each nonzero cross-term element
-                    if (input.crossTermMatrix[i, j] != 0.0)
+                    for (int j = 0; j < nModes; j++)
                     {
-                        alglib.sparsematrix tempMat = new alglib.sparsematrix();
-                        alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);
-                        matList.Add(tempMat);
+                        //add a new sparsematrix for each nonzero cross-term element
+                        if (input.crossTermMatrix[i, j] != 0.0)
+                        {
+                            alglib.sparsematrix tempMat = new alglib.sparsematrix();
+                            alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);
+                            matList.Add(tempMat);
+                        }
                     }
                 }
-            }
+            }//enf if crossTermMatrix == null
 
             //initialize the List for Positions
-            matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>(matList.Count - 1);
+            //matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>(matList.Count - 1);
+            for (int n = 0; n < matList.Count - 1; n++)
+            {
+                matrixPos.Add(new ConcurrentBag<Tuple<int, int, double>>());
+            }
 
             //set up the settings for the parallel foreach loop
             var rangePartitioner = Partitioner.Create(0, matSize);
@@ -1384,10 +1390,13 @@ namespace ConsoleApplication1
                                             column = biEVecPos[e];
                                             row = biAVecPos[a];
                                         }
+                                        //take this out because it should already be handled by initialization function
+                                        /*
                                         if (input.crossTermMatrix[row, column] == 0D)
                                         {
                                             continue;
                                         }
+                                        */
                                         int nl = vlLambda[n, nModes + biEVecPos[e]];
                                         int ml = vlLambda[m, nModes + biEVecPos[e]];
                                         int sl = (int)Math.Pow(-1D, (double)input.S1);
@@ -1539,11 +1548,12 @@ namespace ConsoleApplication1
                         #endregion
                     }//column for loop
                 }//row for loop
-            }//end anonymous function in paralle for loop
+            }//end anonymous function in parallel for loop
             );//end parallel for
 
             //actually add all of the matrix elements to the matrices
-            for (int i = 0; i < matrixPos.Count; i++)
+            //I think this should start at 1 because 0 is the diagonal elements
+            for (int i = 1; i < matrixPos.Count; i++)
             {
                 foreach (Tuple<int, int, double> spot in matrixPos[i])
                 {
@@ -1554,10 +1564,12 @@ namespace ConsoleApplication1
             return matList;
         }//end method genMatrix
 
-        public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, List<int> AVecPos, List<int> EVecPos, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
+        public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
         {
             bool containsAVecs = false;
             bilinear = false;
+            List<int> AVecPos = new List<int>();
+            List<int> EVecPos = new List<int>();
             biAVecPos = new List<int>();
             biEVecPos = new List<int>();
             for (int i = 0; i < nModes; i++)
