@@ -307,7 +307,6 @@ namespace ConsoleApplication1
             file.AppendLine("CALC_DERIV" + " = " + Convert.ToString(input.calcDeriv));
             file.AppendLine("ZETAE" + " = " + String.Format("{0,10:0.00000}", input.zetaE));
             file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.useKappaEta));
-            file.AppendLine("DEBUG_FLAG = " + Convert.ToString(input.debugFlag));
             file.AppendLine("S1" + " = " + Convert.ToString(input.S1));
             file.AppendLine("S2" + " = " + Convert.ToString(input.S2));
             file.AppendLine("/");
@@ -347,7 +346,6 @@ namespace ConsoleApplication1
             file.AppendLine("&SOLVE_INFO");
             file.AppendLine("BLOCK_LANCZOS = " + Convert.ToString(input.blockLanczos));
             file.AppendLine("NEW_RANDOM = " + Convert.ToString(input.newRandom));
-            file.AppendLine("FIT_MAT = " + Convert.ToString(input.debugFlag));
             file.AppendLine("M" + " = " + Convert.ToString(input.M));
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));

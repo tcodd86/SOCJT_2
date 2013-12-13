@@ -230,73 +230,70 @@ namespace ConsoleApplication1
             }//end else
             #endregion            
 
-            if (input.debugFlag)
+            //list where each element of mat is a list of alglib.sparsematrix objects.  One for each off-diagonal parameter (D, K, B)
+            var mat = new List<List<alglib.sparsematrix>>();
+            bool bilinear = false;
+            var biAVecPos = new List<int>();
+            var biEVecPos = new List<int>();
+            GenHamMat.crossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            //code here to convert the alglib matrices to matrices for each j block
+            for (int i = 0; i < fitHamList.Count; i++)
             {
-                //list where each element of mat is a list of alglib.sparsematrix objects.  One for each off-diagonal parameter (D, K, B)
-                var mat = new List<List<alglib.sparsematrix>>();
-                bool bilinear = false;
-                var biAVecPos = new List<int>();
-                var biEVecPos = new List<int>();
-                GenHamMat.crossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
-                //code here to convert the alglib matrices to matrices for each j block
-                for (int i = 0; i < fitHamList.Count; i++)
-                {
-                    mat.Add(new List<alglib.sparsematrix>());
-                    int count;
-                    int DorK;
-                    double val = 0.0;
-                    //this adds the diagonal elements to the list
-                    mat[i].Add(fitHamList[i][0]);
-                    //go through each member of the list and multiply it by the appropriate value, combine them all
-                    //skip the first one which is the diagonal elements and isn't multiplied by anything.
-                    for (int j = 1; j < fitHamList[i].Count; j++)
-                    { 
-                        count = (j - 1) / 2;
-                        DorK = (j - 1) % 2;
-                        if (count < input.nModes)
+                mat.Add(new List<alglib.sparsematrix>());
+                int count;
+                int DorK;
+                double val = 0.0;
+                //this adds the diagonal elements to the list
+                mat[i].Add(fitHamList[i][0]);
+                //go through each member of the list and multiply it by the appropriate value, combine them all
+                //skip the first one which is the diagonal elements and isn't multiplied by anything.
+                for (int j = 1; j < fitHamList[i].Count; j++)
+                { 
+                    count = (j - 1) / 2;
+                    DorK = (j - 1) % 2;
+                    if (count < input.nModes)
+                    {
+                        if (DorK == 0)
                         {
-                            if (DorK == 0)
-                            {
-                                val = Math.Sqrt(Modes[count].D) * Modes[count].modeOmega;
-                            }
-                            else
-                            {
-                                val = Modes[count].K * Modes[count].modeOmega;
-                            }
+                            val = Math.Sqrt(Modes[count].D) * Modes[count].modeOmega;
                         }
-                        else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
+                        else
                         {
-                            for (int aa = 0; aa < biAVecPos.Count; aa++)
+                            val = Modes[count].K * Modes[count].modeOmega;
+                        }
+                    }
+                    else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
+                    {
+                        for (int aa = 0; aa < biAVecPos.Count; aa++)
+                        {
+                            for (int e = 0; e < biEVecPos.Count; e++)
                             {
-                                for (int e = 0; e < biEVecPos.Count; e++)
+                                int crossCount = aa + e;
+                                int row;
+                                int column;
+                                if (biAVecPos[aa] > biEVecPos[e])
                                 {
-                                    int crossCount = aa + e;
-                                    int row;
-                                    int column;
-                                    if (biAVecPos[aa] > biEVecPos[e])
-                                    {
-                                        column = biAVecPos[aa];
-                                        row = biEVecPos[e];
-                                    }
-                                    else
-                                    {
-                                        column = biEVecPos[e];
-                                        row = biAVecPos[aa];
-                                    }
-                                    val = input.crossTermMatrix[row, column];
-                                }//end loop over e elements
-                            }//end loop over a elements
-                        }//end else for counting if it's D / K or cross-Term
-                        mat[i].Add(cTimesSparse(fitHamList[i][j], val));
-                    }//end loop over fitHamList
-                }
-                //now need to convert the lists of matrices in each mat element into a single object
-                //here convert the alglib matrices to the appropriate things.
-                for (int i = 0; i < array1.Length; i++)
-                {
-                    array1[i] = aggregator(mat[i]);//some functio to put in aggregate of mat[i] sparsematrices
-                }
-            }//end if input.debugflag, region to create proper matrix lists from genFitMatrix functions
+                                    column = biAVecPos[aa];
+                                    row = biEVecPos[e];
+                                }
+                                else
+                                {
+                                    column = biEVecPos[e];
+                                    row = biAVecPos[aa];
+                                }
+                                val = input.crossTermMatrix[row, column];
+                            }//end loop over e elements
+                        }//end loop over a elements
+                    }//end else for counting if it's D / K or cross-Term
+                    mat[i].Add(cTimesSparse(fitHamList[i][j], val));
+                }//end loop over fitHamList
+            }
+            //now need to convert the lists of matrices in each mat element into a single object
+            //here convert the alglib matrices to the appropriate things.
+            for (int i = 0; i < array1.Length; i++)
+            {
+                array1[i] = aggregator(mat[i]);//some functio to put in aggregate of mat[i] sparsematrices
+            }
 
             //move this to after genFitMatricss are treated so that SO code does not need to be changed
             #region Spin Orbit
@@ -374,7 +371,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
                         temp = new double[numcolumnsA[i], input.M];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.debugFlag, input.tol, input.newRandom, input.pVector);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.newRandom, input.pVector);
                     }
                     else//means use block Lanczos from SOCJT
                     {

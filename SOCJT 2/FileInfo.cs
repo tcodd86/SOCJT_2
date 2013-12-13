@@ -375,11 +375,7 @@ namespace ConsoleApplication1
 
         public bool blockLanczos { get; private set; }//end naiveLanczos
 
-        public bool debugFlag { get; private set; }//end debugFlag
-
         public bool newRandom { get; private set; }//end newRandom
-
-        public bool fitMatrix { get; private set; }//end fitMatrix
 
         #endregion properties
 
@@ -402,9 +398,7 @@ namespace ConsoleApplication1
             beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
-            debugFlag = false;
             newRandom = false;
-            fitMatrix = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -738,13 +732,6 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 newRandom = true;
-                            }
-                        }
-                        if (inputf[u].ToUpper() == "FIT_MAT")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                debugFlag = true;
                             }
                         }
                         if (inputf[u] == "/")

@@ -859,7 +859,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, bool flag, double tol, bool newRandom, bool evsNeeded)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool newRandom, bool evsNeeded)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
