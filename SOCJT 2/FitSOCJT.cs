@@ -493,6 +493,21 @@ namespace ConsoleApplication1
             return errorsvec;
         }
 
+        /// <summary>
+        /// Returns the RMS deviation between two arrays of Eigenvalues including the origin value.
+        /// </summary>
+        /// <param name="exp">
+        /// Eigenvalues from the .fit file.
+        /// </param>
+        /// <param name="socjtOut">
+        /// Eigenvalues from the SOCJT routine.
+        /// </param>
+        /// <param name="origin">
+        /// Origin shift to be applied to the experimental values.
+        /// </param>
+        /// <returns>
+        /// RMS error.
+        /// </returns>
         public static double Comparer(Eigenvalue[] exp, Eigenvalue[] socjtOut, double origin)
         {
             double RMS = 0D;
