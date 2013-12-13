@@ -97,7 +97,11 @@ namespace ConsoleApplication1
             //Creates the Hamiltonian matrices for linear cases            
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();
-          
+
+            if (input.M > input.noIts)
+            {
+                throw new BasisSetTooSmallException(false);
+            }
             if (isQuad == false)            
             {            
                 int h = 0;                
@@ -151,7 +155,7 @@ namespace ConsoleApplication1
                 //handles errors where the basis set is too small
                 if (a.Count > 0)
                 {
-                    throw new BasisSetTooSmallException();
+                    throw new BasisSetTooSmallException(true);
                 }
             }//end if  
 
@@ -220,7 +224,7 @@ namespace ConsoleApplication1
                 input.matGenTime = (double)howMuchTime / 1000D;
                 if (a.Count > 0)
                 {
-                    throw new BasisSetTooSmallException();
+                    throw new BasisSetTooSmallException(true);
                 }
                 for (int i = 0; i < 2; i++)
                 {

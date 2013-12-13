@@ -248,7 +248,7 @@ namespace ConsoleApplication1
                     linesToWrite.Add(" ");
                     linesToWrite.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
 #if DEBUG
-                    if (!input.blockLanczos)
+                    if (input.blockLanczos)
                     {
                         linesToWrite.Add("Orthog took " + Lanczos.reorthogTime / 1000L + " seconds");
                     }
@@ -395,11 +395,9 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (BasisSetTooSmallException)
+            catch (BasisSetTooSmallException a)
             {
-                Console.WriteLine("At least one of the j-blocks has a dimension smaller than M.");
-                Console.WriteLine("Increase the basis set or decrease M.");
-                Console.WriteLine("Press enter to terminate the program.");
+                Console.Write(a.eMessage);
                 Console.ReadLine();
             }
             catch (SpinInvalidException)
