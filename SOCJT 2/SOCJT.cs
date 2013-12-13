@@ -117,19 +117,15 @@ namespace ConsoleApplication1
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
-                        if (input.debugFlag && !matricesMade)
+                        if (!matricesMade)//if matrices not made then generate all matrices
                         {
                             fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
                             matricesMade = true;
                         }
-                        else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+                        else//this makes sure that the diagonal portion is regenerated on each call.
 	                    {
                             fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                    }
-                        else
-                        {
-                            array1[i] = GenHamMat.genMatrix2(jBasisVecsByJ[i], isQuad, input, out nColumns, true, input.parMat);
-                        }
                         numcolumnsA[i] = nColumns;
                         if (numcolumnsA[i] < input.M)
                         {
@@ -199,18 +195,14 @@ namespace ConsoleApplication1
                     }
 
                     //made specialHam matrix the default and not optional
-                    if (input.debugFlag && !matricesMade)
+                    if (!matricesMade)
                     {
                         fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
                     }                        
-                    else if (matricesMade)//this makes sure that the diagonal portion is regenerated on each call.
+                    else//this makes sure that the diagonal portion is regenerated on each call.
 	                {
                         fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                }
-                    else
-                    {
-                        array1[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrix2(quadVecs, isQuad, input, out nColumns, true, input.parMat);
-                    }
 
                     jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
                     numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
