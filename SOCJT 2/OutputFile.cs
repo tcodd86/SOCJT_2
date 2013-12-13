@@ -8,7 +8,7 @@ namespace ConsoleApplication1
 {
     static class OutputFile
     {
-        public static List<string> makeOutput(FileInfo input, List<double[,]> zMatrices, List<double[,]> hamMatrix, List<alglib.sparsematrix> sHamMatrix, List<List<BasisFunction>> jBasisVecsByJ, List<double[]> eigenvalues, bool isQuad, List<int> matSize, Eigenvalue[] finalList, bool isSparse, int[] IECODE, int[] ITER)
+        public static List<string> makeOutput(FileInfo input, List<double[,]> zMatrices, alglib.sparsematrix[] sHamMatrix, List<List<BasisFunction>> jBasisVecsByJ, List<double[]> eigenvalues, bool isQuad, Eigenvalue[] finalList, int[] IECODE, int[] ITER)
         {
             List<string> linesToWrite = new List<string>();
             StringBuilder file = new StringBuilder();
@@ -48,23 +48,10 @@ namespace ConsoleApplication1
 
                 double[,] tempMat = zMatrices[i];
 
-                if (isSparse == true)
-                {
-                    int numRows = sHamMatrix[i].innerobj.m;
-                    file.AppendLine(" ");
-                    file.AppendLine("Number of basis functions: " + Convert.ToString(numRows));
-                }
-                else
-                {
-                    int numRows = hamMatrix[i].GetLength(1);
-                    file.AppendLine(" ");
-                    file.AppendLine("Number of basis functions: " + Convert.ToString(numRows));
-                }
-
-                if (isSparse)
-                { 
-                    file.AppendLine("Number of non-zero matrix elements: " + Convert.ToString(sHamMatrix[i].innerobj.vals.Length));
-                }
+                int numRows = sHamMatrix[i].innerobj.m;
+                file.AppendLine(" ");
+                file.AppendLine("Number of basis functions: " + Convert.ToString(numRows));
+                file.AppendLine("Number of non-zero matrix elements: " + Convert.ToString(sHamMatrix[i].innerobj.vals.Length));
 
                 file.AppendLine(" ");
                 switch (IECODE[i])
@@ -151,34 +138,7 @@ namespace ConsoleApplication1
                     #endregion
                 }//end print Basis code
 
-                if (input.pMatrix == true & isSparse == false)
-                {
-                    #region PrintMatrix
-                    int nonZeroCount = 0;
-                    int upDiag = 0;
-                    int numRows = hamMatrix[i].GetLength(1);
-                    file.AppendLine("\t");
-                    file.AppendLine("\r");
-                    file.AppendLine("\t" + "Hamiltonian Matrix");
-                    file.AppendLine("\t" + "Only upper triangle given");
-                    file.AppendLine("Row" + "\t" + "Column" + "\t" + "Value");
-                    for (int m = 0; m < numRows; m++)
-                    {
-                        for (int r = 0 + upDiag; r < numRows; r++)
-                        {
-                            if (hamMatrix[i][m, r] > 0.001 || hamMatrix[i][m, r] < -0.001)
-                            {
-                                file.AppendLine("  " + Convert.ToString(m + 1) + "\t" + "  " + Convert.ToString(r + 1) + "\t" + String.Format("{0,10:0.0000}", hamMatrix[i][m, r]));
-                                nonZeroCount++;
-                            }                            
-                        }
-                        upDiag++;
-                    }
-                    file.AppendLine("    " + Convert.ToString(nonZeroCount) + " non-zero matrix elements");
-                    #endregion
-                }//end print Matrix code
-
-                if (input.pMatrix == true & isSparse == true)
+                if (input.pMatrix == true)
                 {
                     #region PrintMatrixSparse
                     int nonZeroCount = 0;
@@ -267,18 +227,6 @@ namespace ConsoleApplication1
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                /*
-                if (input.naiveLanczos)
-                {
-                    if (i > 0)
-                    {
-                        if (finalList[i].Ev - finalList[i - 1].Ev < 0.00001)
-                        {
-                            continue;
-                        }
-                    }
-                }
-                */
                 file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
                 l++;
             }

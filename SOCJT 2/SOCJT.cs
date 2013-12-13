@@ -438,11 +438,8 @@ namespace ConsoleApplication1
             }//end else
                     
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well                
-            //dummy hamiltonian matrix list for outuput file generator                
-            List<double[,]> hamMatrices = new List<double[,]>();                
-            sHamMatrix = array1.ToList();                
-            linesToWrite = OutputFile.makeOutput(input, zMatrices, hamMatrices, sHamMatrix, JvecsForOutuput, eigenvalues, isQuad, numColumns, finalList, true, IECODE, ITER);                
+            finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
+            linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
