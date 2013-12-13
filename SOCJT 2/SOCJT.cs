@@ -106,10 +106,13 @@ namespace ConsoleApplication1
             {            
                 int h = 0;                
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
-                fitHamList = new List<List<alglib.sparsematrix>>();
-                for (int m = 0; m < jBasisVecsByJ.Count; m++)
+                if (!matricesMade)
                 {
-                    fitHamList.Add(new List<alglib.sparsematrix>());
+                    fitHamList = new List<List<alglib.sparsematrix>>();
+                    for (int m = 0; m < jBasisVecsByJ.Count; m++)
+                    {
+                        fitHamList.Add(new List<alglib.sparsematrix>());
+                    }
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
@@ -165,10 +168,13 @@ namespace ConsoleApplication1
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                fitHamList = new List<List<alglib.sparsematrix>>();
-                for (int m = 0; m < jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2; m++)
+                if (!matricesMade)
                 {
-                    fitHamList.Add(new List<alglib.sparsematrix>());
+                    fitHamList = new List<List<alglib.sparsematrix>>();
+                    for (int m = 0; m < jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2; m++)
+                    {
+                        fitHamList.Add(new List<alglib.sparsematrix>());
+                    }
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -183,19 +189,9 @@ namespace ConsoleApplication1
                 {
                     List<BasisFunction> quadVecs = new List<BasisFunction>();
                     int nColumns;
-                    if (jMax == 2.5M)
+                    for (int v = -dynVar2; v <= dynVar2; v++)
                     {
-                        for (int v = -1; v < 1; v++)
-                        {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
-                        }
-                    }
-                    else
-                    {
-                        for (int v = -dynVar2; v <= dynVar2; v++)
-                        {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
-                        }
+                        quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                     }
 
                     //made specialHam matrix the default and not optional
