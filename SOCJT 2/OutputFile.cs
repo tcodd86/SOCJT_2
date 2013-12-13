@@ -223,11 +223,11 @@ namespace ConsoleApplication1
             }//writes all evs to the file object
             
             file.AppendLine("#" + "\t" + "Final results showing all eigenvalues found");
-            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + "Symm");
+            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + (input.blockLanczos ? "Symm" : input.pVector ? "Symm" : ""));
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (finalList[i].isa1 ? "1" : "2"));
+                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (input.blockLanczos ? (finalList[i].isa1 ? "1" : "2") : input.pVector ? (finalList[i].isa1 ? "1" : "2") : ""));
                 l++;
             }
             linesToWrite.Add(file.ToString());
