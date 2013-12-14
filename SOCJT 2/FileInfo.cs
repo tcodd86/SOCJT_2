@@ -584,13 +584,6 @@ namespace ConsoleApplication1
                                 useKappaEta = false;
                             }
                         }
-                        if (inputf[u].ToUpper() == "DEBUG_FLAG")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                debugFlag = true;
-                            }
-                        }
                         if (inputf[u] == "/")
                         {
                             break;
@@ -745,6 +738,13 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 newRandom = true;
+                            }
+                        }
+                        if (inputf[u].ToUpper() == "FIT_MAT")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                debugFlag = true;
                             }
                         }
                         if (inputf[u] == "/")

@@ -1155,7 +1155,11 @@ namespace ConsoleApplication1
         }//end method genMatrix
 
         /// <summary>
+<<<<<<< HEAD
         /// Generates an alglib sparsematrix list to be used in Lanczos diagonalization.
+=======
+        /// Generates a list of alglib sparsematrix objects where the first is the diagonal elements and the remaining ones are for D and K for each mode and then the matrices for the cross terms.
+>>>>>>> 80bfd838271fdd87d07204610146799c7c13c279
         /// </summary>
         /// <param name="basisVectorsByJ">
         /// List of JBasisVectors sorted by J.
@@ -1552,13 +1556,14 @@ namespace ConsoleApplication1
             );//end parallel for
 
             //actually add all of the matrix elements to the matrices
-            //I think this should start at 1 because 0 is the diagonal elements
-            for (int i = 1; i < matrixPos.Count; i++)
+            //I think this should start at 1 because 0 is the diagonal elements -- WRONG
+            //Start at 0 because matrixPos only has off diagonal elements.  Add elements to matList[i + 1] because matList already has diagonal elements in position 0.
+            for (int i = 0; i < matrixPos.Count; i++)
             {
                 foreach (Tuple<int, int, double> spot in matrixPos[i])
                 {
-                    alglib.sparseadd(matList[i], spot.Item1, spot.Item2, spot.Item3);
-                    alglib.sparseadd(matList[i], spot.Item2, spot.Item1, spot.Item3);
+                    alglib.sparseadd(matList[i + 1], spot.Item1, spot.Item2, spot.Item3);
+                    alglib.sparseadd(matList[i + 1], spot.Item2, spot.Item1, spot.Item3);
                 }
             }
             return matList;

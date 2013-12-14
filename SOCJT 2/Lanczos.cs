@@ -943,6 +943,8 @@ namespace ConsoleApplication1
                 zz = 2;
                 z = new double[its, M];
             }
+
+            //******************************add some code here to check for stupid errors like M > alphas.Length***************************
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M - 1, ref z);//put in M - 1 for # of eigenpairs to request because for some reason it returns one more than requested
             evs = alphas;
             //now generate the eigenvectors by matrix multiplication
@@ -951,8 +953,6 @@ namespace ConsoleApplication1
             {
                 transEvecs = new double[N, evs.Length];
                 alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
-                //alglib keeps throwing an error, indices seem to be off.  Try my own function
-
             }
             //if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
             {
