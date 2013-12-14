@@ -294,6 +294,7 @@ namespace ConsoleApplication1
 
                             int lval = ldiff.Sum() * -1;
                             int mode = 0;
+                            //this loop finds which mode has the linear JT term
                             for (int h = 0; h < nModes; h++)
                             {
                                 if (vdiff[h] == 0)
@@ -306,10 +307,10 @@ namespace ConsoleApplication1
                                     break;
                                 }
                             }
+                            //formula for the linear JT matrix element
                             temp = Math.Sqrt(((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
                             Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
                             matrixPos[2 * mode].Add(ttTemp);
-                            //matPos.Add(ttTemp);
                             continue;
                             #endregion
                         }
@@ -347,6 +348,7 @@ namespace ConsoleApplication1
                             {
                                 continue;
                             }
+                            //it might be possible to simplify these formulas down to only two (one for delta v = +/- 2 and one for delta v = 0) but it would be very confusing
                             if (count == 1)//means Delta v = +/- 2
                             {
                                 if (pos != pos2)//same mode has changes in v and l
@@ -401,12 +403,14 @@ namespace ConsoleApplication1
             );//end parallel for
 
             //actually add all of the matrix elements to the matrices
-            //I think this should start at 1 because 0 is the diagonal elements -- WRONG
             //Start at 0 because matrixPos only has off diagonal elements.  Add elements to matList[i + 1] because matList already has diagonal elements in position 0.
             for (int i = 0; i < matrixPos.Count; i++)
             {
+                //add all calculated matrix elements to the appropriate sparsematrices
                 foreach (Tuple<int, int, double> spot in matrixPos[i])
                 {
+                    //add to both upper and lower triangle because I've found that the matrix multiplication for a symmetric matrix where all elements are actually stored
+                    //as opposed to storing only the upper or lower triangle is roughly %30 faster and the extra memory required has not been a concern yet
                     alglib.sparseadd(matList[i + 1], spot.Item1, spot.Item2, spot.Item3);
                     alglib.sparseadd(matList[i + 1], spot.Item2, spot.Item1, spot.Item3);
                 }
@@ -414,6 +418,27 @@ namespace ConsoleApplication1
             return matList;
         }//end method genMatrix
 
+        /// <summary>
+        /// This function initializes the biAVecPos and biEVecPos lists which tell which A and E vecs have cross-term coupling.  Also finds if there is any bilinear coupling.
+        /// </summary>
+        /// <param name="modesInVec">
+        /// List BasisByMode which is used to find the symmetry of all of the modes.
+        /// </param>
+        /// <param name="nModes">
+        /// Int indicating how many modes are in the input file.
+        /// </param>
+        /// <param name="bilinear">
+        /// Boolean used to indicate if there is any bilinear coupling
+        /// </param>
+        /// <param name="biAVecPos">
+        /// List which will contain the positions (in the mode list) of any A modes with bilinear coupling
+        /// </param>
+        /// <param name="biEVecPos">
+        /// List which will contain the positions (in the mode list) of any E modes with bilinear coupling
+        /// </param>
+        /// <param name="crossTermMatrix">
+        /// Cross term matrix containing coupling the actual coupling terms.
+        /// </param>
         public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
         {
             bool containsAVecs = false;
