@@ -39,22 +39,22 @@ namespace ConsoleApplication1
             nColumns = matSize;
             bool bilinear = false;
             int nModes = input.nModes;
-            //List<int> AVecPos = new List<int>();
-            //List<int> EVecPos = new List<int>();
+
+            //Lists to store the positions of the A and E vecs with cross-terms coupling
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
-            //List to store the matrix elements in parallel bags for each matrix generated
+            //List to store the alglib sparse matrices for each variable
             var matList = new List<alglib.sparsematrix>();
-            //ConcurrentBag<Tuple<int, int, double>> matPos = new ConcurrentBag<Tuple<int, int, double>>();
+            //The Tuple stores the row and column of the matrix element in the two int values and the value at that matrix element as the double
+            //order of row and column is unimportant since the matrix is symmetric
             List<ConcurrentBag<Tuple<int, int, double>>> matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>();
-            int[] change = new int[3];
-
             
             //this array stores the v and l values for each mode for each basis function as well as Lambda and J
             //all v values are stored in elements 0 through nmodes - 1 and l is in nmodes through 2*nmodes - 1
             //Lambda is stored in element 2*nmodes and J is stored as an int as (J - 0.5) in 2 * nmodes + 1
+            //the nested loops initialize the vlLambda arrays for each basis function
+            //This is ugly but makes the matrix generation much faster than accessing the objects in the matrix generation and saves me a ton of re-coding
             int[,] vlLambda = new int[matSize, nModes * 2 + 2];
-            //vlLambda.AsParallel();
             for (int i = 0; i < matSize; i++)
             {
                 for (int j = 0; j < nModes; j++)
@@ -66,7 +66,8 @@ namespace ConsoleApplication1
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
             }//end loop to make vlLambda
 
-            //generate an array for omega, omegaExe, D, K and degeneracy
+            //generate an array to store omega, omegaExe, D, K and degeneracy of each mode
+            //only one copy of this is needed since those values are the same across all basis functions
             var modeVals = new double[nModes, 5];
             for (int i = 0; i < nModes; i++)
             {
@@ -80,13 +81,13 @@ namespace ConsoleApplication1
                     modeVals[i, 4] = 1.0;
                 }
             }//end loop to make modeVals[,] array
-
-            //generates the Hamiltonian Matrix
+                        
             #region HO Terms
-            //just the HO terms
+            //just the harmonic oscillator terms.  Here only the diagonal elements are generated
             var diag = new alglib.sparsematrix();
             alglib.sparsecreate(matSize, matSize, matSize, out diag);
             
+            //loop through all diagonal elements
             for (int n = 0; n < matSize; n++)
             {
                 //one mode harmonic and anharmonic terms
@@ -97,9 +98,12 @@ namespace ConsoleApplication1
                 }//end loop over modes
                 continue;
             }//end HO loop
+            //add diagonal matrix elements to matList as element [0]
             matList.Add(diag);
             #endregion
 
+            //if this is not the first call to the Hamiltonian generation function then only the diagonal elements are needed
+            //therefore, if diagOnly is true, just return matList with only the diagonal portion of the matrix.
             if (diagOnly)
             {                
                 return matList;
@@ -120,7 +124,7 @@ namespace ConsoleApplication1
                 }
                 else
                 {
-                    //add empty matrices for D and K for non degenerate modes
+                    //add empty matrices for D and K for non degenerate modes. Probably not a huge deal but saves some memory
                     alglib.sparsematrix tempMat = new alglib.sparsematrix();
                     alglib.sparsecreate(matSize, matSize, 0, out tempMat);
                     matList.Add(tempMat);
@@ -151,8 +155,7 @@ namespace ConsoleApplication1
                 }
             }//enf if crossTermMatrix == null
 
-            //initialize the List for Positions
-            //matrixPos = new List<ConcurrentBag<Tuple<int, int, double>>>(matList.Count - 1);
+            //initialize the concurrentBags for each matrix being generated. -1 in loop bounds because diagonal already done
             for (int n = 0; n < matList.Count - 1; n++)
             {
                 matrixPos.Add(new ConcurrentBag<Tuple<int, int, double>>());
@@ -164,6 +167,7 @@ namespace ConsoleApplication1
             parOp.MaxDegreeOfParallelism = par;
             Parallel.ForEach(rangePartitioner, parOp, (range, loopState) =>
             {
+                //these arrays will store the differences in v and l between two different basis functions
                 int[] vdiff = new int[nModes];
                 int[] ldiff = new int[nModes];
                 //indexes n and m are for the rows and columns of the matrix respectively
@@ -176,6 +180,7 @@ namespace ConsoleApplication1
                         {
                             continue;
                         }
+                        //set the values for vdiff and ldiff
                         for (int b = 0; b < nModes; b++)
                         {
                             vdiff[b] = vlLambda[n, b] - vlLambda[m, b];
@@ -201,12 +206,8 @@ namespace ConsoleApplication1
                             {
                                 continue;
                             }
-                            if (vlprod.Sum() != 1)//this means |Delta V| = |Delta l| = 1 for only 1 mode, the same mode
-                            {
-                                continue;
-                            }
                             #region Bilinear
-                            //means possible bilinear term since Delta v = +/- 1 for both A and E mode and Delta l = 1 for E mode and bilinear = true
+                            //checks for possible bilinear term by checking Delta v = +/- 1 for both A and E mode and Delta l = 1 for E mode and bilinear = true
                             if (vabs.Sum() == 2 && labs.Sum() == 1 && bilinear)
                             {
                                 //next check that the changes are in A and E vec positions
@@ -217,18 +218,20 @@ namespace ConsoleApplication1
                                     ASum += vabs[biAVecPos[u]];
                                     AVal += vdiff[biAVecPos[u]];
                                 }
-                                if (ASum != 1)//means that one change is in Avec and other must be in Evec
+                                if (ASum != 1)//checks that one change is in an Avec and other must be in Evec, if not continue
                                 {
                                     continue;
                                 }
 
+                                //loop through A and E vecs with possible coupling
                                 for (int a = 0; a < biAVecPos.Count; a++)
                                 {
                                     for (int e = 0; e < biEVecPos.Count; e++)
                                     {
-                                        //int to keep track of which cross-term matrix we're on.
+                                        //value to keep track of which cross-term matrix we're on.
                                         int crossCount = a + e;
 
+                                        //this is because the cross-term couplings for JT terms are stored in the upper-diagonal of the cross-term matrix
                                         int row;
                                         int column;
                                         if (biAVecPos[a] > biEVecPos[e])
@@ -241,13 +244,8 @@ namespace ConsoleApplication1
                                             column = biEVecPos[e];
                                             row = biAVecPos[a];
                                         }
-                                        //take this out because it should already be handled by initialization function
-                                        /*
-                                        if (input.crossTermMatrix[row, column] == 0D)
-                                        {
-                                            continue;
-                                        }
-                                        */
+
+                                        //this sets up the values for the matrix element.  Doing this makes it so that only one matrix element formula needs to be included
                                         int nl = vlLambda[n, nModes + biEVecPos[e]];
                                         int ml = vlLambda[m, nModes + biEVecPos[e]];
                                         int sl = (int)Math.Pow(-1D, (double)input.S1);
@@ -274,10 +272,10 @@ namespace ConsoleApplication1
                                         {
                                             continue;
                                         }
+                                        //formula for bilinear matrix element
                                         temp = 0.5 * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
                                         Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                                         matrixPos[2 * nModes + crossCount].Add(tTemp);
-                                        //matPos.Add(tTemp);
                                         continue;
                                     }//end for loop over evec positions
                                 }//end for loop over a vec positions
