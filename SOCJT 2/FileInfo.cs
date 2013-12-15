@@ -782,11 +782,6 @@ namespace ConsoleApplication1
                             factor = parseDouble(inputf[u + 1]);
                             continue;
                         }
-                        if (inputf[u].ToUpper() == "NPRINT")
-                        {
-                            print = Convert.ToInt16(inputf[u + 1]);
-                            continue;
-                        }
                         if (inputf[u].ToUpper() == "/")
                         {
                             break;
