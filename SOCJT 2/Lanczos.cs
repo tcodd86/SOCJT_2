@@ -944,10 +944,11 @@ namespace ConsoleApplication1
                 z = new double[its, M];
             }
 
-            //******************************add some code here to check for stupid errors like M > alphas.Length***************************
+            //this is the diagonalization of the complete Lanczos matrix
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M - 1, ref z);//put in M - 1 for # of eigenpairs to request because for some reason it returns one more than requested
             evs = alphas;
             
+            //this is the diagonalization of the Lanczos matrix without the first row and column
             bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
 
             //here I run test from Lanczos book to see if evs are good.  Briefly, 
