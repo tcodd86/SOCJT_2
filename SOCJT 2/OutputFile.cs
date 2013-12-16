@@ -330,7 +330,7 @@ namespace ConsoleApplication1
             if (input.includeCrossTerms == true)
             {
                 file.AppendLine("&CROSS_TERMS");
-                file.AppendLine("INCLUDE" + " = " + Convert.ToString(input.includeCrossTerms));
+                //file.AppendLine("INCLUDE" + " = " + Convert.ToString(input.includeCrossTerms));
                 for (int i = 0; i < input.nModes; i++)
                 {
                     for (int j = 0; j < input.nModes; j++)

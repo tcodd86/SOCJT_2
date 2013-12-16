@@ -797,89 +797,76 @@ namespace ConsoleApplication1
                     int column;
                     int temp;
                     bool tbool;
+                    includeCrossTerms = true;
+                    crossTermMatrix = new double[nModes, nModes];
+                    crossTermFit = new bool[nModes, nModes];
+                    for (int l = 0; l < nModes; l++)
+                    {
+                        for (int m = 0; m < nModes; m++)
+                        {
+                            crossTermMatrix[l, m] = 0D;
+                            crossTermFit[l, m] = false;
+                        }
+                    }//end loops to initalize crossTermMatrix to all 0's
+
                     for (int j = i; ; j++)
                     {
-                        if (inputf[j].ToUpper() == "INCLUDE")
+                        if (inputf[j].ToUpper() == "JT")
                         {
-                            if (inputf[j + 1].ToUpper() == "T" || inputf[j + 1].ToUpper() == "TRUE")
-                            {                                
-                                includeCrossTerms = true;
-                                crossTermMatrix = new double[nModes, nModes];
-                                crossTermFit = new bool[nModes, nModes];
-                                for (int l = 0; l < nModes; l++)
-                                {
-                                    for (int m = 0; m < nModes; m++)
-                                    {
-                                        crossTermMatrix[l, m] = 0D;
-                                        crossTermFit[l, m] = false;
-                                    }
-                                }//end loops to initalize crossTermMatrix to all 0's
+                            tbool = false;
+                            row = Convert.ToInt16(inputf[j + 2]) - 1;
+                            column = Convert.ToInt16(inputf[j + 4]) - 1;
+                            if (row > column)
+                            {
+                                temp = row;
+                                row = column;
+                                column = temp;
                             }//end if
-                            else
+                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                            crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
+                            if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                             {
-                                break;
-                            }//end else
-                        }//end includeCrossTerms
+                                tbool = true;
+                            }//end if
+                            crossTermFit[row, column] = tbool;
+                            //j += 8;
+                            continue;
+                        }
 
-                        if (includeCrossTerms == true)
+                        if (inputf[j].ToUpper() == "AT")
                         {
-                            if (inputf[j].ToUpper() == "JT")
+                            AT = true;
+                            tbool = false;
+                            row = Convert.ToInt16(inputf[j + 2]) - 1;
+                            column = Convert.ToInt16(inputf[j + 4]) - 1;
+                            if (row < column)
                             {
-                                tbool = false;
-                                row = Convert.ToInt16(inputf[j + 2]) - 1;
-                                column = Convert.ToInt16(inputf[j + 4]) - 1;
-                                if (row > column)
-                                {
-                                    temp = row;
-                                    row = column;
-                                    column = temp;
-                                }//end if
-                                //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
-                                crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
-                                if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
-                                {
-                                    tbool = true;
-                                }//end if
-                                crossTermFit[row, column] = tbool;
-                                //j += 8;
-                                continue;
-                            }
+                                temp = row;
+                                row = column;
+                                column = temp;
+                            }//end if
+                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
+                            crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
+                            if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
+                            {
+                                tbool = true;
+                            }//end if
+                            crossTermFit[row, column] = tbool;
+                            //j += 8;
+                            continue;
+                        }
 
-                            if (inputf[j].ToUpper() == "AT")
+                        if (inputf[j].ToUpper() == "SPECIAL")
+                        {
+                            tbool = false;
+                            Special = true;
+                            //crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
+                            crossTermMatrix[0, 0] = parseDouble(inputf[j + 1]);
+                            if (inputf[j + 3].ToUpper() == "T" || inputf[j + 3].ToUpper() == "TRUE")
                             {
-                                AT = true;
-                                tbool = false;
-                                row = Convert.ToInt16(inputf[j + 2]) - 1;
-                                column = Convert.ToInt16(inputf[j + 4]) - 1;
-                                if (row < column)
-                                {
-                                    temp = row;
-                                    row = column;
-                                    column = temp;
-                                }//end if
-                                //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
-                                crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
-                                if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
-                                {
-                                    tbool = true;
-                                }//end if
-                                crossTermFit[row, column] = tbool;
-                                //j += 8;
-                                continue;
+                                tbool = true;
                             }
-
-                            if (inputf[j].ToUpper() == "SPECIAL")
-                            {
-                                tbool = false;
-                                Special = true;
-                                //crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
-                                crossTermMatrix[0, 0] = parseDouble(inputf[j + 1]);
-                                if (inputf[j + 3].ToUpper() == "T" || inputf[j + 3].ToUpper() == "TRUE")
-                                {
-                                    tbool = true;
-                                }
-                                crossTermFit[0, 0] = tbool;
-                            }
+                            crossTermFit[0, 0] = tbool;
                         }
                         if (inputf[j] == "/")
                         {
