@@ -533,7 +533,8 @@ The input file is organized into sets of namelist groups, each of
 which is begun by a \&NAMELIST command and ended with a forward slash
 \/, as in 
 \begin{verbatim}
- &GENERAL nmodes = 1
+ &GENERAL 
+  nmodes = 1
   AZETA = 950.
   MAXJ = 1.5
   TITLE = cdch3 
@@ -543,7 +544,7 @@ Within each \&NAMELIST the input variables are assigned their initial
 values, and separated by returns, spaces or tabs. Each \&NAMELIST group is separated from
 the previous by a '/'. C$\sharp$ does not suffer the same weaknesses of FORTRAN for file I/O
 so the number of spaces and alignment of decimals for the input parameters is unimportant.
-Where a boolean value is required \socjttwo checks for a 'T' or 'TRUE' (in upper or lower case)
+Where a boolean value is required \socjttwo checks for a T or TRUE (in upper or lower case)
 and if that is not found the default value of FALSE is used. Any input files for \socjt will work
 with \socjttwo however there are some capabilities in \socjt not included in \socjttwo such as 
 computation of spectra and those sections will be ignored. The order of the variables in
@@ -572,7 +573,7 @@ calculation. The default values are
 \begin{verbatim}
  &GENERAL 
   NMODES = 1
-  TITLE = 'TITLE'
+  TITLE = TITLE
   S = 0.5
   AZETA = 0.0
   FIT_AZETA = FALSE
@@ -668,7 +669,7 @@ the input file. The default values are
   /
 \end{verbatim}
 
-If using KAPPA and ETA then replace MODED, MODEK, FIT\_D, and FIT\_K by the following.
+If using USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MODEK, FIT\_D, and FIT\_K by the following.
 
 \begin{verbatim}
   KAPPA = 0.0
@@ -770,7 +771,7 @@ Defaults are
   PARMAT = 1
   PARJ = 2
   BLOCK_LANCZOS = F
-  NEW_RANDOM = F
+  OLD_RANDOM = F
   /
 \end{verbatim}
 
@@ -817,7 +818,7 @@ Defaults are
 \item[BLOCK\_LANCZOS] Boolean value to indicate if the block Lanczos
   routine should be used. Boolean.
 
-\item[NEW\_RANDOM] Boolean value to indicate if the random number
+\item[OLD\_RANDOM] Boolean value to indicate if the random number
   generator from \socjt should be used or the \bf{.NET} built in
   random number generator should be used. Typically fewer iterations
   are used in the block routine with the new random routine. Boolean.
@@ -915,6 +916,46 @@ the jacobian.
 
 \end{description}
 
+\subsection{\&SCAN} \label{scan}
+
+The \&SCAN namelist is optional and is only needed if one or more parameters
+are being scanned. Any number of parameters may be scanned simultaneously.
+
+\begin{verbatim}
+ &SCAN
+  STEPS = 10
+  MODE 1 D 0.0 0.1
+  MODE 1 K 0.01 0.02
+  MODE 2 OMEGA 540.0 -5.0
+  CROSS 1 2 JT 0.01 2.0
+/
+\end{verbatim}
+
+\begin{description}
+\item[STEPS] This indicates how many steps should be done in the scan.
+Integer.
+
+\item[MODE] Lines starting with MODE indicate which parameters are being 
+scanned. The first value beyond MODE must be an integer which is the mode
+whose parameter is being scanned. Modes are labeled numerically in the order
+in which they are in the input file. The next value is a string which may be
+OMEGA, WEXE, D or K and says which variable is being scanned. After that 
+is a double value giving the starting value of the parameter. The final
+item is a double giving the step size of the parameter each iteration. 
+The step size may be positive or negative.
+
+\item[CROSS] If cross-terms are to be scanned the line must start with 
+CROSS. The next two values are integers indicating which modes are coupled.
+JT indicates that this is a Jahn-Teller type coupling term (the only type
+of cross-terms currently implemented). The last two elements are the starting
+value and step size respectively.
+
+\end{description}
+
+When doing a scan all fit booleans are set to false automatically. It is important
+that if fitting a cross-term or quadratic JT term their starting value should not
+be exactly 0. Not doing so will cause the comparison of final results difficult and may
+cause errors.
 
 \section{Output} \label{section:output}
 
