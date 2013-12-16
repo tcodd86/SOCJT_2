@@ -478,9 +478,9 @@ namespace ConsoleApplication1
         }
         //PCH done new
         
-        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool newRandom)
+        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool oldRandom)
         {
-            if (!newRandom)
+            if (!oldRandom)
             {
                 double[] T = new double[100];
                 int X1;
@@ -538,12 +538,12 @@ namespace ConsoleApplication1
             }
         }
 
-        private static double[] RANDOM(int N, bool newRandom)
+        private static double[] RANDOM(int N, bool oldRandom)
         {
             //initialize vector to be returned
             var X = new double[N];
             //if not using new Random routine use old one
-            if (!newRandom)
+            if (oldRandom)
             {
                 double[] T = new double[100];
                 int X1;
@@ -712,7 +712,7 @@ namespace ConsoleApplication1
         /// array.  Also used as working storage while computing.</param>
         /// <param name="IECODE"></param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
-        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool newRandom)
+        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool oldRandom)
         {
             double[] E = new double[Q];
             double[,] C = new double[Q, Q];
@@ -764,7 +764,7 @@ namespace ConsoleApplication1
             {
                 for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
                 {
-                    RANDOM(N, Q, K, ref X, newRandom);
+                    RANDOM(N, Q, K, ref X, oldRandom);
                 }
             }
                         
@@ -859,7 +859,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool newRandom, bool evsNeeded)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -868,7 +868,7 @@ namespace ConsoleApplication1
             var betas = new double[its];
             betas[0] = 0.0;
 
-            var vi = RANDOM(N, newRandom);
+            var vi = RANDOM(N, oldRandom);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];

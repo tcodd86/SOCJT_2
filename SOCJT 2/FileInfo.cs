@@ -375,7 +375,7 @@ namespace ConsoleApplication1
 
         public bool blockLanczos { get; private set; }//end naiveLanczos
 
-        public bool newRandom { get; private set; }//end newRandom
+        public bool oldRandom { get; private set; }//end newRandom
 
         #endregion properties
 
@@ -398,7 +398,7 @@ namespace ConsoleApplication1
             beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
-            newRandom = false;
+            oldRandom = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -731,7 +731,7 @@ namespace ConsoleApplication1
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
-                                newRandom = true;
+                                oldRandom = true;
                             }
                         }
                         if (inputf[u] == "/")
