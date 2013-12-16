@@ -480,7 +480,7 @@ namespace ConsoleApplication1
         
         private static void RANDOM(int N, int Q, int L, ref double[,] X, bool oldRandom)
         {
-            if (!oldRandom)
+            if (oldRandom)
             {
                 double[] T = new double[100];
                 int X1;
@@ -947,85 +947,81 @@ namespace ConsoleApplication1
             //******************************add some code here to check for stupid errors like M > alphas.Length***************************
             bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M - 1, ref z);//put in M - 1 for # of eigenpairs to request because for some reason it returns one more than requested
             evs = alphas;
-            //now generate the eigenvectors by matrix multiplication
-            double[,] transEvecs = new double[0,0];
-            if (evsNeeded)
-            {
-                transEvecs = new double[N, evs.Length];
-                alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
-            }
-            //if(flag == false)//if flag == true then don't run this code and just pass the repeats and ghosts out -- useful for demonstration/debugging purposes
-            {
-                bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
+            
+            bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
 
-                //here I run test from Lanczos book to see if evs are good.  Briefly, 
-                //there are 3 cases to consider:
-                //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
-                //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
-                //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
-                //As presently implemented this test may miss evs.
-                //evs evaluated as correct will be stored in this list
-                //Tuple so that proper eigenvectors can be pulled when that is implemented
-                List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
+            //here I run test from Lanczos book to see if evs are good.  Briefly, 
+            //there are 3 cases to consider:
+            //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
+            //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
+            //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
+            //As presently implemented this test may miss evs.
+            //evs evaluated as correct will be stored in this list
+            //Tuple so that proper eigenvectors can be pulled when that is implemented
+            List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
 
-                for (int i = 0; i < tAlphas.Length - 1; i++)
+            for (int i = 0; i < tAlphas.Length - 1; i++)
+            {
+                //checks to see if the value is in T^2 eigenvalues
+                bool temp = checkInTT(alphas[i], tAlphas, tol);
+                //tells how many times alphas[i] is in alphas, always at least 1
+                int repeater = repeat(i, alphas, tol);
+                //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
+                if (repeater == 0)
                 {
-                    //tol = 1E-6;
-                    //checks to see if the value is in T^2 eigenvalues
-                    bool temp = checkInTT(alphas[i], tAlphas, tol);
-                    //tells how many times alphas[i] is in alphas, always at least 1
-                    int repeater = repeat(i, alphas, tol);
-                    //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
-                    if (repeater == 0)
+                    throw new RepeaterError();
+                }
+                if (repeater == 1)
+                {
+                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
+                    if (!temp)
                     {
-                        throw new RepeaterError();
+                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                        continue;
                     }
-                    if (repeater == 1)
+                }//end if
+                else//means this evalue has a repeat.
+                {
+                    //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
+                    correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
+                    //add repeater to i, subtract 1 because i += 1 for each loop anyway.
+                    i += repeater - 1;
+                }//end else
+            }
+
+            //build array of final eigenvalues to return
+            double[] checkedEvs = new double[correctEvs.Count];
+            for (int i = 0; i < checkedEvs.Length; i++)
+            {
+                checkedEvs[i] = correctEvs[i].Item2;
+            }            
+            evs = checkedEvs;
+
+            //if needed, build array of eigenvectors to return
+            if (evsNeeded)
+            {                
+                //now generate the eigenvectors by matrix multiplication
+                //temporary storage for eigenvectors
+                var tempEvecs = new double[its, correctEvs.Count];
+                for (int i = 0; i < correctEvs.Count; i++)
+                {
+                    for (int j = 0; j < its; j++)
                     {
-                        //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
-                        if (!temp)
-                        {
-                            correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                            continue;
-                        }
-                    }//end if
-                    else//means this evalue has a repeat.
-                    {
-                        //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
-                        correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
-                        //add repeater to i, subtract 1 because i += 1 for each loop anyway.
-                        i += repeater - 1;
-                    }//end else
+                        //pull only eigenvectors which correspond to a true eigenvalue
+                        tempEvecs[j, i] = z[j, correctEvs[i].Item1];
+                    }
                 }
 
-                //build array of final eigenvalues to return
-                double[] checkedEvs = new double[correctEvs.Count];
-                for (int i = 0; i < checkedEvs.Length; i++)
-                {
-                    checkedEvs[i] = correctEvs[i].Item2;
-                }            
-                evs = checkedEvs;
+                //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
+                double[,] transEvecs = new double[N, evs.Length];
+                alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
 
-                //if needed, build array of eigenvectors to return
-                if (evsNeeded)
-                {
-                    //temporary storage for eigenvectors
-                    var tempEvecs = new double[N, correctEvs.Count];
-                    for (int i = 0; i < correctEvs.Count; i++)
-                    {
-                        for (int j = 0; j < N; j++)
-                        {
-                            //pull only eigenvectors which correspond to a true eigenvalue
-                            tempEvecs[j, i] = transEvecs[j, correctEvs[i].Item1];
-                        }
-                    }
-                    //then normalize
-                    normalize(ref tempEvecs);
+                //then normalize
+                normalize(ref transEvecs);
 
-                    //then set equal to z
-                    z = tempEvecs;
-                }//end if evsNeeded
-            }//end if flags = false
+                //then set equal to z
+                z = transEvecs;
+            }//end if evsNeeded
         }//end NaiveLanczos
 
         /// <summary>

@@ -727,7 +727,7 @@ namespace ConsoleApplication1
                                 blockLanczos = true;
                             }
                         }
-                        if (inputf[u].ToUpper() == "NEW_RANDOM")
+                        if (inputf[u].ToUpper() == "OLD_RANDOM")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {

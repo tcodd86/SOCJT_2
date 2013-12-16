@@ -293,7 +293,7 @@ namespace ConsoleApplication1
 
             file.AppendLine("&SOLVE_INFO");
             file.AppendLine("BLOCK_LANCZOS = " + Convert.ToString(input.blockLanczos));
-            file.AppendLine("NEW_RANDOM = " + Convert.ToString(input.oldRandom));
+            file.AppendLine("OLD_RANDOM = " + Convert.ToString(input.oldRandom));
             file.AppendLine("M" + " = " + Convert.ToString(input.M));
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
             file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));
