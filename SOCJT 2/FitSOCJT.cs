@@ -158,7 +158,15 @@ namespace ConsoleApplication1
             //to this routine but can only include one object in the arguments.  Therefore, I created the MasterObject just to store
             //this information which I pass to the ALGLIB routine.  Where it's used, it is cast from object to a MasterObject.
             SOCJT run = new SOCJT();            
-            MasterObject Masterly = new MasterObject();            
+            MasterObject Masterly = new MasterObject();
+
+            //here, if using simple lanczos and wanting evecs, set pVector to false so that they are not calculated each step of the fit
+            bool evecs = false;
+            if (input.pVector && !input.blockLanczos)
+            {
+                evecs = true;
+                input.pVector = false;
+            }
             Masterly.Initialize(run, input, Modes, inputFile, isQuad, userInput);
 
             //initialize and run MinLM algorithm
@@ -208,6 +216,13 @@ namespace ConsoleApplication1
                 }
             }
 
+            //if eigenvectors are needed, run SOCJT routine one more time to calculate them.
+            if (evecs)
+            {
+                Console.WriteLine("Calculating eigenvectors.");
+                Masterly.nInput.pVector = true;
+                Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput);
+            }
             //make output
             output = Masterly.nSoc.outp;
             //add something showing RMS error and parameters for each JT mode
