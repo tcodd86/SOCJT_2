@@ -375,11 +375,7 @@ namespace ConsoleApplication1
 
         public bool blockLanczos { get; private set; }//end naiveLanczos
 
-        public bool debugFlag { get; private set; }//end debugFlag
-
-        public bool newRandom { get; private set; }//end newRandom
-
-        public bool fitMatrix { get; private set; }//end fitMatrix
+        public bool oldRandom { get; private set; }//end newRandom
 
         #endregion properties
 
@@ -402,9 +398,7 @@ namespace ConsoleApplication1
             beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
-            debugFlag = false;
-            newRandom = false;
-            fitMatrix = false;
+            oldRandom = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -733,18 +727,11 @@ namespace ConsoleApplication1
                                 blockLanczos = true;
                             }
                         }
-                        if (inputf[u].ToUpper() == "NEW_RANDOM")
+                        if (inputf[u].ToUpper() == "OLD_RANDOM")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
-                                newRandom = true;
-                            }
-                        }
-                        if (inputf[u].ToUpper() == "FIT_MAT")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                debugFlag = true;
+                                oldRandom = true;
                             }
                         }
                         if (inputf[u] == "/")
@@ -793,11 +780,6 @@ namespace ConsoleApplication1
                         {
                             //factor = Convert.ToDouble(inputf[u + 1]);
                             factor = parseDouble(inputf[u + 1]);
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "NPRINT")
-                        {
-                            print = Convert.ToInt16(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "/")

@@ -35,19 +35,34 @@ namespace ConsoleApplication1
             {
                 throw new FitFileNotFoundException();
             }
+
+            //assign number of eigenvalues to be fit from fitFile
             int nToFit = Convert.ToInt16(fitF[0]);
+
+            //create new Eigenvalue array to store the values from the fit file for each value being fit
             Eigenvalue[] userInput = new Eigenvalue[nToFit];
+
+            //initialize the Eigenvalue array for the fit values from the fit file
             for (int i = 0; i < nToFit; i++)
             {
                 userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false);
             }
             
             //initializes the X vector, boundary conditions and variable scales
+            //xList will contain each parameter being fit
             List<double> xList = new List<double>();
+
+            //the lower bounds for each variable being fit, these are hardcoded
             List<double> bndL = new List<double>();
+
+            //the upper bounds for each variable being fit, these are hardcoded
             List<double> bndU = new List<double>();
+
+            //the scaling values for each variable being fit, these are hardcoded
             List<double> lScale = new List<double>();
 
+            //here I initialize the xList, upper and lower boundaries, and scales for each parameter being fit.
+            //for Azeta
             if (input.fitAzeta == true)
             {
                 xList.Add(input.Azeta);
@@ -55,6 +70,7 @@ namespace ConsoleApplication1
                 bndU.Add(double.PositiveInfinity);
                 lScale.Add(1.0);
             }
+            //for the origin
             if (input.fitOrigin == true)
             {
                 xList.Add(0.0);
@@ -62,8 +78,10 @@ namespace ConsoleApplication1
                 bndU.Add(double.PositiveInfinity);
                 lScale.Add(200.0);//changed from 75
             }
+            //for each mode
             for (int i = 0; i < input.nModes; i++)
-            {                
+            {   
+                //for Omega
                 if (Modes[i].fitOmega == true)
                 {
                     xList.Add(Modes[i].modeOmega);
@@ -71,6 +89,7 @@ namespace ConsoleApplication1
                     bndU.Add(double.PositiveInfinity);
                     lScale.Add(200.0);//changed from 200
                 }
+                //for D
                 if (Modes[i].fitD == true)
                 {
                     xList.Add(Modes[i].D);
@@ -78,6 +97,7 @@ namespace ConsoleApplication1
                     bndU.Add(double.PositiveInfinity);
                     lScale.Add(10.0);//changed from 1000
                 }
+                //for K
                 if (Modes[i].fitK == true)
                 {
                     xList.Add(Modes[i].K);
@@ -85,6 +105,7 @@ namespace ConsoleApplication1
                     bndU.Add(double.PositiveInfinity);
                     lScale.Add(1.0);//changed from 100
                 }
+                //for wexe
                 if (Modes[i].fitWEXE == true)
                 {
                     xList.Add(Modes[i].wExe);
@@ -93,6 +114,7 @@ namespace ConsoleApplication1
                     lScale.Add(50.0);//change from 250
                 }
             }
+            //then for cross-terms
             if (input.includeCrossTerms == true)
             {
                 for (int i = 0; i < input.nModes; i++)
@@ -132,6 +154,9 @@ namespace ConsoleApplication1
             double[] scale = lScale.ToArray();
 
             //Generate new Master Object
+            //this is an ugly solution to the problem of using the ALGLIB routines since I need to pass a large amount of information
+            //to this routine but can only include one object in the arguments.  Therefore, I created the MasterObject just to store
+            //this information which I pass to the ALGLIB routine.  Where it's used, it is cast from object to a MasterObject.
             SOCJT run = new SOCJT();            
             MasterObject Masterly = new MasterObject();            
             Masterly.Initialize(run, input, Modes, inputFile, isQuad, userInput);
@@ -440,7 +465,7 @@ namespace ConsoleApplication1
             }
             rmsError /= temp.Length;
 
-            Console.WriteLine("Eigenvalues have been calculated {0} times.", count++);
+            Console.WriteLine("Eigenvalues have been calculated {0} times.", ++count);
             Console.WriteLine("RMS Error is {0}.", rmsError);
         }
 
@@ -493,6 +518,21 @@ namespace ConsoleApplication1
             return errorsvec;
         }
 
+        /// <summary>
+        /// Returns the RMS deviation between two arrays of Eigenvalues including the origin value.
+        /// </summary>
+        /// <param name="exp">
+        /// Eigenvalues from the .fit file.
+        /// </param>
+        /// <param name="socjtOut">
+        /// Eigenvalues from the SOCJT routine.
+        /// </param>
+        /// <param name="origin">
+        /// Origin shift to be applied to the experimental values.
+        /// </param>
+        /// <returns>
+        /// RMS error.
+        /// </returns>
         public static double Comparer(Eigenvalue[] exp, Eigenvalue[] socjtOut, double origin)
         {
             double RMS = 0D;
