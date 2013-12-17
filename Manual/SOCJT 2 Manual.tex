@@ -51,8 +51,8 @@
 \newcommand{\ul}{\underline }
 \renewcommand{\o}{CF$_3$O}
 \newcommand{\s}{CF$_3$S}
-\newcommand{\socjttwo}{\bf{SOCJT 2 }}
-\newcommand{\socjt}{{\bf SOCJT }}
+\newcommand{\socjttwo}{\bf{SOCJT 2}}
+\newcommand{\socjt}{{\bf SOCJT}}
 \newcommand{\socrt}{{\bf SOCRT}}
 \newcommand{\etoe}{{\bf e2e}}
 \newcommand{\pitopi}{{\bf pi2pi}}
@@ -916,6 +916,26 @@ the jacobian.
 
 \end{description}
 
+\subsection{\&CROSS\_TERMS} The \&CROSS\_TERMS namelist group specifies
+any coupling terms between two modes and whether they are to be fit.
+
+\begin{verbatim}
+ &CROSS_TERMS
+  JT MODE 1 MODE 2 100.0
+  FIT = FALSE
+ /
+\end{verbatim}
+
+\begin{description}
+\item[JT] The string JT should be first which says this is a Jahn-Teller type cross-term.
+Next, the two modes coupled by this term should be given as 'MODE x MODE y'. 
+The last term is the value of the cross-term between the two modes. Double.
+
+\item[FIT] Boolean value indicating whether the cross-term on the preceding line
+should be fit. This line is optional and has a default value of FALSE.
+
+\end{description}
+
 \subsection{\&SCAN} \label{scan}
 
 The \&SCAN namelist is optional and is only needed if one or more parameters
@@ -928,7 +948,7 @@ are being scanned. Any number of parameters may be scanned simultaneously.
   MODE 1 K 0.01 0.02
   MODE 2 OMEGA 540.0 -5.0
   CROSS 1 2 JT 0.01 2.0
-/
+ /
 \end{verbatim}
 
 \begin{description}
@@ -969,7 +989,7 @@ sufficient to explain the output. The name of the output file is {\tt
 
 \subsubsection{Preamble}
 
-The output of the main program \socjt\ begins with the time the
+The output of the main program \socjttwo begins with the time the
 calculation began,
 \begin{verbatim}
  It is 171236.280 on 19990805
@@ -1277,44 +1297,6 @@ basis set or eigenvectors that are being written. While cumbersome,
 these filenames allow for all of the required information to be stored
 in a useable format.
 
-\paragraph{Electron transition simulations}
-For each electronic transition calculated, a file an {\tt (x,y)} file
-is generated that simulates the electronic transition to facilitate
-comparisons with experimental data. 
-\begin{verbatim}
-  36073.00     .01675822
-  36072.00     .02837989
-  .
-  .
-  .
-  35002.00   89.50251000
-  35001.00   97.26550000
-  35000.00  100.00000000
-  34999.00   97.26550000
-  34998.00   89.50251000
-  34997.00   77.91646000
-  34996.00   64.17130000
-  34995.00   50.00000000
-  .
-  .
-  .
- Parameters
- azeta =      100.000000
- omega(          1) =      573.000000
- D(          1) =    2.300000E-02
- K(          1) =    1.000000E-02
- A_omega(          1) =      585.000000
- omega(          2) =      263.000000
- D(          2) =    4.350000E-01
- K(          2) =    0.000000E+00
- A_omega(          2) =      239.000000
-\end{verbatim}
-The simulation assumes a Gaussian
-line profile, with a full width at half maximum of $fwhm$ from the
-input file. To keep the file length manageable, when the intensity
-drops below 0.01 (the maximum is set to 100.0), the data point is
-deleted from the file. The file concludes with a summary of most of
-the relevant input parameters to the \JT\ calculation.
 
 \paragraph{Basis set and vector files}
 
@@ -1349,23 +1331,27 @@ associated with \socjt .
 The time required for execution scales exponentially with the size of
 the basis set. It is recommended that the user perform preliminary
 calculations with smaller basis sets, and then work up to bigger basis
-sets. Elsewhere,\cite{tab11} we have tabulated the time required for a
-variety of calculations using a 200 MHz Cyrix-686. As an example, a
-four-mode linear \JT\ calculation with values of $mode\_vmax$ equal to
-7,5,3, and 2 took approximately 70 minutes. So far, I have experienced
-no problems with the program running out of memory, using machines
-with only 32 MB of RAM.
+sets. The block-Lanczos routine (from \socjt) can take more than 100
+times longer than the simple Lanczos routine written for \socjttwo\ so
+it is recommended to use the simple Lanczos whenever possible and only
+use the block routine to double check results. For example, a quadratic JT problem with $\sim$8800 basis functions took 180 s using the block Lanczos 
+algorithm while it took only 2.7 s using the simple Lanczos. Hamiltonian
+generation times scale quadratically with basis set size and may represent
+the majority of execution time for large basis sets. For example, a problem with $\sim$450,000 basis functions took $\sim$1400 s to generate (using PARMAT = 4, PARJ = 2) the matrix but only $\sim$120 s to diagonalize with the simple Lanczos algorithm. All time tests were run on a machine with duo quad-core Intel Xeon processors at 2.6 GHz with 6 GB RAM. A final note is that execution times for the simple Lanczos routine increase, sometimes dramatically, when eigenvectors are requested. This is because, unlike the block Lanczos routine which automatically generates eigenvectors, they must be explicitly calculated by transforming the eigenvectors of the Lanczos matrix to those of the Hamiltonian by multiplying them by the Lanczos vectors. This means you have M matrix vector products of a matrix with dimension N (the size of the basis set) x NOITS times a vector of size N. 
 
 \subsection{Recommendations on input parameters}
 There are a few general recommendations regarding the choice of basis
 set. First, in general, the larger the value of either $D_i$ or $K_i$,
-the larger that mode's value of $mode\_vmax$ should be. This result is
+the larger that mode's value of $MODE\_VMAX$ should be. This result is
 fairly obvious. Second, the smaller the frequency $\omega _{e,i}$ is,
 the larger the basis set should be. This result is not directly
 obvious, but is derived from the experimental realization that most
 information is available for the lower energy spin-vibronic levels,
 and these levels will be dominated by the vibrational modes with low
-frequencies. 
+frequencies. It is also important to vary the $MAXJ$ parameter, especially
+for cases with strong JT coupling. For quadratic JT calculations a $MAXJ$
+value of at least 7.5 should be used but a larger basis set may
+be necessary.
 
 Lastly, and most importantly, it is important to recognize that the
 choice of a finite basis set is a potentially severe
@@ -1376,23 +1362,6 @@ although in practice a few \wn \ is as close as they will
 converge. For fitting spectra, most calculations can be run with only
 moderately sized basis sets. As the improvement of the fit to the
 experimental data improves, the basis set can be slowly increased.
-
-\subsection{Initial guesses}
-The initial guess functionality is intended to improve the convergence
-speed from one iteration to the next. In the first calculation, the
-variables $vec\_file$ and $basis\_file$ in the \&IO\_INFO namelist
-group must both be set to {\tt .true.}. This generates the necessary
-files to jump start the next calculation. In the next calculation, the
-variable $guesses$ in the \&SOLVE\_INFO group is set to {\tt
-  .true.}. As indicated in section \ref{section:input}, this
-calculation only works if the basis sets from the two calculations are
-identical. In other words, the exactly same values of $mode\_vmax$
-must be used. Also, the calculations must be the same with respect to
-the terms in the Hamiltonian. For example, one calculation cannot have
-spin-orbit coupling, while the other does. While the initial guess
-does work, it is often no faster than starting from scratch. This
-feature has not been fully tested, and is not guaranteed to work
-without error.
 
 \subsection{Degeneracies}
 One subtlety that is often not appreciated is that every single level
@@ -1483,154 +1452,6 @@ for $a\zeta _e$ equal to zero.  The three ``quantum numbers'' $j$,
 $n_j$, and $\Sigma $ define each unique energy level, and can be found
 at the end of the output of a \socjt\ run.
 
-
-\section{\socrt } \label{section:socrt}
-
-The program \socrt\ is actually only a slight modified version of
-\socjt . As discussed in section \ref{section:intro}, the
-Renner-Teller effect for $\Pi $ states of polyatomic linear molecules
-can be formulated using the \JT\ Hamiltonian, but with a zero (by
-symmetry) linear \JT\ effect. Because of the higher symmetry of the
-linear molecule's PES, a greater number of quantum numbers are
-conserved. Combined with the slightly different nomenclature used for
-the Renner-Teller problem, these changes necessitated a unique program
-for Renner-Teller molecules.
-
-This section discusses the few changes that have been made to the
-input file for the program \socrt\ as compared to that for \socjt
-. The output has only cosmetic changes associated with it, and will
-not be discussed futher. The fitting routines are not available with
-\socrt .
-
-\subsection{\&GENERAL}
-
-In the \&GENERAL namelist group, the variables $zetae, s1,$ and $s2$
-have been deleted, while the variable $maxj$ has been changed to
-$maxk$, since $K$ is the name given to the conserved vibronic quantum
-number in Renner-Teller systems. It is an integer, and indicates up to
-what value of $K$ the blocks should be calculated.
-
-\subsection{\&MODE\_INFO}
-
-The Renner-Teller analogue of the \JT\ parameter $K_i$ is $\epsilon
-_i$. For Renner-Teller molecules, there is no equivalent of the linear
-\JT\ effect, and so $D_i$ is non existent. Thus, the variables
-$moded$ and $modek$ have been eliminated from the \&MODE\_INFO
-namelist group. In their place the variable $mode\_epsilon$ as been
-added, which is a real variable with units of \wn .
-
-\subsection{\&SOLVE\_INFO}
-
-The variable $guesses$ has been deleted from \socrt . The initial
-guess functionality is not available in \socrt . The Renner-Teller
-calculations are in general very quick, and this should not cause a
-major inconvenience to most users.
-
-\subsection{\&IO\_INFO}
-
-There have been no changes made to this namelist group.
-
-\subsection{\&SPECTRA}
-
-There have been no changes made to this namelist group.
-
-\subsection{\&UV\_INFO}
-
-Only the name of the variable $e_j$ has been changed to $e_k$, to
-reflect the change in the nomenclature of the conserved vibronic
-quantum number.
-
-\section{\etoe } \label{section:e2e}
-
-The program \etoe\ was written to take the output of two \JT\
-calculations and calculate the intensities of an electronic transition
-between the two states. As such, it requires that these two
-calculations have been successfully completed, with the variables
-$vec\_file$ and $basis\_file$ having been set to {\tt .true.}. All of
-the output files, along with the \etoe\ executable file, must be in
-the same directory. As with \socjt\ and \socrt , \etoe\ is executed by
-simply double clicking the file {\tt e2e.exe} from the explorer or
-executing it from a DOS prompt. 
-
-The two JT calculations have to have the same number of active modes,
-although it is not necessary for them to have had the same values of
-$modevmax$. Diagonal Franck-Condon factors are assumed (which is an
-improvement to be left to a future version). The order of the modes is
-the same between the two calculations - i.e., the mode listed first in
-the state 1 \socjt\ calculation is the same as the mode listed first in
-the state 2 \socjt\ calculation. Both calculations must be the same
-with respect to spin-orbit coupling, and this must be properly listed
-in the input file to e2e. If it is desired for one state to have zero
-spin-orbit coupling, a very small (ca. 0.1 \wn ) value should be used
-for $azetae$.
-
-Two reasonable assumptions are made in the calculation, that the
-selection rules on $j$ and $\Sigma $ are $\Delta j = 0$ and $\Delta
-\Sigma = 0$. 
-
-This program has not been fully tested, and the program is not
-foolproof with respect to the input - i.e., garbage-in-garbage-out may
-apply.  
-
-There is an interesting application of the program \etoe , unrelated
-to the calculation of transition intensities. The program \etoe\ can
-be used to test whether or not a calculation has converged with
-respect to the size of the basis set. In testing convergence, the only
-difference between the two calculations is the size of the basis set
-(i.e., the values of $modevmax$). In this case, a calculation of the
-transition intensities from one state to another gives an indication
-of how closely the calculation is converged. The closer the
-convergence, the closer the intensity of the zero-zero band will be to
-unity, and the lower the intensities of all other transitions.
-
-\subsection{Input}
-
-The input file is old-style; i.e., it's not namelist oriented like the
-input file for \socjt\ and \socrt.  The input file begins with the
-following four lines (type of variable is given in parentheses): 
-\begin{verbatim*}
-filename1 (character(15))
-filename2 (character(15))
-nspectra (i2)
-spin_orbit (logical)
-\end{verbatim*}
-The first two lines contain the filenames of the two \socjt\
-calculations, followed by the number of spectra to be calculated. The
-last line is a logical variable to indicate whether or not spin-orbit
-coupling was used in the \socjt\ calculations.
-
-After these four lines, there follows a line for each spectrum to be
-calculated.  The input differs slightly depending on whether
-spin-orbit coupling was included in the calculation.  If $spin\_orbit$
-is true, then these lines take the form
-\begin{verbatim*}
-j sigma nj1 ttype origin step_size fwhm
-\end{verbatim*}
-and if $spin\_orbit$ was set to {\tt .false.}, then it has the form
-\begin{verbatim*}
-j nj1 ttype origin step_size fwhm
-\end{verbatim*}
-The variables are
-\begin{description}
-\item[$j$] The value of $j$ for the two vibronic levels involved in
-  the transition. Real.
-
-\item[$sigma$] The value of $\Sigma $ for the two vibronic levels
-  involved in the transition. Real.
-
-\item[$nj1$] Which eigenvector of state 1 the transition originates
-  from ($nj1$ = 1 for lowest energy eigenvector for the
-  state). Integer.
-
-\end{description}
-The variables $ttype, origin, step\_size, $ and $fwhm$ are defined as
-they are for \socjt .
-
-\section{\pitopi} \label{section:pi2pi}
-
-This program has not yet been written, but it will come quickly. It
-isn't that much different than \etoe . If you require it, send email
-to the author (timothy.barckholtz@colorado.edu).
 
 \bibliographystyle{achemso_local}
 \bibliography{organometallics,socjt,methoxy,tab,benzenes}
