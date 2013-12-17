@@ -103,9 +103,6 @@ namespace ConsoleApplication1
                 throw new BasisSetTooSmallException(false);
             }
 
-            //check if matFile = true and if file exists, if so the read from it.  If not then write to it.
-            
-
             if (isQuad == false)            
             {            
                 int h = 0;                
@@ -117,12 +114,12 @@ namespace ConsoleApplication1
                     {
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
+                    //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
+                    //call some matrix read function here.
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
                 measurer.Start();
-
-                //conditional call to matrix read function here, sets matrices made to true
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;          
@@ -182,6 +179,8 @@ namespace ConsoleApplication1
                     {
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
+                    //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
+                    //call some matrix read function here.
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -189,8 +188,6 @@ namespace ConsoleApplication1
                 measurer.Reset();
                 measurer.Start();
 
-                //conditional call to matrix generation function here, sets matricesMade to true
-                
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
                 

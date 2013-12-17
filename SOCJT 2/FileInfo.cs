@@ -193,22 +193,6 @@ namespace ConsoleApplication1
             set { nguesses = value; }
         }//end property guesses
 
-        /*
-        private bool nUV;
-        public bool UV
-        {
-            get { return nUV; }
-            set { nUV = value; }
-        }//end property UV
-        
-        private int nNSpectra;
-        public int NSpectra
-        {
-            get { return nNSpectra; }
-            set { nNSpectra = value; }
-        }//end property nSpectra
-        */
-
         private string nfitFile;
         public string fitFile
         {
@@ -342,15 +326,6 @@ namespace ConsoleApplication1
             set { nInclSO = value; }
         }//end property inclSO
 
-        /*
-        private bool nspecialHam;
-        public bool specialHam
-        {
-            get { return nspecialHam; }
-            set { nspecialHam = value; }
-        }//end property specialHam
-        */
-
         private List<Tuple<decimal, int, int>> neVecs;
         public List<Tuple<decimal, int, int>> eVecs
         {
@@ -390,7 +365,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// Boolean indicating whether the matrix file exists or not.
         /// </summary>
-        public bool matMade { get; private set; }//end matMade
+        public bool matMade { get; set; }//end matMade
 
         #endregion properties
 
@@ -403,7 +378,6 @@ namespace ConsoleApplication1
             minJBool = false;
             fitOrigin = false;
             inclSO = false;
-            //specialHam = false;
             printBasis = false;
             pMatrix = false;
             pVector = false;
@@ -417,11 +391,6 @@ namespace ConsoleApplication1
             matFile = "matrix.txt";
             useMatFile = false;
             matMade = false;
-
-            //pMonit = false;
-            //pDerivs = false;
-            //vecFile = false;
-            //basisFile = false;
 
             title = "TITLE";
             origin = 0.0;
@@ -615,43 +584,16 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
-                        /*
-                        if (inputf[u].ToUpper() == "PRINT_MONIT")
+                        if (inputf[u].ToUpper() == "USE_MATRIX_FILE")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
-                                pMonit = true;
+                                useMatFile = true;
                             }
                             continue;
                         }
-                        if (inputf[u].ToUpper() == "PRINT_DERIVS")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                pDerivs = true;
-                            }
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "VEC_FILE")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                vecFile = true;
-                            }
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "BASIS_FILE")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                basisFile = true;
-                            }
-                            continue;
-                        }
-                        */
                         if (inputf[u].ToUpper() == "MATRIX_FILE")
                         {
-                            useMatFile = true;
                             matFile = inputf[u + 1];
                             continue;
                         }

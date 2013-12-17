@@ -88,7 +88,14 @@ namespace ConsoleApplication1
 
                 //see if matFile is true, and if so if the matfile exists or not.
                 if (input.useMatFile)
-                { 
+                {
+                    //create file pointer for the matrix file
+                    filepathMat = string.Concat(input.matFile);
+                    //if this file already exists, then use it for the matrix generation
+                    if (File.Exists(filepathMat))
+                    {
+                        input.matMade = true;
+                    }
                 }
 
                 //check that spin is integer or half integer only

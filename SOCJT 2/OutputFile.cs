@@ -308,10 +308,8 @@ namespace ConsoleApplication1
             file.AppendLine("PRINT_BASIS" + " = " + Convert.ToString(input.printBasis));
             file.AppendLine("PRINT_MATRIX" + " = " + Convert.ToString(input.pMatrix));
             file.AppendLine("PRINT_VEC" + " = " + Convert.ToString(input.pVector));
-            //file.AppendLine("PRINT_MONIT" + " = " + Convert.ToString(input.pMonit));
-            //file.AppendLine("PRINT_DERIVS" + " = " + Convert.ToString(input.pDerivs));
-            //file.AppendLine("VEC_FILE" + " = " + Convert.ToString(input.vecFile));
-            //file.AppendLine("BASIS_FILE" + " = " + Convert.ToString(input.basisFile));
+            file.AppendLine("USE_MATRIX_FILE = " + Convert.ToString(input.useMatFile));
+            file.AppendLine("MATRIX_FILE = " + input.matFile);
             file.AppendLine("EV_MIN = " + Convert.ToString(input.evMin));
             file.AppendLine("/");
             file.AppendLine("  ");
