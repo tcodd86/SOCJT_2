@@ -102,6 +102,10 @@ namespace ConsoleApplication1
             {
                 throw new BasisSetTooSmallException(false);
             }
+
+            //check if matFile = true and if file exists, if so the read from it.  If not then write to it.
+            
+
             if (isQuad == false)            
             {            
                 int h = 0;                
@@ -117,6 +121,9 @@ namespace ConsoleApplication1
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
                 measurer.Start();
+
+                //conditional call to matrix read function here, sets matrices made to true
+
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;          
                 Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
@@ -181,6 +188,8 @@ namespace ConsoleApplication1
                 //this tells how much time has passed this could be used to time out different parts of code                
                 measurer.Reset();
                 measurer.Start();
+
+                //conditional call to matrix generation function here, sets matricesMade to true
                 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;

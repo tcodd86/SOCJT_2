@@ -377,6 +377,21 @@ namespace ConsoleApplication1
 
         public bool oldRandom { get; private set; }//end newRandom
 
+        /// <summary>
+        /// String value. File name of file containing the previous matrix or the filename desired to write the matrix to.
+        /// </summary>
+        public string matFile { get; private set; }//end matFile
+
+        /// <summary>
+        /// Boolean indicating that a matrix file should be used or generated.
+        /// </summary>
+        public bool useMatFile { get; private set; }//end useMatFile
+
+        /// <summary>
+        /// Boolean indicating whether the matrix file exists or not.
+        /// </summary>
+        public bool matMade { get; private set; }//end matMade
+
         #endregion properties
 
         //initializes most values with reasonable defaults in case user forgets something
@@ -399,6 +414,9 @@ namespace ConsoleApplication1
             useKappaEta = false;
             blockLanczos = false;
             oldRandom = false;
+            matFile = "matrix.txt";
+            useMatFile = false;
+            matMade = false;
 
             //pMonit = false;
             //pDerivs = false;
@@ -477,7 +495,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "S")
                         {
-                            //S = Convert.ToDecimal(inputf[u + 1]);
                             S = parseDecimal(inputf[u + 1]);
                             if (S < 0M)
                             {
@@ -487,7 +504,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "AZETA")
                         {
-                            //Azeta = Convert.ToDouble(inputf[u + 1]);
                             Azeta = parseDouble(inputf[u + 1]);
                             if (Azeta != 0D)
                             {
@@ -505,13 +521,11 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "MAXJ")
                         {
-                            //maxJ = Convert.ToDecimal(inputf[u + 1]);
                             maxJ = parseDecimal(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MINJ")
                         {
-                            //minJ = Convert.ToDecimal(inputf[u + 1]);
                             minJ = parseDecimal(inputf[u + 1]);
                             minJBool = true;
                             continue;
@@ -526,7 +540,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
                         {
-                            //origin = Convert.ToDouble(inputf[u + 1]);
                             origin = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -540,7 +553,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "ZETAE")
                         {
-                            //zetaE = Convert.ToDecimal(inputf[u + 1]);
                             zetaE = parseDecimal(inputf[u + 1]);
                             continue;
                         }
@@ -554,19 +566,6 @@ namespace ConsoleApplication1
                             S2 = Convert.ToInt16(inputf[u + 1]);
                             continue;
                         }
-                        /*
-                        if (inputf[u].ToUpper() == "SPECIAL_HAM")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                specialHam = true;
-                            }
-                            else
-                            {
-                                specialHam = false;
-                            }
-                        }
-                        */ 
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
@@ -650,6 +649,12 @@ namespace ConsoleApplication1
                             continue;
                         }
                         */
+                        if (inputf[u].ToUpper() == "MATRIX_FILE")
+                        {
+                            useMatFile = true;
+                            matFile = inputf[u + 1];
+                            continue;
+                        }
                         if (inputf[u].ToUpper() == "EV_MIN")
                         {
                             evMin = Convert.ToDouble(inputf[u + 1]);

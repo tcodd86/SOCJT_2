@@ -25,7 +25,6 @@ namespace ConsoleApplication1
                 //consider making this the default for Release jobs  -- done
                 //if (!runningOnMono)
 #if DEBUG
-                //{
                 //prompt user for input directory.  Default value is C:\SOCJT 2
                 Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
                 fileDirectory = Console.ReadLine();
@@ -37,21 +36,8 @@ namespace ConsoleApplication1
                 //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
                 if (Directory.Exists(fileDirectory) == false)
                 {
-                    //Commenting this out unless I add an input file maker helper method
-                    /*
-                    Console.WriteLine("The directory does not exist.  Would you like to create it? Y/N");
-                    string YN = Console.ReadLine();
-                    if (YN.ToUpper() == "Y" || YN.ToUpper() == "YES")
-                    {
-                        Directory.CreateDirectory(fileDirectory);
-                    }
-                    else
-                    {
-                        */
                     throw new DirectoryNotFoundException();
-                    //}
                 }
-                //}
 #else
                 //else//meaning it's running mono on the Linux cluster
                 //{
@@ -84,6 +70,7 @@ namespace ConsoleApplication1
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
                 string filepathFIT = string.Copy(filepath);
+                string filepathMat = string.Copy(filepath);
                 filepathIN = string.Concat(inFileName);
                 filepathOUT = string.Concat(outFile);
 
@@ -98,6 +85,11 @@ namespace ConsoleApplication1
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
+
+                //see if matFile is true, and if so if the matfile exists or not.
+                if (input.useMatFile)
+                { 
+                }
 
                 //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
@@ -253,7 +245,6 @@ namespace ConsoleApplication1
                         linesToWrite.Add("Orthog took " + Lanczos.reorthogTime / 1000L + " seconds");
                     }
 #endif
-
                     //writes all info to the output file
                     File.WriteAllLines(filepathOUT, linesToWrite);
                 }//end no scan
