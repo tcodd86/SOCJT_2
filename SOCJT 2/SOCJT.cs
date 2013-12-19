@@ -630,6 +630,11 @@ namespace ConsoleApplication1
                 while (alglib.sparseenumerate(mat[m], ref t0, ref t1, out i, out j, out oldVal))
                 {
                     alglib.sparseadd(B, i, j, oldVal);
+                    //adds lower diagonal matrix elements for all off-diagonal matrices (first element in mat is the diagonal elements so don't do this for it). 
+                    if (m != 0)
+                    {
+                        alglib.sparseadd(B, j, i, oldVal);
+                    }
                 }
             }
             return B;

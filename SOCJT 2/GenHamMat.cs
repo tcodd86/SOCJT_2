@@ -411,8 +411,9 @@ namespace ConsoleApplication1
                 {
                     //add to both upper and lower triangle because I've found that the matrix multiplication for a symmetric matrix where all elements are actually stored
                     //as opposed to storing only the upper or lower triangle is roughly %30 faster and the extra memory required has not been a concern yet
+                    //moved this to the aggregator function in SOCJT.cs so that the persistent lists take less memory
                     alglib.sparseadd(matList[i + 1], spot.Item1, spot.Item2, spot.Item3);
-                    alglib.sparseadd(matList[i + 1], spot.Item2, spot.Item1, spot.Item3);
+                    //alglib.sparseadd(matList[i + 1], spot.Item2, spot.Item1, spot.Item3);
                 }
             }
             return matList;
