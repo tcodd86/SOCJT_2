@@ -363,6 +363,9 @@ namespace ConsoleApplication1
                     scanOut.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
                     File.WriteAllLines(filepathOUT, scanOut);
                 }
+
+                //code to write matrix file to disc here?
+
             }//end try block
 
             //Exception handling
@@ -374,14 +377,7 @@ namespace ConsoleApplication1
             }
             catch (FileNotFoundException a)
             {
-                if (a.Message == null)
-                {
-                    Console.WriteLine("The file does not exist");
-                }
-                else
-                {
-                    Console.WriteLine(a.Message);
-                }
+                Console.WriteLine(a.Message);
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }

@@ -658,11 +658,12 @@ namespace ConsoleApplication1
         private static bool matReadFunction(FileInfo input, ref List<List<alglib.sparsematrix>> fitHamList)
         {
             bool matricesMade = false;
-            if (input.useMatFile)
+            if (input.useMatFile && input.matMade)
             {
+                string[] matFileVals = { };
                 try
                 {
-                    string[] matFileVals = FileInfo.fileRead(input.matFilePath);
+                    matFileVals = FileInfo.fileRead(input.matFilePath);
                 }
                 catch(FileNotFoundException)
                 {
@@ -672,10 +673,9 @@ namespace ConsoleApplication1
                 {
                     throw new Exception("Matrix File Error." + "\r" + "Please check the matrix file and try again.");
                 }
+                matricesMade = true;
+                //actual code to parse the matrix file.
             }
-
-
-
             return matricesMade;
         }
     }//end class SOCJT
