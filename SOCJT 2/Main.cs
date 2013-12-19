@@ -70,7 +70,6 @@ namespace ConsoleApplication1
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
                 string filepathFIT = string.Copy(filepath);
-                string filepathMat = string.Copy(filepath);
                 filepathIN = string.Concat(inFileName);
                 filepathOUT = string.Concat(outFile);
 
@@ -81,7 +80,7 @@ namespace ConsoleApplication1
                 FileInfo input = new FileInfo();
 
                 //set input object data from input file
-                input.setFileInfo(inputFile);
+                input.setFileInfo(inputFile);                
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
@@ -90,9 +89,10 @@ namespace ConsoleApplication1
                 if (input.useMatFile)
                 {
                     //create file pointer for the matrix file
-                    filepathMat = string.Concat(input.matFile);
+                    input.matFilePath = string.Copy(filepath);
+                    input.matFilePath = string.Concat(input.matFile);
                     //if this file already exists, then use it for the matrix generation
-                    if (File.Exists(filepathMat))
+                    if (File.Exists(input.matFilePath))
                     {
                         input.matMade = true;
                     }
@@ -372,15 +372,16 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-            catch (FileNotFoundException)
+            catch (FileNotFoundException a)
             {
-                Console.WriteLine("The file does not exist");
-                Console.WriteLine("Press enter to terminate the program.");
-                Console.ReadLine();
-            }
-            catch (FitFileNotFoundException)
-            {
-                Console.WriteLine("The fit file does not exist.");
+                if (a.Message == null)
+                {
+                    Console.WriteLine("The file does not exist");
+                }
+                else
+                {
+                    Console.WriteLine(a.Message);
+                }
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
+using System.IO;
 
 namespace ConsoleApplication1
 {
@@ -181,6 +182,8 @@ namespace ConsoleApplication1
                     }
                     //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
                     //call some matrix read function here.
+                    //matricesMade = someFunctionCall that returns a boolean value if the matfile exists and is read.
+                    //function should take input and ref fitHamList as arguments
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -640,6 +643,40 @@ namespace ConsoleApplication1
             return B;
         }
 
-        
+        /// <summary>
+        /// Function that reads a matrix file from file and initializes hamiltonian matrices.
+        /// </summary>
+        /// <param name="input">
+        /// initialized FileInfo object.
+        /// </param>
+        /// <param name="fitHamList">
+        /// List of matrices. If matFile is to be used and exists this list will contain initialized off-diagonal matrices after function call.
+        /// </param>
+        /// <returns>
+        /// Boolean indicating whether or not the fitHamList matrices have been initialized from matFile.
+        /// </returns>
+        private static bool matReadFunction(FileInfo input, ref List<List<alglib.sparsematrix>> fitHamList)
+        {
+            bool matricesMade = false;
+            if (input.useMatFile)
+            {
+                try
+                {
+                    string[] matFileVals = FileInfo.fileRead(input.matFilePath);
+                }
+                catch(FileNotFoundException)
+                {
+                    throw new FileNotFoundException("The matrix file does not exist.");
+                }
+                catch
+                {
+                    throw new Exception("Matrix File Error." + "\r" + "Please check the matrix file and try again.");
+                }
+            }
+
+
+
+            return matricesMade;
+        }
     }//end class SOCJT
 }

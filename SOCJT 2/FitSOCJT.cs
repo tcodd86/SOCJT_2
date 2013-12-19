@@ -19,6 +19,8 @@ namespace ConsoleApplication1
             string[] fitF = {};
             try
             {
+                fitF = FileInfo.fileRead(filepath);
+                /*
                 using (StreamReader FitIn = new StreamReader(filepath))
                 {
                     string lineS;
@@ -30,10 +32,11 @@ namespace ConsoleApplication1
                         fitF = fitF.Concat(FitNewLine).ToArray();
                     }
                 }
+                */
             }
             catch(FileNotFoundException)
             {
-                throw new FitFileNotFoundException();
+                throw new FileNotFoundException("The fit file does not exist.");
             }
 
             //assign number of eigenvalues to be fit from fitFile

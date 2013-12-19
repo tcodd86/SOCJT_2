@@ -353,6 +353,11 @@ namespace ConsoleApplication1
         public bool oldRandom { get; private set; }//end newRandom
 
         /// <summary>
+        /// Filepath of matrix file to read.
+        /// </summary>
+        public string matFilePath { get; set; }//end matFilePath
+
+        /// <summary>
         /// String value. File name of file containing the previous matrix or the filename desired to write the matrix to.
         /// </summary>
         public string matFile { get; private set; }//end matFile
@@ -428,7 +433,6 @@ namespace ConsoleApplication1
         public static string[] fileRead(string filepath)
         {
             string[] inputF = { };
-
             using (StreamReader SOCJTin = new StreamReader(filepath))
             {
                 string lineS;
