@@ -5,14 +5,6 @@ using System.Text;
 
 namespace ConsoleApplication1
 {
-    class FitFileNotFoundException : ApplicationException
-    {
-        public FitFileNotFoundException()
-        { 
-            //empty body
-        }
-    }
-
     class BasisSetTooSmallException : ApplicationException
     {
         public string eMessage { get; private set; }
