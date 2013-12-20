@@ -426,6 +426,7 @@ namespace ConsoleApplication1
             for (int i = 0; i < SOCJT.fitHamList.Count; i++)
             {
                 file.AppendLine("List " + i);
+                file.AppendLine(Convert.ToString(SOCJT.fitHamList[i][0].innerobj.m));
                 file.AppendLine(" ");
                 for (int j = 1; j < SOCJT.fitHamList[i].Count; j++)
                 {
@@ -438,7 +439,7 @@ namespace ConsoleApplication1
                     int t1 = 0;
                     while (alglib.sparseenumerate(SOCJT.fitHamList[i][j], ref t0, ref t1, out m, out n, out oldVal))
                     {
-                        file.AppendLine("\t" + Convert.ToString(m) + "\t" + Convert.ToString(n) + "\t" + Convert.ToString(oldVal));
+                        file.AppendLine("\t" + Convert.ToString(n) + "\t" + Convert.ToString(m) + "\t" + Convert.ToString(oldVal));
                     }
                     file.AppendLine(" ");
                 }//end loop j

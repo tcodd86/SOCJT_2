@@ -116,7 +116,7 @@ namespace ConsoleApplication1
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
                     //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
-                    //call some matrix read function here.
+                    matricesMade = matReadFunction(input);
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
                 measurer.Reset();
@@ -181,9 +181,7 @@ namespace ConsoleApplication1
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
                     //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
-                    //call some matrix read function here.
-                    //matricesMade = someFunctionCall that returns a boolean value if the matfile exists and is read.
-                    //function should take input and ref fitHamList as arguments
+                    matricesMade = matReadFunction(input);
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -655,15 +653,15 @@ namespace ConsoleApplication1
         /// <returns>
         /// Boolean indicating whether or not the fitHamList matrices have been initialized from matFile.
         /// </returns>
-        private static bool matReadFunction(FileInfo input, ref List<List<alglib.sparsematrix>> fitHamList)
+        private static bool matReadFunction(FileInfo input)
         {
             bool matricesMade = false;
             if (input.useMatFile && input.matMade)
             {
-                string[] matFileVals = { };
+                string[] matFile = { };
                 try
                 {
-                    matFileVals = FileInfo.fileRead(input.matFilePath);
+                    matFile = FileInfo.fileRead(input.matFilePath);
                 }
                 catch(FileNotFoundException)
                 {
@@ -674,9 +672,34 @@ namespace ConsoleApplication1
                     throw new Exception("Matrix File Error." + "\r" + "Please check the matrix file and try again.");
                 }
                 matricesMade = true;
-                //actual code to parse the matrix file.
-            }
+                //read the matrix into memory
+                //string[] matFile = FileInfo.fileRead(input.matFilePath);
+                int index = 0, basisSize = 0;
+                for (int i = 0; i < matFile.Length; i++)
+                {
+                    if (matFile[i] == "List")
+                    {
+                        index = Convert.ToInt16(matFile[i + 1]);
+                        basisSize = Convert.ToInt16(matFile[i + 2]);
+                        //this is the matrix for the diagonal elements.  These are added seperately.
+                        fitHamList[index].Add(new alglib.sparsematrix());
+                        continue;
+                    }//end if matFile[i] == List
+                    if (matFile[i] == "Matrix")
+                    {
+                        var B = new alglib.sparsematrix();
+                        alglib.sparsecreate(basisSize, basisSize, out B);
+                        i += 2;
+                        while (matFile[i] != "List" || matFile[i] != "Matrix")
+                        {
+                            alglib.sparseadd(B, Convert.ToInt16(matFile[i]), Convert.ToInt16(matFile[i + 1]), FileInfo.parseDouble(matFile[i + 2]));
+                            i += 3;
+                        }
+                        fitHamList[index].Add(B);
+                    }//end if matFile[i] == Matrix
+                }//end for loop over entire matrix file
+            }//end if
             return matricesMade;
-        }
+        }//end matReadFunction
     }//end class SOCJT
 }

@@ -430,6 +430,15 @@ namespace ConsoleApplication1
             nprint = 0;            
         }
         
+        /// <summary>
+        /// Reads a text file into memory and parses it into a string array.
+        /// </summary>
+        /// <param name="filepath">
+        /// Filepath of file to be read and parsed.
+        /// </param>
+        /// <returns>
+        /// Array containing all values from text file.
+        /// </returns>
         public static string[] fileRead(string filepath)
         {
             string[] inputF = { };
