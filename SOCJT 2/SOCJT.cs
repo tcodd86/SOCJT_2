@@ -13,7 +13,7 @@ namespace ConsoleApplication1
         private static bool matricesMade = false;
 
         //keep this so that on concurrent calls the matrix does not need to be regenerated
-        private static List<List<alglib.sparsematrix>> fitHamList;
+        public static List<List<alglib.sparsematrix>> fitHamList { get; private set; }
 
         private Eigenvalue[] nfinalList;
         public Eigenvalue[] finalList

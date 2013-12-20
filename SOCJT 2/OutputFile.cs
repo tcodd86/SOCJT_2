@@ -413,5 +413,40 @@ namespace ConsoleApplication1
             return linesToWrite;
         }//end method ScanOutput
 
+        /// <summary>
+        /// Writes all off-diagonal matrices to a matrix file for future use.
+        /// </summary>
+        /// <param name="input">
+        /// FileInfo object containing matrix file name/path.
+        /// </param>
+        public static void writeMatFile(FileInfo input)
+        { 
+            //writes only the off-diagonal matrices to the file.\
+            StringBuilder file = new StringBuilder();
+            for (int i = 0; i < SOCJT.fitHamList.Count; i++)
+            {
+                file.AppendLine("List " + i);
+                file.AppendLine(" ");
+                for (int j = 1; j < SOCJT.fitHamList[i].Count; j++)
+                {
+                    file.AppendLine("Matrix " + j);
+                    file.AppendLine(" ");
+                    int m;
+                    int n;
+                    double oldVal;
+                    int t0 = 0;
+                    int t1 = 0;
+                    while (alglib.sparseenumerate(SOCJT.fitHamList[i][j], ref t0, ref t1, out m, out n, out oldVal))
+                    {
+                        file.AppendLine("\t" + Convert.ToString(m) + "\t" + Convert.ToString(n) + "\t" + Convert.ToString(oldVal));
+                    }
+                    file.AppendLine(" ");
+                }//end loop j
+            }//end loop i
+            List<string> linesToWrite = new List<string>();
+            linesToWrite.Add(file.ToString());
+            File.WriteAllLines(input.matFilePath, linesToWrite);
+        }//end method writeMatFile
+
     }//end class OutputFile    
 }

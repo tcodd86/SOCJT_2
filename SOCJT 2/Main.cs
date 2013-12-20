@@ -256,8 +256,7 @@ namespace ConsoleApplication1
                     File.WriteAllLines(filepathOUT, linesToWrite);
                 }//end no scan
 
-                //means a scan is being run
-                else
+                else//means a scan is being run
                 {
                     //create a list to store the final output eigenvalues from each iteration of SOCJT
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
@@ -362,9 +361,13 @@ namespace ConsoleApplication1
                     scanOut.Add(" ");
                     scanOut.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
                     File.WriteAllLines(filepathOUT, scanOut);
-                }
+                }//end else for scan
 
                 //code to write matrix file to disc here?
+                if (input.useMatFile && !input.matMade)
+                {
+                    OutputFile.writeMatFile(input);
+                }//end if to write matrix to file
 
             }//end try block
 
