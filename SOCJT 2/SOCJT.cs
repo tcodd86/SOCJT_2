@@ -682,7 +682,9 @@ namespace ConsoleApplication1
                         index = Convert.ToInt16(matFile[i + 1]);
                         basisSize = Convert.ToInt16(matFile[i + 2]);
                         //this is the matrix for the diagonal elements.  These are added seperately.
-                        fitHamList[index].Add(new alglib.sparsematrix());
+                        var B = new alglib.sparsematrix();
+                        alglib.sparsecreate(basisSize, basisSize, out B);
+                        fitHamList[index].Add(B);
                         continue;
                     }//end if matFile[i] == List
                     if (matFile[i] == "Matrix")
@@ -690,11 +692,16 @@ namespace ConsoleApplication1
                         var B = new alglib.sparsematrix();
                         alglib.sparsecreate(basisSize, basisSize, out B);
                         i += 2;
-                        while (matFile[i] != "List" || matFile[i] != "Matrix")
+                        while (matFile[i] != "List" && matFile[i] != "Matrix")
                         {
                             alglib.sparseadd(B, Convert.ToInt16(matFile[i]), Convert.ToInt16(matFile[i + 1]), FileInfo.parseDouble(matFile[i + 2]));
                             i += 3;
+                            if (i >= matFile.Length)
+                            {
+                                break;
+                            }
                         }
+                        i--;
                         fitHamList[index].Add(B);
                     }//end if matFile[i] == Matrix
                 }//end for loop over entire matrix file

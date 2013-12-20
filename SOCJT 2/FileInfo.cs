@@ -441,19 +441,24 @@ namespace ConsoleApplication1
         /// </returns>
         public static string[] fileRead(string filepath)
         {
-            string[] inputF = { };
+            List<string> inputF = new List<string>();
+            string[] inputFa = { };
             using (StreamReader SOCJTin = new StreamReader(filepath))
             {
                 string lineS;
                 string[] SOCJTNewLine;
+                char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
                 while ((lineS = SOCJTin.ReadLine()) != null)
-                {
-                    char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
+                {                    
                     SOCJTNewLine = lineS.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                    inputF = inputF.Concat(SOCJTNewLine).ToArray();
+                    for (int i = 0; i < SOCJTNewLine.Length; i++)
+                    {
+                        inputF.Add(SOCJTNewLine[i]);
+                    }
                 }//end while
             }//end StreamReader
-            return inputF;
+            inputFa = inputF.ToArray();
+            return inputFa;
         }//end method fileRead
 
         public void setFileInfo(string[] inputf)
