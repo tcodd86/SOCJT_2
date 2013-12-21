@@ -105,7 +105,9 @@ namespace ConsoleApplication1
             }
 
             if (isQuad == false)            
-            {            
+            {
+                measurer.Reset();
+                measurer.Start();
                 int h = 0;                
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
                 if (!matricesMade)
@@ -119,8 +121,6 @@ namespace ConsoleApplication1
                     matricesMade = matReadFunction(input);
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
-                measurer.Reset();
-                measurer.Start();
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;          
@@ -169,7 +169,9 @@ namespace ConsoleApplication1
 
             //Creates the Hamiltonian matrices for quadratic cases.            
             else            
-            { 
+            {
+                measurer.Reset();
+                measurer.Start();
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -185,9 +187,7 @@ namespace ConsoleApplication1
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                //this tells how much time has passed this could be used to time out different parts of code                
-                measurer.Reset();
-                measurer.Start();
+                //this tells how much time has passed this could be used to time out different parts of code      
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
@@ -679,8 +679,8 @@ namespace ConsoleApplication1
                 {
                     if (matFile[i] == "List")
                     {
-                        index = Convert.ToInt16(matFile[i + 1]);
-                        basisSize = Convert.ToInt16(matFile[i + 2]);
+                        index = Convert.ToInt32(matFile[i + 1]);
+                        basisSize = Convert.ToInt32(matFile[i + 2]);
                         //this is the matrix for the diagonal elements.  These are added seperately.
                         var B = new alglib.sparsematrix();
                         alglib.sparsecreate(basisSize, basisSize, out B);
@@ -694,7 +694,7 @@ namespace ConsoleApplication1
                         i += 2;
                         while (matFile[i] != "List" && matFile[i] != "Matrix")
                         {
-                            alglib.sparseadd(B, Convert.ToInt16(matFile[i]), Convert.ToInt16(matFile[i + 1]), FileInfo.parseDouble(matFile[i + 2]));
+                            alglib.sparseadd(B, Convert.ToInt32(matFile[i]), Convert.ToInt32(matFile[i + 1]), FileInfo.parseDouble(matFile[i + 2]));
                             i += 3;
                             if (i >= matFile.Length)
                             {
