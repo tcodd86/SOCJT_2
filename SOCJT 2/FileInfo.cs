@@ -904,6 +904,13 @@ namespace ConsoleApplication1
                     #endregion
                 }
             }//end for
+
+            //this is to initialize the cross-term matrix no matter what
+            if (crossTermMatrix == null)
+            {
+                crossTermMatrix = new double[nModes, nModes];
+                crossTermFit = new bool[nModes, nModes];
+            }
         }//end method setFileInfo
 
         /// <summary>
