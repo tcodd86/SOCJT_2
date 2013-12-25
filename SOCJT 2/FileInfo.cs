@@ -374,7 +374,9 @@ namespace ConsoleApplication1
 
         #endregion properties
 
-        //initializes most values with reasonable defaults in case user forgets something
+        /// <summary>
+        /// Constructor for FileInfo object. Sets reasonable values for most properties in case user forgets something in input file.
+        /// </summary>
         public FileInfo()
         {
             //initialize all booleans to false by default            
