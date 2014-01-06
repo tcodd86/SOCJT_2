@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Collections;
 
 namespace ConsoleApplication1
 {
@@ -54,6 +55,68 @@ namespace ConsoleApplication1
             Lambda = lam;
         }//end constructor
 
+        /// <summary>
+        /// Class to implement IComparer interface for BasisFunctions for sorting
+        /// </summary>
+        private class sortBasisFunctionsHelper : IComparer
+        {
+            int IComparer<BasisFunction>.Compare(BasisFunction a, BasisFunction b)
+            {
+                int val = 0;
+                //start at last mode and check it, if it matches move to next mode
+
+                //start with lambda values
+                if (a.Lambda > b.Lambda)
+                {
+                    val = 1;
+                    return val;
+                }
+                if (a.Lambda < b.Lambda)
+                {
+                    val = -1;
+                    return val;
+                }
+                //if lambdas are the same then check v and l for each mode until a difference is found
+                for(int place = a.modesInVec.Count; place >= 0; place--)
+                {
+                    //check v
+                    if (a.modesInVec[place].v > b.modesInVec[place].v)
+                    {
+                        val = 1;
+                        break;
+                    }
+                    if (a.modesInVec[place].v < b.modesInVec[place].v)
+                    {
+                        val = -1;
+                        break;
+                    }
+                    //if neither of those is true then the two v values are equal, then check l values
+                    if (a.modesInVec[place].l > b.modesInVec[place].l)
+                    {
+                        val = 1;
+                        break;
+                    }
+                    if (a.modesInVec[place].l < b.modesInVec[place].l)
+                    {
+                        val = -1;
+                        break;
+                    }
+                    //if neither of these is true then the two l values are identical, check the next mode in the list
+                }//end for loop
+                return val;
+            }//end comparer            
+        }//end class SortBasisFunctions
+
+        /// <summary>
+        /// Functiont IComparer to pass in sort functions
+        /// </summary>
+        /// <returns>
+        /// IComparer for custom sorting of BasisFunction objects
+        /// </returns>
+        public static IComparer<BasisFunction> sortBasisFunctions()
+        {
+            return (IComparer<BasisFunction>) new BasisFunction.sortBasisFunctionsHelper();
+        }//and sortBasisFunctions
 
         /// <summary>
         /// Function to generate a list of all possible JBasisVectors.

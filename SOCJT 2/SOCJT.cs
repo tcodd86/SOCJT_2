@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
+using System.Collections;
 
 namespace ConsoleApplication1
 {
@@ -200,6 +201,10 @@ namespace ConsoleApplication1
                     {
                         quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                     }
+
+#if DEBUG
+                    quadVecs.Sort(BasisFunction.sortBasisFunctions());
+#endif
 
                     //made specialHam matrix the default and not optional
                     if (!matricesMade)
