@@ -173,13 +173,15 @@ namespace ConsoleApplication1
                 //indexes n and m are for the rows and columns of the matrix respectively
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
-                    for (int m = n + 1; m < matSize; m++)//changed from r + 1
+                    for (int m = n + 1; m < matSize; m += 2)//m += 2 skips those values with the same lambda value
                     {
                         double temp;
+                        /*
                         if (vlLambda[n, nModes * 2] == vlLambda[m, nModes * 2])//Delta Lambda must be +/- 1
                         {
                             continue;
                         }
+                        */
                         //set the values for vdiff and ldiff
                         for (int b = 0; b < nModes; b++)
                         {

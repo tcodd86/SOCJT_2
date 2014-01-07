@@ -126,7 +126,10 @@ namespace ConsoleApplication1
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;          
                 Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
-                {                
+                {
+#if DEBUG
+                    //jBasisVecsByJ[i].Sort(BasisFunction.sortBasisFunctions());
+#endif
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
@@ -203,7 +206,7 @@ namespace ConsoleApplication1
                     }
 
 #if DEBUG
-                    quadVecs.Sort(BasisFunction.sortBasisFunctions());
+                    //quadVecs.Sort(BasisFunction.sortBasisFunctions());
 #endif
 
                     //made specialHam matrix the default and not optional

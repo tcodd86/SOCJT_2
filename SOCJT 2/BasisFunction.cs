@@ -58,13 +58,14 @@ namespace ConsoleApplication1
         /// <summary>
         /// Class to implement IComparer interface for BasisFunctions for sorting
         /// </summary>
-        private class sortBasisFunctionsHelper : IComparer
+        private class sortBasisFunctionsHelper : IComparer<BasisFunction>
         {
             int IComparer<BasisFunction>.Compare(BasisFunction a, BasisFunction b)
             {
                 int val = 0;
                 //start at last mode and check it, if it matches move to next mode
-
+                //try leaving lambda out of it completely
+                /*
                 //start with lambda values
                 if (a.Lambda > b.Lambda)
                 {
@@ -77,7 +78,8 @@ namespace ConsoleApplication1
                     return val;
                 }
                 //if lambdas are the same then check v and l for each mode until a difference is found
-                for(int place = a.modesInVec.Count; place >= 0; place--)
+                */
+                for(int place = a.modesInVec.Count - 1; place >= 0; place--)
                 {
                     //check v
                     if (a.modesInVec[place].v > b.modesInVec[place].v)
