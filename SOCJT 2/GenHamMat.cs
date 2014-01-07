@@ -170,23 +170,35 @@ namespace ConsoleApplication1
                 //these arrays will store the differences in v and l between two different basis functions
                 int[] vdiff = new int[nModes];
                 int[] ldiff = new int[nModes];
+                bool exit = false;
                 //indexes n and m are for the rows and columns of the matrix respectively
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
-                    for (int m = n + 1; m < matSize; m += 2)//m += 2 skips those values with the same lambda value
+                    for (int m = n + 1; m < matSize; m++)
                     {
-                        double temp;
-                        /*
+                        double temp;   
                         if (vlLambda[n, nModes * 2] == vlLambda[m, nModes * 2])//Delta Lambda must be +/- 1
                         {
                             continue;
                         }
-                        */
+                        
                         //set the values for vdiff and ldiff
                         for (int b = 0; b < nModes; b++)
                         {
                             vdiff[b] = vlLambda[n, b] - vlLambda[m, b];
                             ldiff[b] = vlLambda[n, b + nModes] - vlLambda[m, b + nModes];
+                            //check to see if vdiff or ldiff have impossible values (Abs value > 2) if so, skip.
+                            if (Math.Abs(vdiff[b]) > 2 || Math.Abs(ldiff[b]) > 2)
+                            {
+                                exit = true;
+                                break;
+                            }
+                        }
+                        //if an impossible value for vdiff or ldiff is found then skip all conditionals and move to next
+                        if (exit)
+                        {
+                            exit = false;
+                            continue;
                         }
 
                         //Linear JT elements
