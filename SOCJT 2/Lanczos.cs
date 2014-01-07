@@ -875,7 +875,14 @@ namespace ConsoleApplication1
             var lanczosVecs = new double[0,0];
             if(evsNeeded)
             {
-                lanczosVecs = new double[N, its];
+                if (N < 100000)
+                {
+                    lanczosVecs = new double[N, its];
+                }
+                else
+                {
+                    //create file to store the eigenvectors in the directory
+                }
             }
             for(int i = 0; i < its; i++)
             {
@@ -889,9 +896,16 @@ namespace ConsoleApplication1
                 //if calculating the eigenvectors then store the lanczos vectors here
                 if (evsNeeded)
                 {
-                    for (int j = 0; j < N; j++)
+                    if (N < 100000)
                     {
-                        lanczosVecs[j, i] = vi[j];
+                        for (int j = 0; j < N; j++)
+                        {
+                            lanczosVecs[j, i] = vi[j];
+                        }
+                    }
+                    else
+                    {
+                        //write the vector to the evFile
                     }
                 }
 
