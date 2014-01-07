@@ -197,6 +197,7 @@ namespace ConsoleApplication1
                         //if an impossible value for vdiff or ldiff is found then skip all conditionals and move to next
                         if (exit)
                         {
+                            //reset exit value for next iteration
                             exit = false;
                             continue;
                         }
@@ -327,7 +328,7 @@ namespace ConsoleApplication1
                             matrixPos[2 * mode].Add(ttTemp);
                             continue;
                             #endregion
-                        }
+                        }//end linear and bilinear terms
 
                         #region Quadratic Terms
                         if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 3, possible quadratic term
