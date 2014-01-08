@@ -896,6 +896,7 @@ namespace ConsoleApplication1
                 //if calculating the eigenvectors then store the lanczos vectors here
                 if (evsNeeded)
                 {
+                    //store in memory if small enough
                     if (N < 100000)
                     {
                         for (int j = 0; j < N; j++)
@@ -903,6 +904,7 @@ namespace ConsoleApplication1
                             lanczosVecs[j, i] = vi[j];
                         }
                     }
+                    //if not, then write them to file
                     else
                     {
                         //write the vector to the evFile
