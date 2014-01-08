@@ -223,6 +223,9 @@ namespace ConsoleApplication1
                     input.Scan = false;
                 }
 
+                SOCJT runner = new SOCJT();
+                FitSOCJT fitt = new FitSOCJT();
+
                 //main subroutine execution when not running a scan
                 if (input.Scan == false)
                 {
@@ -232,14 +235,12 @@ namespace ConsoleApplication1
 
                     //if not fitting any variables run SOCJT routine directly
                     if (!fit)
-                    {
-                        SOCJT runner = new SOCJT();
+                    {                        
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
                     else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
-                    {
-                        FitSOCJT fitter = new FitSOCJT();
-                        linesToWrite.AddRange(fitter.fit(Modes, isQuad, inputFile, input, filepathFIT));
+                    {   
+                        linesToWrite.AddRange(fitt.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
 
                     //end stopwatch for total program time execution and appends the total run time to the output file
@@ -270,7 +271,7 @@ namespace ConsoleApplication1
                     {
                         //basically run the SOCJT subroutine for each step of the scan and save the output file at the end of the loop.
                         List<string> linesToWrite = new List<string>();
-                        SOCJT runner = new SOCJT();
+                        //SOCJT runner = new SOCJT();
 
                         //run loop over each variable to be scanned and increment by step size times loop iteration.
                         for (int n = 0; n < input.scanList.Count; n++)
@@ -371,6 +372,7 @@ namespace ConsoleApplication1
                 }//end if to write matrix to file
 
                 //code to generate the eigenvector file here.
+                
 
             }//end try block
 
