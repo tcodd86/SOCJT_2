@@ -30,6 +30,8 @@ namespace ConsoleApplication1
             set { nOutput = value; }
         }
 
+        public double[,] lanczosEVectors { get; private set; }
+
         public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input)
         {
             //Sets minimum and maximum j values.
@@ -127,9 +129,6 @@ namespace ConsoleApplication1
                 options.MaxDegreeOfParallelism = input.parJ;          
                 Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
                 {
-#if DEBUG
-                    //jBasisVecsByJ[i].Sort(BasisFunction.sortBasisFunctions());
-#endif
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
@@ -204,10 +203,6 @@ namespace ConsoleApplication1
                     {
                         quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                     }
-
-#if DEBUG
-                    //quadVecs.Sort(BasisFunction.sortBasisFunctions());
-#endif
 
                     //made specialHam matrix the default and not optional
                     if (!matricesMade)

@@ -873,15 +873,21 @@ namespace ConsoleApplication1
             var viplusone = new double[N];
             double[] Axvi = new double[N];
             var lanczosVecs = new double[0,0];
+            bool NTooBig = false;
+            if (N > 100000)
+            {
+                NTooBig = true;
+            }
             if(evsNeeded)
             {
-                if (N < 100000)
+                if (!NTooBig)
                 {
                     lanczosVecs = new double[N, its];
                 }
                 else
                 {
                     //create file to store the eigenvectors in the directory
+                    //Uses a default file name each time and deletes it at the end
                 }
             }
             for(int i = 0; i < its; i++)
@@ -897,7 +903,7 @@ namespace ConsoleApplication1
                 if (evsNeeded)
                 {
                     //store in memory if small enough
-                    if (N < 100000)
+                    if (!NTooBig)
                     {
                         for (int j = 0; j < N; j++)
                         {
@@ -952,7 +958,7 @@ namespace ConsoleApplication1
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
             //double[,] z = new double[N, M];//use this line when ready to implement eigenvectors as well.
             var ZZ = new double[0,0];
-            //set flag for eigenvalues
+            //set flag for eigenvectors
             int zz = 0;
             if (evsNeeded)
             {
@@ -1016,7 +1022,8 @@ namespace ConsoleApplication1
 
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
-            {                
+            {
+                
                 //now generate the eigenvectors by matrix multiplication
                 //temporary storage for eigenvectors
                 var tempEvecs = new double[its, correctEvs.Count];
@@ -1028,16 +1035,23 @@ namespace ConsoleApplication1
                         tempEvecs[j, i] = z[j, correctEvs[i].Item1];
                     }
                 }
+                if (!NTooBig)
+                {
+                    //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
+                    double[,] transEvecs = new double[N, evs.Length];
+                    alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
 
-                //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
-                double[,] transEvecs = new double[N, evs.Length];
-                alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
+                    //then normalize
+                    normalize(ref transEvecs);
 
-                //then normalize
-                normalize(ref transEvecs);
-
-                //then set equal to z
-                z = transEvecs;
+                    //then set equal to z
+                    z = transEvecs;
+                }
+                else
+                {
+                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors to be transformed.
+                    z = tempEvecs;
+                }
             }//end if evsNeeded
         }//end NaiveLanczos
 

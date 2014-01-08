@@ -230,15 +230,16 @@ namespace ConsoleApplication1
                     List<string> linesToWrite = new List<string>();
                     linesToWrite = OutputFile.inputFileMaker(input, Modes);
 
-                    //if not fitting anyvariables run SOCJT routine directly
-                    if (fit == false)
+                    //if not fitting any variables run SOCJT routine directly
+                    if (!fit)
                     {
                         SOCJT runner = new SOCJT();
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
                     else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
                     {
-                        linesToWrite.AddRange(FitSOCJT.fit(Modes, isQuad, inputFile, input, filepathFIT));
+                        FitSOCJT fitter = new FitSOCJT();
+                        linesToWrite.AddRange(fitter.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
 
                     //end stopwatch for total program time execution and appends the total run time to the output file
@@ -368,6 +369,8 @@ namespace ConsoleApplication1
                 {
                     OutputFile.writeMatFile(input);
                 }//end if to write matrix to file
+
+                //code to generate the eigenvector file here.
 
             }//end try block
 

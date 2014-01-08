@@ -6,11 +6,13 @@ using System.IO;
 
 namespace ConsoleApplication1
 {
-    static class FitSOCJT
+    class FitSOCJT
     {
         static int count = 0;
 
-        public static List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
+        public double[,] lanczosEVectors { get; private set; }
+
+        public List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
         {
             //string to return
             List<string> output = new List<string>();
@@ -20,19 +22,6 @@ namespace ConsoleApplication1
             try
             {
                 fitF = FileInfo.fileRead(filepath);
-                /*
-                using (StreamReader FitIn = new StreamReader(filepath))
-                {
-                    string lineS;
-                    string[] FitNewLine;
-                    while ((lineS = FitIn.ReadLine()) != null)
-                    {
-                        char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
-                        FitNewLine = lineS.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
-                        fitF = fitF.Concat(FitNewLine).ToArray();
-                    }
-                }
-                */
             }
             catch(FileNotFoundException)
             {
