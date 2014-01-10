@@ -920,13 +920,14 @@ namespace ConsoleApplication1
                     else
                     {
                         //write which iteration this is
-                        writer.WriteLine(i);
                         writer.WriteLine(" ");
+                        writer.WriteLine("START_VEC" + i);
                         //write the vector to the evFile
                         for (int j = 0; j < N; j++)
                         {
                             writer.WriteLine(vi[j]);
                         }
+                        writer.WriteLine("END_VEC");
                         writer.WriteLine(" ");
                     }
                 }

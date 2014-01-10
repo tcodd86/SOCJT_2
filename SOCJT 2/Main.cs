@@ -255,10 +255,12 @@ namespace ConsoleApplication1
 #endif
                     //writes all info to the output file
                     File.WriteAllLines(filepathOUT, linesToWrite);
+                    Console.WriteLine("SOCJT Has Completed");
                 }//end no scan
 
                 else//means a scan is being run
                 {
+                    #region SCAN
                     //create a list to store the final output eigenvalues from each iteration of SOCJT
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
 
@@ -362,6 +364,7 @@ namespace ConsoleApplication1
                     scanOut.Add(" ");
                     scanOut.Add("SOCJT 2 has completed. Total time elapsed = " + String.Format("{0,11:0.0000}", TIME) + " seconds.");
                     File.WriteAllLines(filepathOUT, scanOut);
+                    #endregion
                 }//end else for scan
 
                 //code to write matrix file to disc here?
@@ -371,7 +374,19 @@ namespace ConsoleApplication1
                 }//end if to write matrix to file
 
                 //code to generate the eigenvector file here.
-                
+                if (runner.lanczosEVectors != null || fitt.lanczosEVectors != null)
+                {
+                    if (fit)
+                    { }//end if
+                    else
+                    {
+                        //call matrix mult function
+                        for (int i = 0; i < runner.lanczosEVectors.Count; i++)
+                        { 
+
+                        }//end for loop
+                    }//end else
+                }//end if
 
             }//end try block
 
@@ -432,5 +447,35 @@ namespace ConsoleApplication1
             }
 #endif
         }//end Main
+
+        /// <summary>
+        /// Reads a text file into memory and parses it into a string array.
+        /// </summary>
+        /// <param name="filepath">
+        /// Filepath of file to be read and parsed.
+        /// </param>
+        /// <returns>
+        /// Array containing all values from text file.
+        /// </returns>
+        public static double[] vecRead(string filepath, int n)
+        {
+            List<double> vector = new List<double>();
+            //string[] inputFa = { };
+            using (StreamReader vecIn = new StreamReader(filepath))
+            {
+                string lineS;
+                //string[] SOCJTNewLine;
+                //char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
+                while ((lineS = vecIn.ReadLine()) != ("START_VEC" + n))
+                {
+                    continue;
+                }
+                while ((lineS = vecIn.ReadLine()) != "END_VEC")
+                {
+                    vector.Add(FileInfo.parseDouble(lineS));
+                }//end while
+            }//end StreamReader
+            return vector.ToArray();
+        }//end method vecRead
     }//end class Program
 }//end namespace
