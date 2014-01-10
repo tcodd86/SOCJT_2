@@ -39,10 +39,9 @@ namespace ConsoleApplication1
                     throw new DirectoryNotFoundException();
                 }
 #else
-                //else//meaning it's running mono on the Linux cluster
-                //{
-                    fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                //}
+                
+                fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                
 #endif
 
                 //set the directory for reading and writing files

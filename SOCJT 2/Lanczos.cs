@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Reflection;
 
 namespace ConsoleApplication1
 {
@@ -859,7 +861,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded, int n)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -878,6 +880,8 @@ namespace ConsoleApplication1
             {
                 NTooBig = true;
             }
+            string fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            StreamWriter writer = new StreamWriter(fileDirectory);
             if(evsNeeded)
             {
                 if (!NTooBig)
@@ -888,6 +892,8 @@ namespace ConsoleApplication1
                 {
                     //create file to store the eigenvectors in the directory
                     //Uses a default file name each time and deletes it at the end
+                    fileDirectory += "\\temp_vecs" + "_" + n + "_" + ".tmp";
+                    writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 }
             }
             for(int i = 0; i < its; i++)
@@ -913,7 +919,15 @@ namespace ConsoleApplication1
                     //if not, then write them to file
                     else
                     {
+                        //write which iteration this is
+                        writer.WriteLine(i);
+                        writer.WriteLine(" ");
                         //write the vector to the evFile
+                        for (int j = 0; j < N; j++)
+                        {
+                            writer.WriteLine(vi[j]);
+                        }
+                        writer.WriteLine(" ");
                     }
                 }
 

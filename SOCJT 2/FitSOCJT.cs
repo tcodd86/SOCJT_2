@@ -10,7 +10,7 @@ namespace ConsoleApplication1
     {
         static int count = 0;
 
-        public double[,] lanczosEVectors { get; private set; }
+        public List<double[,]> lanczosEVectors { get; private set; }
 
         public List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
         {
@@ -208,12 +208,14 @@ namespace ConsoleApplication1
                 }
             }
 
-            //if eigenvectors are needed, run SOCJT routine one more time to calculate them.
-            if (evecs)
+            //if eigenvectors are needed when using naive lanczos, run SOCJT routine one more time to calculate them.
+            if (evecs && !input.blockLanczos)
             {
                 Console.WriteLine("Calculating eigenvectors.");
                 Masterly.nInput.pVector = true;
                 Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput);
+                //now assign the lanczosEVectors to those from the SOCJT routine
+                lanczosEVectors = Masterly.nSoc.lanczosEVectors;
             }
             //make output
             output = Masterly.nSoc.outp;

@@ -30,7 +30,8 @@ namespace ConsoleApplication1
             set { nOutput = value; }
         }
 
-        public double[,] lanczosEVectors { get; private set; }
+        //this list stores the untransformed eigenvectors
+        public List<double[,]> lanczosEVectors { get; private set; }
 
         public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input)
         {
@@ -363,15 +364,19 @@ namespace ConsoleApplication1
             //actually diagonalizes the Hamiltonian matrix
             measurer.Reset();
             measurer.Start();
+            //if the evecs of the lanczos matrices will need to be stored then save the lanczos matrices.
+            if (input.pVector && !input.blockLanczos && array1[0].innerobj.m >= 100000)
+            {
+                lanczosEVectors = new List<double[,]>(array1.Length);
+            }
             ParallelOptions options2 = new ParallelOptions();
             options2.MaxDegreeOfParallelism = input.parJ;
             try
             {
                 Parallel.For(0, array1.Length, options2, i =>//changed to array1.count from sHamMatrix.count
                 {
-                    //this is where multithreading is needed
                     double[] evs;
-                    double[,] temp;//changed here to numcolumnsA
+                    double[,] temp;
                     IECODE[i] = -1;
 
                     //add a parameter to count Lanczos iterations to set possible stopping criteria that way
@@ -381,7 +386,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
                         temp = new double[numcolumnsA[i], input.M];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.oldRandom, input.pVector);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.oldRandom, input.pVector, i);
                     }
                     else//means use block Lanczos from SOCJT
                     {
@@ -397,15 +402,33 @@ namespace ConsoleApplication1
                     {                    
                         eigenvalues[i][j] = evs[j];                        
                     }
-                    zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
-                    for (int j = 0; j < numcolumnsA[i]; j++)                        
+                    //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
+                    if (input.blockLanczos || (!input.blockLanczos && array1[i].innerobj.m < 100000))
                     {
-                        for (int k = 0; k < evs.Length - 1; k++)//changed input.M to evs.Length - 1                            
-                        {                            
-                            zMatrices[i][j, k] = temp[j, k];                                
-                        }                            
+                        zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
+                        for (int j = 0; j < numcolumnsA[i]; j++)
+                        {
+                            for (int k = 0; k < evs.Length - 1; k++)//changed input.M to evs.Length - 1                            
+                            {
+                                zMatrices[i][j, k] = temp[j, k];
+                            }
+                        }
                     }
-                    
+                    //here if evectors are needed and hamiltonian is too large assign the lanczosEVectors to the 
+                    if (!input.blockLanczos && array1[i].innerobj.m >= 100000 && input.pVector)
+                    {
+                        //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
+                        input.pVector = false;
+                        //assign the evecs of the lanczos matrices to the lanczosEVectors list.
+                        lanczosEVectors[i] = new double[temp.GetLength(0), temp.GetLength(1)];
+                        for (int j = 0; j < temp.GetLength(0); j++)
+                        {
+                            for (int k = 0; k < temp.GetLength(1); k++)
+                            {
+                                lanczosEVectors[i][j, k] = temp[j, k];
+                            }
+                        }
+                    }
                     temp = null;                    
                     evs = null;                    
                 }//end for
