@@ -373,18 +373,20 @@ namespace ConsoleApplication1
                     OutputFile.writeMatFile(input);
                 }//end if to write matrix to file
 
-                //code to generate the eigenvector file here.
+                //Here, if necessary, the eigenvectors for very large matrices are calculated after the rest of the calculations have been done.
+                //This is done because this process may take a large amount of time
                 if (runner.lanczosEVectors != null || fitt.lanczosEVectors != null)
                 {
+                    Console.WriteLine("\n Eigenvectors being calculated...");
+                    Console.WriteLine("This may take some time.");
+                    List<double[,]> eVecs = new List<double[,]>();
                     if (fit)
-                    { }//end if
+                    {
+                        eVecs = eVecGenerator(fitt.lanczosEVectors, filepath);           
+                    }//end if
                     else
                     {
-                        //call matrix mult function
-                        for (int i = 0; i < runner.lanczosEVectors.Count; i++)
-                        { 
-
-                        }//end for loop
+                        eVecs = eVecGenerator(runner.lanczosEVectors, filepath);
                     }//end else
                 }//end if
 
@@ -477,5 +479,16 @@ namespace ConsoleApplication1
             }//end StreamReader
             return vector.ToArray();
         }//end method vecRead
+
+
+        private static List<double[,]> eVecGenerator(List<double[,]> lanczosEVecs, string filepath)
+        {
+            List<double[,]> eVecs = new List<double[,]>();
+            for (int i = 0; i < lanczosEVecs.Count; i++)
+            {
+
+            }//end for loop
+            return eVecs;
+        }
     }//end class Program
 }//end namespace

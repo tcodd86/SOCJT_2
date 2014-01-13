@@ -892,7 +892,7 @@ namespace ConsoleApplication1
                 {
                     //create file to store the eigenvectors in the directory
                     //Uses a default file name each time and deletes it at the end
-                    fileDirectory += "\\temp_vecs" + "_" + n + "_" + ".tmp";
+                    fileDirectory += "\\temp_vecs_" + n + ".tmp";
                     writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 }
             }
