@@ -727,118 +727,119 @@ namespace ConsoleApplication1
             int IMM;
             int IMMURN = 0;
 
-            //this checks that the values are in the proper ranges
-            //need to remove these last gotos but low priority.
+            //this checks that the values are in the proper ranges. If they're not, then skip the lanczos routine.
+            bool go = true;
             if (N < 2)
             {
-                goto onehundred;
+                go = false;
             }
             if (R < 1)
             {
-                goto onehundred;
+                go = false;
             }
             if (Q <= R)
             {
-                goto onehundred;
+                go = false;
             }
             if (Q > N)
             {
-                goto onehundred;
+                go = false;
             }
 
-            //chooses initial values for block size P, the number of steps that the block
-            //lanczos method is carried out, and chooses an initial N by P orthonormal
-            //matrix X1 used to start the block lanczos method
-            int P = PINIT;
-            if (P < 0)
+            if (go)
             {
-                P = -P;
-            }
-            int S = (Q - M) / P;
-
-            if (S <= 2)
-            {
-                S = 2;
-                P = Q / 2;
-            }
-
-            if (PINIT >= 0)
-            {
-                for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
+                //chooses initial values for block size P, the number of steps that the block
+                //lanczos method is carried out, and chooses an initial N by P orthonormal
+                //matrix X1 used to start the block lanczos method
+                int P = PINIT;
+                if (P < 0)
                 {
-                    RANDOM(N, Q, K, ref X, oldRandom);
+                    P = -P;
                 }
-            }
-                        
-            if (M == 0)
-            {
-                ORTHG(N, Q, M, P, ref C, ref X);
-                SECTN(N, Q, M, P, ref X, ref C, ref D, ref U, ref V, A, par);
-                ERRC = 0.0D;
-            }
+                int S = (Q - M) / P;
 
-            IMM = 0;
+                if (S <= 2)
+                {
+                    S = 2;
+                    P = Q / 2;
+                }
 
-            //The main body of the subroutine starts here.  IMM counts the number of 
-            //matrix-vector products computed which is the number of times the 
-            //subroutine named by OP is called.  ERRC measures the accumulated
-            //error in the eigenvalues and eigenvectors.
+                if (PINIT >= 0)
+                {
+                    for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
+                    {
+                        RANDOM(N, Q, K, ref X, oldRandom);
+                    }
+                }
 
-            while (M < R)
-            {
+                if (M == 0)
+                {
+                    ORTHG(N, Q, M, P, ref C, ref X);
+                    SECTN(N, Q, M, P, ref X, ref C, ref D, ref U, ref V, A, par);
+                    ERRC = 0.0D;
+                }
+
+                IMM = 0;
+
+                //The main body of the subroutine starts here.  IMM counts the number of 
+                //matrix-vector products computed which is the number of times the 
+                //subroutine named by OP is called.  ERRC measures the accumulated
+                //error in the eigenvalues and eigenvectors.
+
+                while (M < R)
+                {
+                    if (IMM > MMAX)
+                    {
+                        break;
+                    }
+
+                    //add a conditional here to be able to kill it after a certain number of Lanczos iterations
+
+                    ITER++;
+                    PS = P * S;
+
+                    //BKLANC carries out the block lanczos method and stores the resulting
+                    //block tridiagonal matrix MS in C and the N by PS orthonormal matrix
+                    //XS in X.  The initial N by P orthonormal matrix is assumed to be
+                    //stored in columns M to M + PS of X.  The residuals for these
+                    //vectors and the eigenvalue approximations in D are computed and stored
+                    //in E.
+                    BKLANC(N, Q, M, P, S, D, ref C, ref X, ref E, ref U, ref V, A, par);
+
+                    //Eigen solves the eigenproblem for MS, storing the eigenvalues in
+                    //elements M to M + PS of D and the eigenvectors in the first
+                    //P * S rows and columns of C (overwriting MS, possibly)
+                    EIGEN(Q, M, P, PS, ref C, ref D);
+
+                    //CNVTST determines how many of the eigenvalues and eigenvectors have
+                    //converged using the error estimates stored in E.  The number that have
+                    //converged is stoered in NCONV.  If NCONV = 0 then none have converged.
+                    CNVTST(N, Q, M, P, ref ERRC, EPS, D, E, ref NCONV);
+
+                    //PCH chooses new values for P and S, the block size and the number of 
+                    //steps for the block Lanczos subprogram, respectively.
+                    PCH(N, Q, M, R, NCONV, ref P, ref S);
+
+                    //Rotate computes the eigenvectors of the restricted matrix using XS
+                    //stored in X and the eigenvectors of MS stored in C.  These vectors
+                    //serve both as eigenvector approximations and to form the matrix used
+                    //to start the block Lanczos method in the next iteration.
+                    ROTATE(N, Q, M, PS, NCONV + P, C, ref X);//see if any of this should be ref.
+
+                    M += NCONV;
+                    IMM += P * S;
+                }//end while
+
+                if (M >= R)
+                {
+                    IECODE = 0;
+                }
                 if (IMM > MMAX)
                 {
-                    break;
+                    IECODE = 7;
+                    PINIT = -P;
                 }
-
-                //add a conditional here to be able to kill it after a certain number of Lanczos iterations
-
-                ITER++;
-                PS = P * S;
-
-                //BKLANC carries out the block lanczos method and stores the resulting
-                //block tridiagonal matrix MS in C and the N by PS orthonormal matrix
-                //XS in X.  The initial N by P orthonormal matrix is assumed to be
-                //stored in columns M to M + PS of X.  The residuals for these
-                //vectors and the eigenvalue approximations in D are computed and stored
-                //in E.
-                BKLANC(N, Q, M, P, S, D, ref C, ref X, ref E, ref U, ref V, A, par);
-
-                //Eigen solves the eigenproblem for MS, storing the eigenvalues in
-                //elements M to M + PS of D and the eigenvectors in the first
-                //P * S rows and columns of C (overwriting MS, possibly)
-                EIGEN(Q, M, P, PS, ref C, ref D);
-
-                //CNVTST determines how many of the eigenvalues and eigenvectors have
-                //converged using the error estimates stored in E.  The number that have
-                //converged is stoered in NCONV.  If NCONV = 0 then none have converged.
-                CNVTST(N, Q, M, P, ref ERRC, EPS, D, E, ref NCONV);
-
-                //PCH chooses new values for P and S, the block size and the number of 
-                //steps for the block Lanczos subprogram, respectively.
-                PCH(N, Q, M, R, NCONV, ref P, ref S);
-
-                //Rotate computes the eigenvectors of the restricted matrix using XS
-                //stored in X and the eigenvectors of MS stored in C.  These vectors
-                //serve both as eigenvector approximations and to form the matrix used
-                //to start the block Lanczos method in the next iteration.
-                ROTATE(N, Q, M, PS, NCONV + P, C, ref X);//see if any of this should be ref.
-
-                M += NCONV;
-                IMM += P * S;
-            }//end while
-
-            if (M >= R)
-            {
-                IECODE = 0;
-            }
-            if (IMM > MMAX)
-            {
-                IECODE = 7;
-                PINIT = -P;
-            }           
-         
-            onehundred:
+            }//end if(go = true)
             if (N < 2)
             {
                 IECODE = 1;
