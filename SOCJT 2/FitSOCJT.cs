@@ -12,6 +12,8 @@ namespace ConsoleApplication1
 
         public List<double[,]> lanczosEVectors { get; private set; }
 
+        public SOCJT soc { get; private set; }
+
         public List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
         {
             //string to return
@@ -218,6 +220,7 @@ namespace ConsoleApplication1
                 lanczosEVectors = Masterly.nSoc.lanczosEVectors;
             }
             //make output
+            soc = Masterly.nSoc;
             output = Masterly.nSoc.outp;
             //add something showing RMS error and parameters for each JT mode
             double[] error = ComparerVec(userInput, Masterly.nSoc.finalList, Masterly.nInput.origin, true);
