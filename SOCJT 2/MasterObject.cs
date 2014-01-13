@@ -7,7 +7,7 @@ namespace ConsoleApplication1
 {
     class MasterObject
     {
-        public SOCJT nSoc;// = new SOCJT();
+        public SOCJT nSoc;
         public FileInfo nInput = new FileInfo();
         public string[] nInputFile;
         public bool nIsQuad;

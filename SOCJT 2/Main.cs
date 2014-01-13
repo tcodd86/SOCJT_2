@@ -481,14 +481,35 @@ namespace ConsoleApplication1
         }//end method vecRead
 
 
-        private static List<double[,]> eVecGenerator(List<double[,]> lanczosEVecs, string filepath)
+        private static List<double[,]> eVecGenerator(List<double[,]> lanczosEVectors, string filepath)
         {
             List<double[,]> eVecs = new List<double[,]>();
-            for (int i = 0; i < lanczosEVecs.Count; i++)
+            string file;
+            double[] lanczosVector;
+            for (int i = 0; i < lanczosEVectors.Count; i++)
             {
-
-            }//end for loop
+                //this uses the same convention as in the Lanczos method which saves the vectors. Not as general as I'd like but probably ok.
+                file = filepath + "temp_vecs_" + i + ".tmp";
+                lanczosVector = vecRead(file, 0);
+                int numberOfEigenvalues = lanczosEVectors[i].GetLength(1);
+                int iterations = lanczosEVectors[i].GetLength(0);
+                int dimension = lanczosVector.Length;
+                eVecs[i] = new double[dimension, numberOfEigenvalues];
+                for (int j = 0; j < iterations; j++)
+                {
+                    lanczosVector = vecRead(file, j);
+                    for (int m = 0; m < numberOfEigenvalues; m++)
+                    {
+                        //read in the right vector to memory from the lanczos vector file                    
+                        for (int n = 0; n < lanczosVector.Length; n++)
+                        {                            
+                            eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][n, m];
+                        }//end loop over rows of lanczos Vector
+                    }//end loop over columns of lanczosEVectors
+                }
+                //here delete the temp lanczos vector file
+            }            
             return eVecs;
-        }
+        }//end eVecGenerator
     }//end class Program
 }//end namespace
