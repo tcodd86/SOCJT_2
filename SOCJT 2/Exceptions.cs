@@ -53,4 +53,25 @@ namespace ConsoleApplication1
             //empty body
         }
     }
+
+    class FileNameError : ApplicationException
+    {
+        public string eMessage { get; private set; }
+        public FileNameError(string error)
+        {
+            if (error == "matFile")
+            {
+                eMessage = "The matrix file may not have the same name as the input, \n output, or fit files. Please change the file name.";
+            }
+            else if (error == "outFile")
+            {
+                eMessage = "The output file may not have the same name as the input file. \n Please change the output file name.";
+            }
+            else
+            {
+                eMessage = "There is a file name error. Please check your input file name.";
+            }
+            eMessage += "\r" + "Press enter to terminate the program.";
+        }
+    }
 }

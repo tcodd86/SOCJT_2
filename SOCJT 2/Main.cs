@@ -39,9 +39,9 @@ namespace ConsoleApplication1
                     throw new DirectoryNotFoundException();
                 }
 #else
-                
+
                 fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                
+
 #endif
 
                 //set the directory for reading and writing files
@@ -71,6 +71,10 @@ namespace ConsoleApplication1
                 string filepathFIT = string.Copy(filepath);
                 filepathIN = string.Concat(inFileName);
                 filepathOUT = string.Concat(outFile);
+                if (filepathOUT == filepathIN)
+                {
+                    throw new FileNameError("outFile");
+                }
 
                 //read input file
                 string[] inputFile = FileInfo.fileRead(filepathIN);
@@ -79,7 +83,7 @@ namespace ConsoleApplication1
                 FileInfo input = new FileInfo();
 
                 //set input object data from input file
-                input.setFileInfo(inputFile);                
+                input.setFileInfo(inputFile);
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
@@ -90,6 +94,10 @@ namespace ConsoleApplication1
                     //create file pointer for the matrix file
                     input.matFilePath = string.Copy(filepath);
                     input.matFilePath = string.Concat(input.matFile);
+                    if (input.matFilePath == filepathIN || input.matFilePath == filepathOUT || input.matFilePath == filepathFIT)
+                    {
+                        throw new FileNameError("matFile");
+                    }
                     //if this file already exists, then use it for the matrix generation
                     if (File.Exists(input.matFilePath))
                     {
@@ -234,11 +242,11 @@ namespace ConsoleApplication1
 
                     //if not fitting any variables run SOCJT routine directly
                     if (!fit)
-                    {                        
+                    {
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
                     else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
-                    {   
+                    {
                         linesToWrite.AddRange(fitt.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
 
@@ -382,7 +390,7 @@ namespace ConsoleApplication1
                     List<double[,]> eVecs = new List<double[,]>();
                     if (fit)
                     {
-                        eVecs = eVecGenerator(fitt.lanczosEVectors, filepath);           
+                        eVecs = eVecGenerator(fitt.lanczosEVectors, filepath);
                     }//end if
                     else
                     {
@@ -405,7 +413,7 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
-#if !DEBUG 
+#if !DEBUG
             catch (IndexOutOfRangeException)
             {
                 Console.WriteLine("An index out of range exception has occurred");
@@ -437,6 +445,11 @@ namespace ConsoleApplication1
                 Console.WriteLine("NaN Error in Naive Lanczos routine.");
                 Console.WriteLine("Try decreasing NOITS or using Block Lanczos instead.");
                 Console.WriteLine("Press enter to terminate the program.");
+                Console.ReadLine();
+            }
+            catch (FileNameError err)
+            {
+                Console.WriteLine(err.eMessage);
                 Console.ReadLine();
             }
 
