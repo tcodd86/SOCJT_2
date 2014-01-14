@@ -94,6 +94,7 @@ namespace ConsoleApplication1
                     //create file pointer for the matrix file
                     input.matFilePath = string.Copy(filepath);
                     input.matFilePath = string.Concat(input.matFile);
+                    //check that the mat file has a valid path
                     if (input.matFilePath == filepathIN || input.matFilePath == filepathOUT || input.matFilePath == filepathFIT)
                     {
                         throw new FileNameError("matFile");
@@ -450,6 +451,13 @@ namespace ConsoleApplication1
             catch (FileNameError err)
             {
                 Console.WriteLine(err.eMessage);
+                Console.ReadLine();
+            }
+            catch (MatrixFileError)
+            {
+                Console.WriteLine("The basis sets of the input file and matrix file are different sizes.");
+                Console.WriteLine("Try regenerating the matrix.");
+                Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
 

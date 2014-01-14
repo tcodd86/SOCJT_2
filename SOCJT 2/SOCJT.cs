@@ -114,6 +114,7 @@ namespace ConsoleApplication1
                 measurer.Start();
                 int h = 0;                
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
+                List<int> basisSize = new List<int>();
                 if (!matricesMade)
                 {
                     fitHamList = new List<List<alglib.sparsematrix>>();
@@ -122,7 +123,8 @@ namespace ConsoleApplication1
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
                     //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
-                    matricesMade = matReadFunction(input);
+                    //matricesMade = matReadFunction(input);
+                    basisSize = matReadFunction(input, ref matricesMade);
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
 
@@ -133,6 +135,14 @@ namespace ConsoleApplication1
                     int nColumns;                    
                     if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                     {
+                        //this checks if the matrix was read from file, and if so if the basis set is the correct size
+                        if (basisSize != null)                        
+                        { 
+                            if(basisSize[i] != jBasisVecsByJ[i].Count)
+                            {
+                                throw new MatrixFileError();
+                            }
+                        }
                         if (!matricesMade)//if matrices not made then generate all matrices
                         {
                             fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
@@ -178,6 +188,7 @@ namespace ConsoleApplication1
                 measurer.Start();
                 int dynVar1 = (int)(jMax - 1.5M);
                 int dynVar2 = dynVar1 / 3;
+                List<int> basisSize = new List<int>();
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 if (!matricesMade)
                 {
@@ -187,7 +198,7 @@ namespace ConsoleApplication1
                         fitHamList.Add(new List<alglib.sparsematrix>());
                     }
                     //check here to see if matrix file should be used, if so then read from file and make them, set matricesMade to true
-                    matricesMade = matReadFunction(input);
+                    basisSize = matReadFunction(input, ref matricesMade);
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
@@ -204,7 +215,14 @@ namespace ConsoleApplication1
                     {
                         quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                     }
-
+                    //this checks if the matrix was read from file, and if so if the basis set is the correct size
+                    if (basisSize != null)                        
+                    { 
+                        if(basisSize[i] != quadVecs.Count)
+                        {
+                            throw new MatrixFileError();
+                        }
+                    }
                     //made specialHam matrix the default and not optional
                     if (!matricesMade)
                     {
@@ -679,9 +697,10 @@ namespace ConsoleApplication1
         /// <returns>
         /// Boolean indicating whether or not the fitHamList matrices have been initialized from matFile.
         /// </returns>
-        private static bool matReadFunction(FileInfo input)
+        private static List<int> matReadFunction(FileInfo input, ref bool matricesMade)
         {
-            bool matricesMade = false;
+            matricesMade = false;
+            List<int> basisSizeList = new List<int>();
             if (input.useMatFile && input.matMade)
             {
                 string[] matFile = { };
@@ -699,7 +718,6 @@ namespace ConsoleApplication1
                 }
                 matricesMade = true;
                 //read the matrix into memory
-                //string[] matFile = FileInfo.fileRead(input.matFilePath);
                 int index = 0, basisSize = 0;
                 for (int i = 0; i < matFile.Length; i++)
                 {
@@ -707,6 +725,7 @@ namespace ConsoleApplication1
                     {
                         index = Convert.ToInt32(matFile[i + 1]);
                         basisSize = Convert.ToInt32(matFile[i + 2]);
+                        basisSizeList.Add(basisSize);
                         //this is the matrix for the diagonal elements.  These are added seperately.
                         var B = new alglib.sparsematrix();
                         alglib.sparsecreate(basisSize, basisSize, out B);
@@ -732,7 +751,8 @@ namespace ConsoleApplication1
                     }//end if matFile[i] == Matrix
                 }//end for loop over entire matrix file
             }//end if
-            return matricesMade;
+            //return matricesMade;
+            return basisSizeList;
         }//end matReadFunction
     }//end class SOCJT
 }

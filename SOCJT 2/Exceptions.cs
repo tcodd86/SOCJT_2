@@ -74,4 +74,12 @@ namespace ConsoleApplication1
             eMessage += "\r" + "Press enter to terminate the program.";
         }
     }
+
+    class MatrixFileError : ApplicationException
+    {
+        public MatrixFileError()
+        {
+            //empty body
+        }
+    }
 }
