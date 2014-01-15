@@ -16,6 +16,8 @@ namespace ConsoleApplication1
         //keep this so that on concurrent calls the matrix does not need to be regenerated
         public static List<List<alglib.sparsematrix>> fitHamList { get; private set; }
 
+        public List<List<BasisFunction>> basisSet { get; private set; }
+
         private Eigenvalue[] nfinalList;
         public Eigenvalue[] finalList
         {
@@ -115,6 +117,7 @@ namespace ConsoleApplication1
                 int h = 0;                
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
                 List<int> basisSize = new List<int>();
+                basisSet = jBasisVecsByJ;
                 if (!matricesMade)
                 {
                     fitHamList = new List<List<alglib.sparsematrix>>();
@@ -129,42 +132,60 @@ namespace ConsoleApplication1
                 numcolumnsA = new int[jBasisVecsByJ.Count];
 
                 ParallelOptions options = new ParallelOptions();
-                options.MaxDegreeOfParallelism = input.parJ;          
-                Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>                
+                options.MaxDegreeOfParallelism = input.parJ;
+                try
                 {
-                    int nColumns;                    
-                    if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
+                    Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>
                     {
-                        //this checks if the matrix was read from file, and if so if the basis set is the correct size
-                        if (basisSize != null)                        
-                        { 
-                            if(basisSize[i] != jBasisVecsByJ[i].Count)
-                            {
-                                throw new MatrixFileError();
-                            }
-                        }
-                        if (!matricesMade)//if matrices not made then generate all matrices
+                        int nColumns;
+                        if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                         {
-                            fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                            matricesMade = true;
+                            //this checks if the matrix was read from file, and if so if the basis set is the correct size
+                            if (basisSize != null)
+                            {
+                                if (basisSize[i] != jBasisVecsByJ[i].Count)
+                                {
+                                    throw new MatrixFileError();
+                                }
+                            }
+                            if (!matricesMade)//if matrices not made then generate all matrices
+                            {
+                                fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
+                                matricesMade = true;
+                            }
+                            else//this makes sure that the diagonal portion is regenerated on each call.
+                            {
+                                fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
+                            }
+                            numcolumnsA[i] = nColumns;
+                            if (numcolumnsA[i] < input.M)
+                            {
+                                a.Add(0);
+                            }
+                            h++;
                         }
-                        else//this makes sure that the diagonal portion is regenerated on each call.
-	                    {
-                            fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];		 
-	                    }
-                        numcolumnsA[i] = nColumns;
-                        if (numcolumnsA[i] < input.M)
+                        else
                         {
                             a.Add(0);
                         }
-                        h++;                        
-                    }                    
-                    else                     
-                    {                    
-                        a.Add(0);                        
-                    }                   
-                }//end for loop                                    
-                );
+                    }//end for loop                                    
+                    );
+                }
+                catch (AggregateException ae)
+                {
+                    foreach (var e in ae.InnerExceptions)
+                    {
+                        if (e is MatrixFileError)
+                        {
+                            throw new MatrixFileError();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+
+                }
                 measurer.Stop();
                 howMuchTime = measurer.ElapsedMilliseconds;
                 input.matGenTime = (double)howMuchTime / 1000D;
@@ -206,43 +227,65 @@ namespace ConsoleApplication1
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
-                
-                Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
+                try
                 {
-                    List<BasisFunction> quadVecs = new List<BasisFunction>();
-                    int nColumns;
-                    for (int v = -dynVar2; v <= dynVar2; v++)
+                    Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
                     {
-                        quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                        List<BasisFunction> quadVecs = new List<BasisFunction>();
+                        int nColumns;
+                        for (int v = -dynVar2; v <= dynVar2; v++)
+                        {
+                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                        }
+                        //this checks if the matrix was read from file, and if so if the basis set is the correct size
+                        if (basisSize != null)                        
+                        { 
+                            if(basisSize[i - jBasisVecsByJ.Count / 2] != quadVecs.Count)
+                            {
+                                throw new MatrixFileError();
+                            }
+                        }
+                        //made specialHam matrix the default and not optional
+                        if (!matricesMade)
+                        {
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
+                        }                        
+                        else//this makes sure that the diagonal portion is regenerated on each call.
+	                    {
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
+	                    }
+
+                        jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
+                        numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
+                        //checks to make sure that
+                        if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
+                        {
+                            a.Add(0);
+                        }
+                        numQuadMatrix++;
                     }
-                    //this checks if the matrix was read from file, and if so if the basis set is the correct size
-                    if (basisSize != null)                        
-                    { 
-                        if(basisSize[i] != quadVecs.Count)
+                    );
+                }
+                catch (AggregateException ae)
+                {
+                    foreach (var e in ae.InnerExceptions)
+                    {
+                        if (e is MatrixFileError)
                         {
                             throw new MatrixFileError();
                         }
+                        else
+                        {
+                            throw;
+                        }
                     }
-                    //made specialHam matrix the default and not optional
-                    if (!matricesMade)
-                    {
-                        fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
-                    }                        
-                    else//this makes sure that the diagonal portion is regenerated on each call.
-	                {
-                        fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
-	                }
 
-                    jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
-                    numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
-                    //checks to make sure that
-                    if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
-                    {
-                        a.Add(0);
-                    }
-                    numQuadMatrix++;
                 }
-                );
+
+                for (int jj = 0; jj < jbasisoutA.Length; jj++)
+                {
+                    basisSet.Add(jbasisoutA[jj]);
+                }
                 matricesMade = true;
                 measurer.Stop();                    
                 howMuchTime = measurer.ElapsedMilliseconds;

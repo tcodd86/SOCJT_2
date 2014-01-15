@@ -388,14 +388,13 @@ namespace ConsoleApplication1
                 {
                     Console.WriteLine("\n Eigenvectors being calculated...");
                     Console.WriteLine("This may take some time.");
-                    List<double[,]> eVecs = new List<double[,]>();
                     if (fit)
                     {
-                        eVecs = eVecGenerator(fitt.lanczosEVectors, filepath);
+                        eVecGenerator(fitt.lanczosEVectors, filepath, fitt.basisSet, input.evMin);
                     }//end if
                     else
                     {
-                        eVecs = eVecGenerator(runner.lanczosEVectors, filepath);
+                        eVecGenerator(runner.lanczosEVectors, filepath, runner.basisSet, input.evMin);
                     }//end else
                 }//end if
 
@@ -502,7 +501,7 @@ namespace ConsoleApplication1
         }//end method vecRead
 
 
-        private static List<double[,]> eVecGenerator(List<double[,]> lanczosEVectors, string filepath)
+        private static void eVecGenerator(List<double[,]> lanczosEVectors, string filepath, List<List<BasisFunction>> basisSet, double evMin)
         {
             List<double[,]> eVecs = new List<double[,]>();
             string file;
@@ -529,8 +528,53 @@ namespace ConsoleApplication1
                     }//end loop over columns of lanczosEVectors
                 }
                 //here delete the temp lanczos vector file
-            }            
-            return eVecs;
+            }//end loop to generate eigenvectors
+            //here use basis sets and eigenvectors and write them to file
+            StringBuilder output = new StringBuilder();
+            for (int i = 0; i < lanczosEVectors.Count; i++)
+            {
+                for (int j = 0; j < lanczosEVectors[i].GetLength(0); j++)
+                {
+                    output.AppendLine(" " + "\r");
+                    output.AppendLine("Eigenvalue" + "\t" + Convert.ToString(j + 1));
+                    output.AppendLine(" " + "\r");
+                    output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
+                    output.AppendLine(" ");
+
+                    bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input);
+                    if (a1)
+                    {
+                        output.AppendLine("Vector is Type 1");
+                    }
+                    else
+                    {
+                        output.AppendLine("Vector is Type 2");
+                    }
+                    output.AppendLine(" ");
+
+                    output.Append("Coefficient" + "\t");
+                    for (int h = 0; h < input.nModes; h++)
+                    {
+                        output.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
+                    }
+                    output.Append("lambda");
+                    for (int h = 0; h < jBasisVecsByJ[i].Count; h++)//goes through basis vectors
+                    {
+                        if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * input.evMin)
+                        {
+                            output.AppendLine("\t");
+                            output.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
+                            for (int m = 0; m < input.nModes; m++)//goes through each mode
+                            {
+                                output.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                            }
+                            output.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[i][h].Lambda));
+                        }
+                    }
+                    output.AppendLine("\r");
+                }//end j for loop
+            }//end i loop
+
         }//end eVecGenerator
     }//end class Program
 }//end namespace

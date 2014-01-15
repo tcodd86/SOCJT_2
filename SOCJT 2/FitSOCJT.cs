@@ -12,6 +12,8 @@ namespace ConsoleApplication1
 
         public List<double[,]> lanczosEVectors { get; private set; }
 
+        public List<List<BasisFunction>> basisSet { get; private set; }
+
         public SOCJT soc { get; private set; }
 
         public List<string> fit(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, String filepath)
@@ -218,6 +220,7 @@ namespace ConsoleApplication1
                 Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput);
                 //now assign the lanczosEVectors to those from the SOCJT routine
                 lanczosEVectors = Masterly.nSoc.lanczosEVectors;
+                basisSet = Masterly.nSoc.basisSet;
             }
             //make output
             soc = Masterly.nSoc;
