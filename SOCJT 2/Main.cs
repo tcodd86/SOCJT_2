@@ -390,11 +390,11 @@ namespace ConsoleApplication1
                     Console.WriteLine("This may take some time.");
                     if (fit)
                     {
-                        eVecGenerator(fitt.lanczosEVectors, filepath, fitt.basisSet, input.evMin);
+                        eVecGenerator(fitt.lanczosEVectors, filepath, fitt.basisSet, input);
                     }//end if
                     else
                     {
-                        eVecGenerator(runner.lanczosEVectors, filepath, runner.basisSet, input.evMin);
+                        eVecGenerator(runner.lanczosEVectors, filepath, runner.basisSet, input);
                     }//end else
                 }//end if
 
@@ -501,10 +501,11 @@ namespace ConsoleApplication1
         }//end method vecRead
 
 
-        private static void eVecGenerator(List<double[,]> lanczosEVectors, string filepath, List<List<BasisFunction>> basisSet, double evMin)
+        private static void eVecGenerator(List<double[,]> lanczosEVectors, string filepath, List<List<BasisFunction>> basisSet, FileInfo input)
         {
             List<double[,]> eVecs = new List<double[,]>();
             string file;
+            double evMin = input.evMin;
             double[] lanczosVector;
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
@@ -523,16 +524,20 @@ namespace ConsoleApplication1
                         //read in the right vector to memory from the lanczos vector file                    
                         for (int n = 0; n < lanczosVector.Length; n++)
                         {                            
-                            eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][n, m];
+                            eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
                         }//end loop over rows of lanczos Vector
                     }//end loop over columns of lanczosEVectors
                 }
                 //here delete the temp lanczos vector file
+                File.Delete(file);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
+                decimal jblock = (decimal)i + 0.5M;
+                output.AppendLine("J-Block " + jblock);
+                output.AppendLine(" ");
                 for (int j = 0; j < lanczosEVectors[i].GetLength(0); j++)
                 {
                     output.AppendLine(" " + "\r");
@@ -541,7 +546,7 @@ namespace ConsoleApplication1
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");
 
-                    bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input);
+                    bool a1 = SOCJT.isA(basisSet[i], lanczosEVectors[i], j, input);
                     if (a1)
                     {
                         output.AppendLine("Vector is Type 1");
@@ -558,23 +563,27 @@ namespace ConsoleApplication1
                         output.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
                     }
                     output.Append("lambda");
-                    for (int h = 0; h < jBasisVecsByJ[i].Count; h++)//goes through basis vectors
+                    for (int h = 0; h < basisSet[i].Count; h++)//goes through basis vectors
                     {
-                        if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * input.evMin)
+                        if (lanczosEVectors[i][h, j] > evMin || lanczosEVectors[i][h, j] < -1.0 * input.evMin)
                         {
                             output.AppendLine("\t");
-                            output.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
+                            output.Append(String.Format("{0,10:0.000000}", lanczosEVectors[i][h, j]));
                             for (int m = 0; m < input.nModes; m++)//goes through each mode
                             {
-                                output.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                                output.Append("\t" + "  " + Convert.ToString(basisSet[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", basisSet[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
                             }
-                            output.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[i][h].Lambda));
+                            output.Append("\t" + String.Format("{0,4}", basisSet[i][h].Lambda));
                         }
                     }
                     output.AppendLine("\r");
                 }//end j for loop
             }//end i loop
-
+            //code here to write to file
+            string fileName = filepath + input.title + "_EVecs.out";
+            List<string> ou = new List<string>();
+            ou.Add(output.ToString());
+            File.WriteAllLines(fileName, ou);
         }//end eVecGenerator
     }//end class Program
 }//end namespace
