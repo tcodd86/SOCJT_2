@@ -281,7 +281,7 @@ namespace ConsoleApplication1
                     }
 
                 }
-
+                basisSet = new List<List<BasisFunction>>();
                 for (int jj = 0; jj < jbasisoutA.Length; jj++)
                 {
                     basisSet.Add(jbasisoutA[jj]);
@@ -447,7 +447,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
                         temp = new double[numcolumnsA[i], input.M];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.oldRandom, input.pVector, i);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.oldRandom, input.pVector, i, input.filePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {

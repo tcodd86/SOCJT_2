@@ -862,7 +862,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded, int n)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -881,8 +881,9 @@ namespace ConsoleApplication1
             {
                 NTooBig = true;
             }
-            string fileDirectory = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            StreamWriter writer = new StreamWriter(fileDirectory);
+            string fileDirectory = file + "temp_vecs_" + n + ".tmp";
+            StreamWriter writer = File.CreateText(fileDirectory);
+                //new StreamWriter(fileDirectory); 
             if(evsNeeded)
             {
                 if (!NTooBig)
@@ -893,7 +894,7 @@ namespace ConsoleApplication1
                 {
                     //create file to store the eigenvectors in the directory
                     //Uses a default file name each time and deletes it at the end
-                    fileDirectory += "\\temp_vecs_" + n + ".tmp";
+                    //fileDirectory += "\\temp_vecs_" + n + ".tmp";
                     writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 }
             }
@@ -1053,6 +1054,7 @@ namespace ConsoleApplication1
                 }
                 if (!NTooBig)
                 {
+                    File.Delete(fileDirectory);
                     //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
                     double[,] transEvecs = new double[N, evs.Length];
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
@@ -1069,6 +1071,10 @@ namespace ConsoleApplication1
                     z = tempEvecs;
                 }
             }//end if evsNeeded
+            else
+            {
+                File.Delete(fileDirectory);
+            }
         }//end NaiveLanczos
 
         /// <summary>

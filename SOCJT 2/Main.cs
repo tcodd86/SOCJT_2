@@ -65,12 +65,15 @@ namespace ConsoleApplication1
 
                 //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
-                filepath = string.Concat("\\");
+                //filepath = string.Concat("\\");
+                filepath += "\\";
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
                 string filepathFIT = string.Copy(filepath);
-                filepathIN = string.Concat(inFileName);
-                filepathOUT = string.Concat(outFile);
+                //filepathIN = string.Concat(inFileName);
+                filepathIN += inFileName;
+                //filepathOUT = string.Concat(outFile);
+                filepathOUT += outFile;
                 if (filepathOUT == filepathIN)
                 {
                     throw new FileNameError("outFile");
@@ -84,6 +87,7 @@ namespace ConsoleApplication1
 
                 //set input object data from input file
                 input.setFileInfo(inputFile);
+                input.filePath = filepath;
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);

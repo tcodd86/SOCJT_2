@@ -372,6 +372,11 @@ namespace ConsoleApplication1
         /// </summary>
         public bool matMade { get; set; }//end matMade
 
+        /// <summary>
+        /// String to store the directory of the input and output files.
+        /// </summary>
+        public string filePath { get; set; }
+
         #endregion properties
 
         /// <summary>
