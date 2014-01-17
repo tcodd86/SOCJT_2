@@ -955,7 +955,7 @@ namespace ConsoleApplication1
                 //let the user know things are happening
                 Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
             }
-
+            writer.Close();
             //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"

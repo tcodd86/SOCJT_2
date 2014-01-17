@@ -428,7 +428,11 @@ namespace ConsoleApplication1
             //if the evecs of the lanczos matrices will need to be stored then save the lanczos matrices.
             if (input.pVector && !input.blockLanczos && array1[0].innerobj.m >= 100000)
             {
-                lanczosEVectors = new List<double[,]>(array1.Length);
+                lanczosEVectors = new List<double[,]>();
+                for (int i = 0; i < array1.Length; i++)
+                { 
+                    lanczosEVectors.Add(new double[0,0]);
+                }
             }
             ParallelOptions options2 = new ParallelOptions();
             options2.MaxDegreeOfParallelism = input.parJ;
@@ -476,10 +480,8 @@ namespace ConsoleApplication1
                         }
                     }
                     //here if evectors are needed and hamiltonian is too large assign the lanczosEVectors to the 
-                    if (!input.blockLanczos && array1[i].innerobj.m >= 100000 && input.pVector)
+                    if (!input.blockLanczos && array1[0].innerobj.m >= 100000 && input.pVector)
                     {
-                        //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
-                        input.pVector = false;
                         //assign the evecs of the lanczos matrices to the lanczosEVectors list.
                         lanczosEVectors[i] = new double[temp.GetLength(0), temp.GetLength(1)];
                         for (int j = 0; j < temp.GetLength(0); j++)
@@ -494,7 +496,7 @@ namespace ConsoleApplication1
                     evs = null;                    
                 }//end for
                 );
-            }
+            }//end try
             catch (AggregateException ae)
             {
                 foreach (var e in ae.InnerExceptions)
@@ -509,7 +511,13 @@ namespace ConsoleApplication1
                     }
                 }
 
+            }//end catch
+            if (!input.blockLanczos && array1[0].innerobj.m >= 100000 && input.pVector)
+            {
+                //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
+                input.pVector = false;
             }
+
             measurer.Stop();
             howMuchTime = measurer.ElapsedMilliseconds;
             input.diagTime = (double)howMuchTime / 1000D;

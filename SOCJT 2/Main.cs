@@ -519,7 +519,8 @@ namespace ConsoleApplication1
                 int numberOfEigenvalues = lanczosEVectors[i].GetLength(1);
                 int iterations = lanczosEVectors[i].GetLength(0);
                 int dimension = lanczosVector.Length;
-                eVecs[i] = new double[dimension, numberOfEigenvalues];
+                //eVecs[i] = new double[dimension, numberOfEigenvalues];
+                eVecs.Add(new double[dimension, numberOfEigenvalues]);
                 for (int j = 0; j < iterations; j++)
                 {
                     lanczosVector = vecRead(file, j);
@@ -542,10 +543,10 @@ namespace ConsoleApplication1
                 decimal jblock = (decimal)i + 0.5M;
                 output.AppendLine("J-Block " + jblock);
                 output.AppendLine(" ");
-                for (int j = 0; j < lanczosEVectors[i].GetLength(0); j++)
+                for (int j = 0; j < lanczosEVectors[i].GetLength(1); j++)
                 {
                     output.AppendLine(" " + "\r");
-                    output.AppendLine("Eigenvalue" + "\t" + Convert.ToString(j + 1));
+                    output.AppendLine("Eigenvector" + "\t" + Convert.ToString(j + 1));
                     output.AppendLine(" " + "\r");
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");
