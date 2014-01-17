@@ -483,12 +483,12 @@ namespace ConsoleApplication1
         /// <returns>
         /// Array containing all values from text file.
         /// </returns>
-        public static double[] vecRead(string filepath, int n)
+        public static double[] vecRead(string filepath, int n, ref StreamReader vecIn)
         {
             List<double> vector = new List<double>();
             //string[] inputFa = { };
-            using (StreamReader vecIn = new StreamReader(filepath))
-            {
+            //using (StreamReader vecIn = new StreamReader(filepath))
+            //{
                 string lineS;
                 //string[] SOCJTNewLine;
                 //char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
@@ -500,7 +500,7 @@ namespace ConsoleApplication1
                 {
                     vector.Add(FileInfo.parseDouble(lineS));
                 }//end while
-            }//end StreamReader
+            //}//end StreamReader
             return vector.ToArray();
         }//end method vecRead
 
@@ -515,15 +515,18 @@ namespace ConsoleApplication1
             {
                 //this uses the same convention as in the Lanczos method which saves the vectors. Not as general as I'd like but probably ok.
                 file = filepath + "temp_vecs_" + i + ".tmp";
-                lanczosVector = vecRead(file, 0);
+                StreamReader vecIn = new StreamReader(file);
+                lanczosVector = vecRead(file, 0, ref vecIn);
                 int numberOfEigenvalues = lanczosEVectors[i].GetLength(1);
                 int iterations = lanczosEVectors[i].GetLength(0);
                 int dimension = lanczosVector.Length;
+                vecIn.Close();
+                vecIn = new StreamReader(file);
                 //eVecs[i] = new double[dimension, numberOfEigenvalues];
                 eVecs.Add(new double[dimension, numberOfEigenvalues]);
                 for (int j = 0; j < iterations; j++)
                 {
-                    lanczosVector = vecRead(file, j);
+                    lanczosVector = vecRead(file, j, ref vecIn);
                     for (int m = 0; m < numberOfEigenvalues; m++)
                     {
                         //read in the right vector to memory from the lanczos vector file                    

@@ -31,6 +31,8 @@ namespace ConsoleApplication1
 #if DEBUG
         public static long reorthogTime = 0;
 #endif
+        public static const int basisSetLimit = 50000;
+
         //private static double machEps = 2.22E-16;
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
@@ -877,7 +879,7 @@ namespace ConsoleApplication1
             double[] Axvi = new double[N];
             var lanczosVecs = new double[0,0];
             bool NTooBig = false;
-            if (N > 100000)
+            if (N > basisSetLimit)
             {
                 NTooBig = true;
             }

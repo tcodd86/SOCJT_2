@@ -426,7 +426,7 @@ namespace ConsoleApplication1
             measurer.Reset();
             measurer.Start();
             //if the evecs of the lanczos matrices will need to be stored then save the lanczos matrices.
-            if (input.pVector && !input.blockLanczos && array1[0].innerobj.m >= 100000)
+            if (input.pVector && !input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit)
             {
                 lanczosEVectors = new List<double[,]>();
                 for (int i = 0; i < array1.Length; i++)
@@ -468,7 +468,7 @@ namespace ConsoleApplication1
                         eigenvalues[i][j] = evs[j];                        
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.blockLanczos || (!input.blockLanczos && array1[i].innerobj.m < 100000))
+                    if (input.blockLanczos || (!input.blockLanczos && array1[i].innerobj.m < Lanczos.basisSetLimit))
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
@@ -480,7 +480,7 @@ namespace ConsoleApplication1
                         }
                     }
                     //here if evectors are needed and hamiltonian is too large assign the lanczosEVectors to the 
-                    if (!input.blockLanczos && array1[0].innerobj.m >= 100000 && input.pVector)
+                    if (!input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.pVector)
                     {
                         //assign the evecs of the lanczos matrices to the lanczosEVectors list.
                         lanczosEVectors[i] = new double[temp.GetLength(0), temp.GetLength(1)];
@@ -512,7 +512,7 @@ namespace ConsoleApplication1
                 }
 
             }//end catch
-            if (!input.blockLanczos && array1[0].innerobj.m >= 100000 && input.pVector)
+            if (!input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.pVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
                 input.pVector = false;
