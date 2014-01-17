@@ -31,7 +31,7 @@ namespace ConsoleApplication1
 #if DEBUG
         public static long reorthogTime = 0;
 #endif
-        public static const int basisSetLimit = 50000;
+        public static int basisSetLimit = 50000;
 
         //private static double machEps = 2.22E-16;
         /// <summary>
@@ -939,7 +939,7 @@ namespace ConsoleApplication1
                 //conditional to keep from calculating meaningless values for beta and vi
                 if (i == its - 1)
                 {
-                    Console.WriteLine("Lanczos iterations completed. Entering diagonalization.");
+                    Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
                     break;
                 }
 
@@ -1210,7 +1210,7 @@ namespace ConsoleApplication1
         /// <param name="X">
         /// 2D array containing the vectors to be normalized
         /// </param>
-        private static void normalize(ref double[,] X)
+        public static void normalize(ref double[,] X)
         {
             for (int j = 0; j < X.GetLength(1); j++)
             {

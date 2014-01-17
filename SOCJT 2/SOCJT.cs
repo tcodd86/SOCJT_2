@@ -141,7 +141,7 @@ namespace ConsoleApplication1
                         if (jBasisVecsByJ[i].Count != 0)//changed from h to i                    
                         {
                             //this checks if the matrix was read from file, and if so if the basis set is the correct size
-                            if (basisSize != null)
+                            if (basisSize.Count != 0)
                             {
                                 if (basisSize[i] != jBasisVecsByJ[i].Count)
                                 {
@@ -238,7 +238,7 @@ namespace ConsoleApplication1
                             quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                         }
                         //this checks if the matrix was read from file, and if so if the basis set is the correct size
-                        if (basisSize != null)                        
+                        if (basisSize.Count != 0)                        
                         { 
                             if(basisSize[i - jBasisVecsByJ.Count / 2] != quadVecs.Count)
                             {

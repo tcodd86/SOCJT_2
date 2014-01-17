@@ -390,7 +390,7 @@ namespace ConsoleApplication1
                 //This is done because this process may take a large amount of time
                 if (runner.lanczosEVectors != null || fitt.lanczosEVectors != null)
                 {
-                    Console.WriteLine("\n Eigenvectors being calculated...");
+                    Console.WriteLine("\nEigenvectors being calculated...");
                     Console.WriteLine("This may take some time.");
                     if (fit)
                     {
@@ -522,8 +522,8 @@ namespace ConsoleApplication1
                 int dimension = lanczosVector.Length;
                 vecIn.Close();
                 vecIn = new StreamReader(file);
-                //eVecs[i] = new double[dimension, numberOfEigenvalues];
-                eVecs.Add(new double[dimension, numberOfEigenvalues]);
+                //eVecs.Add(new double[dimension, numberOfEigenvalues]);
+                double[,] temp = new double[dimension, numberOfEigenvalues];
                 for (int j = 0; j < iterations; j++)
                 {
                     lanczosVector = vecRead(file, j, ref vecIn);
@@ -532,12 +532,16 @@ namespace ConsoleApplication1
                         //read in the right vector to memory from the lanczos vector file                    
                         for (int n = 0; n < lanczosVector.Length; n++)
                         {                            
-                            eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
+                            //eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
+                            temp[n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
                         }//end loop over rows of lanczos Vector
                     }//end loop over columns of lanczosEVectors
                 }
                 //here delete the temp lanczos vector file
+                vecIn.Close();
                 File.Delete(file);
+                Lanczos.normalize(ref temp);
+                eVecs.Add(temp);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
             StringBuilder output = new StringBuilder();
@@ -554,7 +558,7 @@ namespace ConsoleApplication1
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");
 
-                    bool a1 = SOCJT.isA(basisSet[i], lanczosEVectors[i], j, input);
+                    bool a1 = SOCJT.isA(basisSet[i], eVecs[i], j, input);
                     if (a1)
                     {
                         output.AppendLine("Vector is Type 1");
@@ -573,10 +577,10 @@ namespace ConsoleApplication1
                     output.Append("lambda");
                     for (int h = 0; h < basisSet[i].Count; h++)//goes through basis vectors
                     {
-                        if (lanczosEVectors[i][h, j] > evMin || lanczosEVectors[i][h, j] < -1.0 * input.evMin)
+                        if (eVecs[i][h, j] > evMin || eVecs[i][h, j] < -1.0 * input.evMin)
                         {
                             output.AppendLine("\t");
-                            output.Append(String.Format("{0,10:0.000000}", lanczosEVectors[i][h, j]));
+                            output.Append(String.Format("{0,10:0.000000}", eVecs[i][h, j]));
                             for (int m = 0; m < input.nModes; m++)//goes through each mode
                             {
                                 output.Append("\t" + "  " + Convert.ToString(basisSet[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", basisSet[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
