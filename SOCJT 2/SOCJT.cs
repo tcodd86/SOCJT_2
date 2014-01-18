@@ -559,7 +559,7 @@ namespace ConsoleApplication1
                 for (int j = 0; j < evs[i].Length; j++)
                 {
                     //add call to symmetry checker function here.
-                    bool tbool = isA(jvecs[i], zMatrices[i], j, input);
+                    bool tbool = isA(jvecs[i], zMatrices[i], j, input, false);
                     eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
                 }
                 if (tempS < maxS)
@@ -601,13 +601,14 @@ namespace ConsoleApplication1
             return eigenarray;
         }
 
-        public static bool isA(List<BasisFunction> jBasisVecsByJ, double[,] tempMat, int j, FileInfo input)
+        public static bool isA(List<BasisFunction> jBasisVecsByJ, double[,] tempMat, int j, FileInfo input, bool overRide)
         {
             bool a1 = false;
             double temp = 0.0;
             int[] tempVL = new int[input.nModes * 2 + 1];
             //this conditional is because if naive lanczos is used and eigenvectors are not calculated the tempMat actually contains the eigenvectors of the the lanczos matrix, not the Hamiltonian
-            if (!input.blockLanczos && !input.pVector)
+            //boolean overRide lets me skip this when it's called to do separate eigenvector calculations
+            if (!input.blockLanczos && !input.pVector && !overRide)
             {
                 return false;
             }

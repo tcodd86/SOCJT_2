@@ -80,7 +80,7 @@ namespace ConsoleApplication1
                         file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.evMin) + " are shown)");
                         file.AppendLine(" ");
 
-                        bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input);
+                        bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input, false);
                         if (a1)
                         {
                             file.AppendLine("Vector is Type 1");

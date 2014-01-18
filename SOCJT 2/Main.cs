@@ -548,7 +548,11 @@ namespace ConsoleApplication1
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
                 decimal jblock = (decimal)i + 0.5M;
+                output.AppendLine("************************************");
+                output.AppendLine(" ");
                 output.AppendLine("J-Block " + jblock);
+                output.AppendLine(" ");
+                output.AppendLine("************************************");
                 output.AppendLine(" ");
                 for (int j = 0; j < lanczosEVectors[i].GetLength(1); j++)
                 {
@@ -558,7 +562,7 @@ namespace ConsoleApplication1
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");
 
-                    bool a1 = SOCJT.isA(basisSet[i], eVecs[i], j, input);
+                    bool a1 = SOCJT.isA(basisSet[i], eVecs[i], j, input, true);
                     if (a1)
                     {
                         output.AppendLine("Vector is Type 1");
@@ -590,6 +594,7 @@ namespace ConsoleApplication1
                     }
                     output.AppendLine("\r");
                 }//end j for loop
+                output.AppendLine("\r");
             }//end i loop
             //code here to write to file
             string fileName = filepath + input.title + "_EVecs.out";
