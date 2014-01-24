@@ -80,37 +80,7 @@ namespace ConsoleApplication1
                         file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.evMin) + " are shown)");
                         file.AppendLine(" ");
 
-                        bool a1 = SOCJT.isA(jBasisVecsByJ[i], zMatrices[i], j, input, false);
-                        if (a1)
-                        {
-                            file.AppendLine("Vector is Type 1");
-                        }
-                        else
-                        {
-                            file.AppendLine("Vector is Type 2");
-                        }
-                        file.AppendLine(" ");
-
-                        file.Append("Coefficient" + "\t");
-                        for (int h = 0; h < input.nModes; h++)
-                        {
-                            file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
-                        }
-                        file.Append("lambda");
-                        for (int h = 0; h < jBasisVecsByJ[i].Count; h++)//goes through basis vectors
-                        {
-                            if (tempMat[h, j] > input.evMin || tempMat[h, j] < -1.0 * input.evMin)
-                            {
-                                file.AppendLine("\t");
-                                file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
-                                for (int m = 0; m < input.nModes; m++)//goes through each mode
-                                {
-                                    file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
-                                }
-                                file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[i][h].Lambda));
-                            }
-                        }
-                        file.AppendLine("\r");
+                        vecBuilder(input, jBasisVecsByJ[i], file, tempMat, j, input.evMin);
                     }
                     #endregion
                 }
@@ -234,6 +204,59 @@ namespace ConsoleApplication1
             
             return linesToWrite;
         }//end method makeOutput
+
+        /// <summary>
+        /// Appends eigenvector information to supplied StringBuilder for a given eigenvector.
+        /// </summary>
+        /// <param name="input">
+        /// FileInfo object
+        /// </param>
+        /// <param name="jBasisVecsByJ">
+        /// List of basis functions for this j block
+        /// </param>
+        /// <param name="file">
+        /// Stringbuilder object to which eigenvector information will be appended
+        /// </param>
+        /// <param name="tempMat">
+        /// Matrix containing the eigenvectors in the columns
+        /// </param>
+        /// <param name="j">
+        /// Which eigenvector is being looked at
+        /// </param>
+        public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin)
+        {
+            bool a1 = SOCJT.isA(jBasisVecsByJ, tempMat, j, input, false);
+            if (a1)
+            {
+                file.AppendLine("Vector is Type 1");
+            }
+            else
+            {
+                file.AppendLine("Vector is Type 2");
+            }
+            file.AppendLine(" ");
+
+            file.Append("Coefficient" + "\t");
+            for (int h = 0; h < input.nModes; h++)
+            {
+                file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
+            }
+            file.Append("lambda");
+            for (int h = 0; h < jBasisVecsByJ.Count; h++)//goes through basis vectors
+            {
+                if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
+                {
+                    file.AppendLine("\t");
+                    file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
+                    for (int m = 0; m < input.nModes; m++)//goes through each mode
+                    {
+                        file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                    }
+                    file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[h].Lambda));
+                }
+            }
+            file.AppendLine("\r");
+        }
 
         public static List<string> inputFileMaker(FileInfo input, List<ModeInfo> Modes)
         {

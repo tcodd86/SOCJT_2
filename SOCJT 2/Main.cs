@@ -567,7 +567,11 @@ namespace ConsoleApplication1
                     output.AppendLine(" " + "\r");
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");
+                    
+                    //see if this works instead of the whole mess of code below
+                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.evMin);
 
+                    /*
                     bool a1 = SOCJT.isA(basisSet[i], eVecs[i], j, input, true);
                     if (a1)
                     {
@@ -599,6 +603,7 @@ namespace ConsoleApplication1
                         }
                     }
                     output.AppendLine("\r");
+                    */
                 }//end j for loop
                 output.AppendLine("\r");
             }//end i loop
