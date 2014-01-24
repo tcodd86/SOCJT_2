@@ -97,7 +97,7 @@ namespace ConsoleApplication1
                 {
                     //create file pointer for the matrix file
                     input.matFilePath = string.Copy(filepath);
-                    input.matFilePath = string.Concat(input.matFile);
+                    input.matFilePath += input.matFile;
                     //check that the mat file has a valid path
                     if (input.matFilePath == filepathIN || input.matFilePath == filepathOUT || input.matFilePath == filepathFIT)
                     {
@@ -108,6 +108,12 @@ namespace ConsoleApplication1
                     {
                         input.matMade = true;
                     }
+                }
+
+                //if using block lanczos then use the old random function. See some problems with new random function in some cases when using block routine.
+                if (input.blockLanczos)
+                {
+                    input.oldRandom = true;
                 }
 
                 //check that spin is integer or half integer only

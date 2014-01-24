@@ -350,7 +350,7 @@ namespace ConsoleApplication1
 
         public bool blockLanczos { get; private set; }//end naiveLanczos
 
-        public bool oldRandom { get; private set; }//end newRandom
+        public bool oldRandom { get; set; }//end newRandom
 
         /// <summary>
         /// Filepath of matrix file to read.
