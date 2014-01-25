@@ -534,7 +534,18 @@ namespace ConsoleApplication1
                     JvecsForOutuput.Add(jbasisoutA[i]);
                 }
             }//end else
-                    
+
+            if (input.vecFile)
+            {
+                StringBuilder vecFile = new StringBuilder();
+                vecFile.AppendLine("VecFile " + input.title);
+                vecFile.AppendLine(" ");
+                for (int m = 0; m < zMatrices.Count; m++)
+                { 
+
+                }
+            }
+
             List<string> linesToWrite = new List<string>();
             finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                

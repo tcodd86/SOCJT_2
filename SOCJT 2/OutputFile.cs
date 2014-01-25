@@ -258,6 +258,18 @@ namespace ConsoleApplication1
             file.AppendLine("\r");
         }
 
+        /// <summary>
+        /// Creates an input file to go at the start of the output files.
+        /// </summary>
+        /// <param name="input">
+        /// FileInfo object
+        /// </param>
+        /// <param name="Modes">
+        /// List of modes to be included in the input file generated.
+        /// </param>
+        /// <returns>
+        /// List containing all lines of input file.
+        /// </returns>
         public static List<string> inputFileMaker(FileInfo input, List<ModeInfo> Modes)
         {
             List<string> linesToWrite = new List<string>();
