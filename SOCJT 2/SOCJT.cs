@@ -110,8 +110,9 @@ namespace ConsoleApplication1
                 throw new BasisSetTooSmallException(false);
             }
 
-            if (isQuad == false)            
+            if (isQuad == false)
             {
+                #region LinearHamiltonian
                 measurer.Reset();
                 measurer.Start();
                 int h = 0;                
@@ -200,11 +201,13 @@ namespace ConsoleApplication1
                 {
                     throw new BasisSetTooSmallException(true);
                 }
+                #endregion
             }//end if  
 
             //Creates the Hamiltonian matrices for quadratic cases.            
-            else            
+            else
             {
+                #region QuadraticHamiltonian
                 measurer.Reset();
                 measurer.Start();
                 int dynVar1 = (int)(jMax - 1.5M);
@@ -233,7 +236,16 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-                        for (int v = -dynVar2; v <= dynVar2; v++)
+                        /*
+                        int tempDynVar2 = -1 * dynVar2;                        
+                        if (i == jBasisVecsByJ.Count - dynVar1 - 1)
+                        {
+                            //try this to see if this makes it so that all of the proper symmetry basis functions are included in the j = 1.5 blocks
+                            tempDynVar2 -= 1;
+                        }
+                        */
+                        //for (int v = tempDynVar2; v <= dynVar2; v++)
+                        for (int v = -dynVar2; v <= dynVar2; v++)                        
                         {
                             quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                         }
@@ -299,6 +311,7 @@ namespace ConsoleApplication1
                     zMatrices.Add(new double[0, 0]);
                     eigenvalues.Add(new double[0]);
                 }
+                #endregion
             }//end else
             #endregion            
 
