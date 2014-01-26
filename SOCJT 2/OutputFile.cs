@@ -483,6 +483,5 @@ namespace ConsoleApplication1
             linesToWrite.Add(file.ToString());
             File.WriteAllLines(input.matFilePath, linesToWrite);
         }//end method writeMatFile
-
     }//end class OutputFile    
 }

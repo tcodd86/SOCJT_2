@@ -548,15 +548,32 @@ namespace ConsoleApplication1
                 }
             }//end else
 
-            if (input.vecFile)
+            //writes the eigenvectors to disk if that has been requested
+            if (input.vecFile && (input.blockLanczos || input.pVector))
             {
                 StringBuilder vecFile = new StringBuilder();
                 vecFile.AppendLine("VecFile " + input.title);
                 vecFile.AppendLine(" ");
                 for (int m = 0; m < zMatrices.Count; m++)
-                { 
-
+                {
+                    vecFile.AppendLine("*************************************");
+                    vecFile.AppendLine(" ");
+                    vecFile.AppendLine("j-block " + ((decimal)m + 0.5M));
+                    vecFile.AppendLine(" ");
+                    vecFile.AppendLine("*************************************");
+                    vecFile.AppendLine(" ");
+                    for (int o = 0; o < zMatrices[m].GetLength(1); o++)
+                    {
+                        vecFile.AppendLine("Eigenvector: " + (o + 1));
+                        vecFile.AppendLine(" ");
+                        OutputFile.vecBuilder(input, jBasisVecsByJ[m], vecFile, zMatrices[m], o, 0.0);
+                        vecFile.AppendLine(" ");
+                    }
+                    vecFile.AppendLine(" ");
                 }
+                List<string> vecFileOut = new List<string>();
+                vecFileOut.Add(vecFile.ToString());
+                File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
             }
 
             List<string> linesToWrite = new List<string>();
