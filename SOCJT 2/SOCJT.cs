@@ -576,6 +576,11 @@ namespace ConsoleApplication1
                 File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
             }
 
+            //put code here to write eigenvectors to file with entire basis set.
+            //do this by writing function to use jbasisvecsbyj which has all basis functions and
+            //go through that list, where a basis function is in it and JvecsForOutput, pull the appropriate coefficient
+            //from the zmatrices, otherwise just put in a 0.
+
             List<string> linesToWrite = new List<string>();
             finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
