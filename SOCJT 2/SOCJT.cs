@@ -566,7 +566,7 @@ namespace ConsoleApplication1
                     {
                         vecFile.AppendLine("Eigenvector: " + (o + 1));
                         vecFile.AppendLine(" ");
-                        OutputFile.vecBuilder(input, jBasisVecsByJ[m], vecFile, zMatrices[m], o, 0.0);
+                        OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, 0.0);
                         vecFile.AppendLine(" ");
                     }
                     vecFile.AppendLine(" ");

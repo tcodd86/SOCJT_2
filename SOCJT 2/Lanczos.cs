@@ -884,8 +884,7 @@ namespace ConsoleApplication1
                 NTooBig = true;
             }
             string fileDirectory = file + "temp_vecs_" + n + ".tmp";
-            StreamWriter writer = File.CreateText(fileDirectory);
-                //new StreamWriter(fileDirectory); 
+            StreamWriter writer = new StreamWriter(fileDirectory);
             if(evsNeeded)
             {
                 if (!NTooBig)
@@ -897,6 +896,7 @@ namespace ConsoleApplication1
                     //create file to store the eigenvectors in the directory
                     //Uses a default file name each time and deletes it at the end
                     //fileDirectory += "\\temp_vecs_" + n + ".tmp";
+                    writer = File.CreateText(fileDirectory);
                     writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 }
             }

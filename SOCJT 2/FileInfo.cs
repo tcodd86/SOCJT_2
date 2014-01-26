@@ -403,6 +403,7 @@ namespace ConsoleApplication1
             matFile = "matrix.txt";
             useMatFile = false;
             matMade = false;
+            vecFile = false;
 
             title = "TITLE";
             origin = 0.0;
@@ -614,6 +615,14 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 useMatFile = true;
+                            }
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "VEC_FILE")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                vecFile = true;
                             }
                             continue;
                         }
