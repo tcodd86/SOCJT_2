@@ -377,6 +377,11 @@ namespace ConsoleApplication1
         /// </summary>
         public string filePath { get; set; }
 
+        /// <summary>
+        /// Boolean indicating whether or not an output file of the eigenvectors using the complete basis set should be printed.
+        /// </summary>
+        public bool vecFileComplete { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -404,6 +409,7 @@ namespace ConsoleApplication1
             useMatFile = false;
             matMade = false;
             vecFile = false;
+            vecFileComplete = false;
 
             title = "TITLE";
             origin = 0.0;
@@ -623,6 +629,14 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 vecFile = true;
+                            }
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "VEC_FILE_COMPLETE")
+                        {
+                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
+                            {
+                                vecFileComplete = true;
                             }
                             continue;
                         }
