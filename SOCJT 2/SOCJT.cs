@@ -574,7 +574,7 @@ namespace ConsoleApplication1
                 List<string> vecFileOut = new List<string>();
                 vecFileOut.Add(vecFile.ToString());
                 File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
-            }
+            }//end if
 
             //put code here to write eigenvectors to file with entire basis set.
             //do this by writing function to use jbasisvecsbyj which has all basis functions and
