@@ -588,6 +588,11 @@ namespace ConsoleApplication1
             return linesToWrite;   
         }//end SOCJT Routine
 
+        private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<double[,]> zMatrices, FileInfo input)
+        { 
+            
+        }
+
         public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
@@ -647,6 +652,27 @@ namespace ConsoleApplication1
             return eigenarray;
         }
 
+        /// <summary>
+        /// Method to determine if a vector is type 1 (symmetric) or type 2 (antisymmetric).
+        /// </summary>
+        /// <param name="jBasisVecsByJ">
+        /// Basis set of vector being looked at
+        /// </param>
+        /// <param name="tempMat">
+        /// Matrix containing the eigenvectors.
+        /// </param>
+        /// <param name="j">
+        /// Which eigenvector to look at.
+        /// </param>
+        /// <param name="input">
+        /// FileInfo object
+        /// </param>
+        /// <param name="overRide">
+        /// Boolean to simply return type 2 for all eigenvectors because this function is being called with the lanczos eigenvectors, not the true eigenvectors.
+        /// </param>
+        /// <returns>
+        /// True if symmetric, false if antisymmetric.
+        /// </returns>
         public static bool isA(List<BasisFunction> jBasisVecsByJ, double[,] tempMat, int j, FileInfo input, bool overRide)
         {
             bool a1 = false;
