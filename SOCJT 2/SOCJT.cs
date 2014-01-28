@@ -588,10 +588,89 @@ namespace ConsoleApplication1
             return linesToWrite;   
         }//end SOCJT Routine
 
-        private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<double[,]> zMatrices, FileInfo input)
-        { 
-            
+        private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues)
+        {
+            double ZPE = eigenvalues[0][0];
+            for (int i = 0; i < eigenvalues.Count; i++)
+            {
+                for (int j = 0; j < eigenvalues[i].Length; j++)
+                {
+                    eigenvalues[i][j] += ZPE;
+                }
+            }
+            StringBuilder file = new StringBuilder(input.filePath + input.title + "_CompleteVector.out");
+            file.AppendLine(" ");
+
+
+
+            file.Append("Coefficient" + "\t");
+            for (int h = 0; h < input.nModes; h++)
+            {
+                file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
+            }
+            file.Append("lambda");
+            for (int h = 0; h < jBasisVecsByJ.Count; h++)//goes through basis vectors
+            {
+                if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
+                {
+                    file.AppendLine("\t");
+                    file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
+                    for (int m = 0; m < input.nModes; m++)//goes through each mode
+                    {
+                        file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                    }
+                    file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[h].Lambda));
+                }
+            }
+            file.AppendLine("\r");
         }
+
+        /// <summary>
+        /// Function to determine if a given basis function is found in an eigenvector.
+        /// </summary>
+        /// <param name="jBasisVec">
+        /// The basis function to be looked for
+        /// </param>
+        /// <param name="eigenvector">
+        /// The eigenvector to check for jBasisVec
+        /// </param>
+        /// <param name="place">
+        /// This will be the index of the jBasisVec if it is found.
+        /// </param>
+        /// <param name="start">
+        /// The place to start in eigenvector. Used to avoid double checking basis functions which have already been found.
+        /// </param>
+        /// <returns>
+        /// Boolean to indicate whether or not the basisfunction is in the eigenvector.
+        /// </returns>
+        private static bool isInBasis(BasisFunction jBasisVec, List<BasisFunction> eigenvector, ref int place, int start)
+        {
+            bool In = false;
+            for (int i = start; i < eigenvector.Count; i++)
+            {
+                if (jBasisVec.J == eigenvector[i].J && jBasisVec.Lambda == eigenvector[i].Lambda)
+                {
+                    for(int j = 0; j < jBasisVec.modesInVec.Count; j++)
+                    {
+                    
+                        if (jBasisVec.modesInVec[j].v == eigenvector[i].modesInVec[j].v && jBasisVec.modesInVec[j].l == eigenvector[i].modesInVec[j].l)
+                        {
+                            if (j == jBasisVec.modesInVec.Count - 1)
+                            {
+                                In = true;
+                                place = i;
+                            }
+                            continue;
+                        }//end if for v and l
+                        else
+                        {
+                            break;
+                        }
+                    }//end for loop
+                }//end if for J and Lambda
+            }//end loop over all eigenvectors
+            return In;
+        }//end isInBasis
 
         public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
         {
