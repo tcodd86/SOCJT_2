@@ -769,6 +769,30 @@ namespace ConsoleApplication1
             return In;
         }//end isInBasis
 
+        /// <summary>
+        /// Function to generate array of Eigenvalues for final output file.
+        /// </summary>
+        /// <param name="evs">
+        /// Eigenvalues for all j blocks
+        /// </param>
+        /// <param name="S">
+        /// Spin
+        /// </param>
+        /// <param name="inclSO">
+        /// True if there is SO coupling, false if not.
+        /// </param>
+        /// <param name="zMatrices">
+        /// Eigenvectors for each j-block
+        /// </param>
+        /// <param name="jvecs">
+        /// Basis set for each j-block
+        /// </param>
+        /// <param name="input">
+        /// FileInfo object
+        /// </param>
+        /// <returns>
+        /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
+        /// </returns>
         public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
@@ -902,6 +926,12 @@ namespace ConsoleApplication1
             return a1;
         }
 
+        /// <summary>
+        /// Method to sort eigenvalues in increasing order
+        /// </summary>
+        /// <param name="arr">
+        /// Eigenvalues to be sorted
+        /// </param>
         private static void bubbleSort(ref Eigenvalue[] arr)
         {
             bool swapped = true;
@@ -922,7 +952,7 @@ namespace ConsoleApplication1
                     }//end if
                 }//end for
             }//end while           
-        }//end method bublleSort
+        }//end method bubbleSort
 
         /// <summary>
         /// Used to multiply all elements in a sparse matrix A by the value val
