@@ -588,7 +588,7 @@ namespace ConsoleApplication1
             return linesToWrite;   
         }//end SOCJT Routine
 
-        private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues)
+        private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<List<BasisFunction>> JvecsForOutput, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues, bool isQuad)
         {
             double ZPE = eigenvalues[0][0];
             for (int i = 0; i < eigenvalues.Count; i++)
@@ -598,32 +598,129 @@ namespace ConsoleApplication1
                     eigenvalues[i][j] += ZPE;
                 }
             }
-            StringBuilder file = new StringBuilder(input.filePath + input.title + "_CompleteVector.out");
+            StringBuilder file = new StringBuilder();
             file.AppendLine(" ");
-
-
-
-            file.Append("Coefficient" + "\t");
-            for (int h = 0; h < input.nModes; h++)
+            file.AppendLine("Eigenvectors in complete basis set for " + input.title);
+            file.AppendLine(" ");
+            //loop over jBlocks
+            for (int i = 0; i < eigenvalues.Count; i++)
             {
-                file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
-            }
-            file.Append("lambda");
-            for (int h = 0; h < jBasisVecsByJ.Count; h++)//goes through basis vectors
-            {
-                if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
+                //here make a list of possible j values in this eigenvector to save time
+                List<decimal> possibleJVals = new List<decimal>();
+                for (int n = i; n < input.maxJ; n += 3)
                 {
-                    file.AppendLine("\t");
-                    file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
-                    for (int m = 0; m < input.nModes; m++)//goes through each mode
+                    possibleJVals.Add((decimal)n + 0.5M);
+                    possibleJVals.Add(-1M * ((decimal)n + 0.5M));
+                }//end loop over possible j values
+                //This takes off the last negative j value which is not included in the basis set
+                possibleJVals.RemoveAt(possibleJVals.Count - 1);
+                possibleJVals.Sort();
+
+                //loop over all of the eigenvalues found
+                for (int l = 0; l < eigenvalues[i].Length; l++)
+                {
+                    file.Append("Coefficient" + "\t");
+                    for (int h = 0; h < input.nModes; h++)
                     {
-                        file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                        file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
                     }
-                    file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[h].Lambda));
-                }
+                    file.Append("lambda");
+                    
+                    for (int j = 0; j < jBasisVecsByJ.Count; j++)//goes through basis vectors
+                    {
+                        int place = 0;
+                        file.AppendLine(" " + "\r");
+                        file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", eigenvalues[i][l]));
+                        file.AppendLine(" " + "\r");
+                        //first split into quadratic and linear
+                        if (isQuad)
+                        {
+                            //first check to see if this J value will have nonzero coefficients
+                            bool rightJ = false;
+                            for (int b = 0; b < possibleJVals.Count; b++)
+                            {
+                                if (jBasisVecsByJ[j][0].J == possibleJVals[b])
+                                {
+                                    rightJ = true;
+                                    break;
+                                }
+                            }//end loop over possible j values
+
+                            //if this j value is not a j value with a nonzero coefficient just put 0 in
+                            if (!rightJ)
+                            { 
+                                for(int k = 0; k < jBasisVecsByJ[j].Count; k++)
+                                {
+                                    writeVec(0.0, jBasisVecsByJ[j][k], file);
+                                }
+                            }//end if
+                            else//means this j has possible nonzero matrix elements
+                            {
+                                for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
+                                {
+                                    bool temp = isInBasis(jBasisVecsByJ[j][k], JvecsForOutput[i], ref place, 0);
+                                    if (temp)
+                                    {
+                                        writeVec(0.0, jBasisVecsByJ[j][k], file);
+                                    }
+                                    else
+                                    {
+                                        writeVec(tempMat[i][k, l], jBasisVecsByJ[j][k], file);
+                                    }
+                                }//end for loop over J
+                            }//end else
+                        }//end if isQuad
+                        else
+                        {
+                            if (jBasisVecsByJ[j][0].J == (decimal)i + 0.5M)
+                            {
+                                //write actual values to the eigenvector
+                                for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
+                                {
+                                    writeVec(tempMat[i][k, l], jBasisVecsByJ[j][k], file);
+                                }//end loop over BasisFunctions in j value for jBasisVecsByJ
+                            }
+                            else
+                            {
+                                //just write a zero for all of the coefficients for this j value
+                                for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
+                                {
+                                    writeVec(0.0, jBasisVecsByJ[j][k], file);
+                                }//end loop over BasisFunctions in j value for jBasisVecsByJ
+                            }
+                        }//end linear option
+                    }//end loop over jValues in jbasisVecsByJ
+                    file.AppendLine("\r");
+                }//end loop over the number of eigenvalues
+            }//end loop over j blocks
+
+            List<string> vecFileOut = new List<string>();
+            vecFileOut.Add(file.ToString());
+            File.WriteAllLines((input.filePath + input.title + "_CompleteVector.out"), vecFileOut);
+        }//end function writeCompleteVec
+
+        /// <summary>
+        /// Addes a basis function to an eigenvector including its coefficient
+        /// </summary>
+        /// <param name="coefficient">
+        /// Coefficient of the basis function
+        /// </param>
+        /// <param name="func">
+        /// Basis function being added
+        /// </param>
+        /// <param name="file">
+        /// StringBuilder to add the function to.
+        /// </param>
+        private static void writeVec(double coefficient, BasisFunction func, StringBuilder file)
+        {
+            file.AppendLine("\t");
+            file.Append(String.Format("{0,10:0.000000}", coefficient));
+            for (int m = 0; m < func.modesInVec.Count; m++)//goes through each mode
+            {
+                file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].v) + "\t" + String.Format("{0,3}", func.modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
             }
-            file.AppendLine("\r");
-        }
+            file.Append("\t" + String.Format("{0,4}", func.Lambda));
+        }//end of function writeVec
 
         /// <summary>
         /// Function to determine if a given basis function is found in an eigenvector.
