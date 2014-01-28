@@ -580,6 +580,10 @@ namespace ConsoleApplication1
             //do this by writing function to use jbasisvecsbyj which has all basis functions and
             //go through that list, where a basis function is in it and JvecsForOutput, pull the appropriate coefficient
             //from the zmatrices, otherwise just put in a 0.
+            if (input.vecFileComplete)
+            {
+                writeVecComplete(jBasisVecsByJ, JvecsForOutuput, zMatrices, input, eigenvalues, isQuad);
+            }
 
             List<string> linesToWrite = new List<string>();
             finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
@@ -591,6 +595,10 @@ namespace ConsoleApplication1
         private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<List<BasisFunction>> JvecsForOutput, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues, bool isQuad)
         {
             double ZPE = eigenvalues[0][0];
+            if (ZPE < 0.0)
+            {
+                ZPE *= -1.0;
+            }
             for (int i = 0; i < eigenvalues.Count; i++)
             {
                 for (int j = 0; j < eigenvalues[i].Length; j++)
@@ -610,15 +618,22 @@ namespace ConsoleApplication1
                 for (int n = i; n < input.maxJ; n += 3)
                 {
                     possibleJVals.Add((decimal)n + 0.5M);
-                    possibleJVals.Add(-1M * ((decimal)n + 0.5M));
+                    if (n == i)
+                    {
+                        continue;
+                    }
+                    possibleJVals.Add((decimal)n * -1M + (decimal)i * 2M + 0.5M);
                 }//end loop over possible j values
                 //This takes off the last negative j value which is not included in the basis set
-                possibleJVals.RemoveAt(possibleJVals.Count - 1);
+                //possibleJVals.RemoveAt(possibleJVals.Count - 1);
                 possibleJVals.Sort();
 
                 //loop over all of the eigenvalues found
                 for (int l = 0; l < eigenvalues[i].Length; l++)
                 {
+                    file.AppendLine(" " + "\r");
+                    file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", eigenvalues[i][l]));
+                    file.AppendLine(" " + "\r");
                     file.Append("Coefficient" + "\t");
                     for (int h = 0; h < input.nModes; h++)
                     {
@@ -629,9 +644,7 @@ namespace ConsoleApplication1
                     for (int j = 0; j < jBasisVecsByJ.Count; j++)//goes through basis vectors
                     {
                         int place = 0;
-                        file.AppendLine(" " + "\r");
-                        file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", eigenvalues[i][l]));
-                        file.AppendLine(" " + "\r");
+                        
                         //first split into quadratic and linear
                         if (isQuad)
                         {
@@ -659,13 +672,13 @@ namespace ConsoleApplication1
                                 for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                                 {
                                     bool temp = isInBasis(jBasisVecsByJ[j][k], JvecsForOutput[i], ref place, 0);
-                                    if (temp)
+                                    if (!temp)
                                     {
                                         writeVec(0.0, jBasisVecsByJ[j][k], file);
                                     }
                                     else
                                     {
-                                        writeVec(tempMat[i][k, l], jBasisVecsByJ[j][k], file);
+                                        writeVec(tempMat[i][place, l], jBasisVecsByJ[j][k], file);
                                     }
                                 }//end for loop over J
                             }//end else
