@@ -609,10 +609,14 @@ namespace ConsoleApplication1
             StringBuilder file = new StringBuilder();
             file.AppendLine(" ");
             file.AppendLine("Eigenvectors in complete basis set for " + input.title);
-            file.AppendLine(" ");
+            file.AppendLine(" ");            
             //loop over jBlocks
             for (int i = 0; i < eigenvalues.Count; i++)
             {
+                file.AppendLine(" ");
+                file.AppendLine("J-Block " + ((decimal)i + 0.5M));
+                file.AppendLine(" ");                
+
                 //here make a list of possible j values in this eigenvector to save time
                 List<decimal> possibleJVals = new List<decimal>();
                 for (int n = i; n < input.maxJ; n += 3)
@@ -630,9 +634,18 @@ namespace ConsoleApplication1
 
                 //loop over all of the eigenvalues found
                 for (int l = 0; l < eigenvalues[i].Length; l++)
-                {
+                {                    
                     file.AppendLine(" " + "\r");
                     file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", eigenvalues[i][l]));
+                    bool a1 = SOCJT.isA(JvecsForOutput[i], tempMat[i], l, input, false);
+                    if (a1)
+                    {
+                        file.AppendLine("Vector is Type 1");
+                    }
+                    else
+                    {
+                        file.AppendLine("Vector is Type 2");
+                    }
                     file.AppendLine(" " + "\r");
                     file.Append("Coefficient" + "\t");
                     for (int h = 0; h < input.nModes; h++)
