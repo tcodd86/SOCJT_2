@@ -873,91 +873,38 @@ namespace ConsoleApplication1
             var betas = new double[its];
             betas[0] = 0.0;
 
-            var vi = RANDOM(N, oldRandom);
-            var viminusone = new double[N];
-            var viplusone = new double[N];
-            double[] Axvi = new double[N];
             var lanczosVecs = new double[0,0];
             bool NTooBig = false;
             if (N > basisSetLimit)
             {
                 NTooBig = true;
             }
-            string fileDirectory = file + "temp_vecs_" + n + ".tmp";
-            StreamWriter writer = new StreamWriter(fileDirectory);
-            if(evsNeeded)
+            //now put two different versions here, one for NTooBig and evsNeeded == true
+            //the other for !NTooBig or !evsNeeded            
+            if (NTooBig && evsNeeded)
             {
-                if (!NTooBig)
+                //create file to store the eigenvectors in the directory
+                //Uses a default file name each time and deletes it at the end
+                //fileDirectory += "\\temp_vecs_" + n + ".tmp"; 
+                string fileDirectory = file + "temp_vecs_" + n + ".tmp";
+                StreamWriter writer = new StreamWriter(fileDirectory);                
+                writer = File.CreateText(fileDirectory);
+                writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, writer);
+                writer.Close();
+            }
+            else
+            {
+                //allocate memory for eigenvectors
+                if (evsNeeded)
                 {
                     lanczosVecs = new double[N, its];
                 }
-                else
-                {
-                    //create file to store the eigenvectors in the directory
-                    //Uses a default file name each time and deletes it at the end
-                    //fileDirectory += "\\temp_vecs_" + n + ".tmp";
-                    writer = File.CreateText(fileDirectory);
-                    writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                }
+                StreamWriter bogus = new StreamWriter();
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, bogus);
             }
-            for(int i = 0; i < its; i++)
-            {
-                //do Lanczos iterations here
-                //Axvi will contain the product of A and vi                
-                OP(A, vi, ref Axvi, 1);
-                
-                //assign alpha value for this iteration
-                alphas[i] = vxv(vi, Axvi);
-
-                //if calculating the eigenvectors then store the lanczos vectors here
-                if (evsNeeded)
-                {
-                    //store in memory if small enough
-                    if (!NTooBig)
-                    {
-                        for (int j = 0; j < N; j++)
-                        {
-                            lanczosVecs[j, i] = vi[j];
-                        }
-                    }
-                    //if not, then write them to file
-                    else
-                    {
-                        //write which iteration this is
-                        writer.WriteLine(" ");
-                        writer.WriteLine("START_VEC" + i);
-                        //write the vector to the evFile
-                        for (int j = 0; j < N; j++)
-                        {
-                            writer.WriteLine(vi[j]);
-                        }
-                        writer.WriteLine("END_VEC");
-                        writer.WriteLine(" ");
-                    }
-                }
-
-                //conditional to keep from calculating meaningless values for beta and vi
-                if (i == its - 1)
-                {
-                    Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
-                    break;
-                }
-
-                //calculate viplusone and beta i + 1.
-                viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
-                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
-                for (int j = 0; j < viplusone.Length; j++)
-                {
-                    viplusone[j] /= betas[i + 1];
-                }
-                //now reassign vi vectors for next iteration.
-                viminusone = vi;
-                vi = viplusone;
-
-                //let the user know things are happening
-                Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
-            }
-            writer.Close();
+            
+            
             //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -1041,8 +988,7 @@ namespace ConsoleApplication1
 
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
-            {
-                
+            {                
                 //now generate the eigenvectors by matrix multiplication
                 //temporary storage for eigenvectors
                 var tempEvecs = new double[its, correctEvs.Count];
@@ -1056,7 +1002,7 @@ namespace ConsoleApplication1
                 }
                 if (!NTooBig)
                 {
-                    File.Delete(fileDirectory);
+                    //File.Delete(fileDirectory);
                     //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
                     double[,] transEvecs = new double[N, evs.Length];
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
@@ -1067,17 +1013,113 @@ namespace ConsoleApplication1
                     //then set equal to z
                     z = transEvecs;
                 }
-                else
+                else//if eigenvectors are not needed
                 {
-                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors to be transformed.
+                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors.
                     z = tempEvecs;
                 }
             }//end if evsNeeded
-            else
-            {
-                File.Delete(fileDirectory);
-            }
+            //else
+            //{
+            //    File.Delete(fileDirectory);
+            //}
         }//end NaiveLanczos
+
+        /// <summary>
+        /// Function which generates the Lanczos matrix and optionally stores or writes to file the Lanczos vectors if necessary.
+        /// </summary>
+        /// <param name="A">
+        /// Sparse matrix being diagonalized
+        /// </param>
+        /// <param name="its">
+        /// Number of iterations for the lanczos routine
+        /// </param>
+        /// <param name="evsNeeded">
+        /// True if eigenvectors will be calculated
+        /// </param>
+        /// <param name="alphas">
+        /// Vector for storing the diagonal of the Lanczos matrix.
+        /// </param>
+        /// <param name="betas">
+        /// Vector for storing the off diagonal of the Lanczos matrix.
+        /// </param>
+        /// <param name="lanczosVecs">
+        /// Array to store the lanczosVecs, should be initialized if evsNeeded and NTooBig == false
+        /// </param>
+        /// <param name="NTooBig">
+        /// True if the basis set is too large to store the Lanczos Vectors in memory and they must be written to file.
+        /// </param>
+        /// <param name="writer">
+        /// StreamWriter for writing LanczosVectors to disc if necessary
+        /// </param>
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, StreamWriter writer)
+        {
+            int N = A.innerobj.m;
+            //initialize vectors to store the various vectors used in the Lanczos iterations
+            var vi = RANDOM(N, false);
+            var viminusone = new double[N];
+            var viplusone = new double[N];
+            double[] Axvi = new double[N];
+
+            //loop to generate the Lanczos matrix
+            for (int i = 0; i < its; i++)
+            {
+                //do Lanczos iterations here
+                //Axvi will contain the product of A and vi                
+                OP(A, vi, ref Axvi, 1);
+
+                //assign alpha value for this iteration
+                alphas[i] = vxv(vi, Axvi);
+
+                //if calculating the eigenvectors then store the lanczos vectors here
+                if (evsNeeded)
+                {
+                    //store in memory if small enough
+                    if (!NTooBig)
+                    {
+                        for (int j = 0; j < N; j++)
+                        {
+                            lanczosVecs[j, i] = vi[j];
+                        }
+                    }
+                    //if not, then write them to file
+                    else
+                    {
+                        //write which iteration this is
+                        writer.WriteLine(" ");
+                        writer.WriteLine("START_VEC" + i);
+                        //write the vector to the evFile
+                        for (int j = 0; j < N; j++)
+                        {
+                            writer.WriteLine(vi[j]);
+                        }
+                        writer.WriteLine("END_VEC");
+                        writer.WriteLine(" ");
+                    }
+                }//end if evsNeeded
+
+                //conditional to keep from calculating meaningless values for beta and vi
+                if (i == its - 1)
+                {
+                    Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
+                    break;
+                }
+
+                //calculate viplusone and beta i + 1.
+                viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
+                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                for (int j = 0; j < viplusone.Length; j++)
+                {
+                    viplusone[j] /= betas[i + 1];
+                }
+                //now reassign vi vectors for next iteration.
+                viminusone = vi;
+                vi = viplusone;
+
+                //let the user know things are happening
+                Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
+            }//end loop to generate Lanczos matrix
+        }//end LanczosIterations
 
         /// <summary>
         /// Dot product of two vectors
