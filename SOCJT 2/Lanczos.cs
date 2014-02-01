@@ -878,7 +878,6 @@ namespace ConsoleApplication1
             }
 
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
-            //double[,] z = new double[N, M];//use this line when ready to implement eigenvectors as well.
             var ZZ = new double[0,0];
             //set flag for eigenvectors
             int zz = 0;
