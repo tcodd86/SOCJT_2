@@ -31,9 +31,8 @@ namespace ConsoleApplication1
 #if DEBUG
         public static long reorthogTime = 0;
 #endif
-        public static int basisSetLimit = 50000;
+        public static int basisSetLimit = 40000;
 
-        //private static double machEps = 2.22E-16;
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
         /// BKLANC computes a block tridiagonal matrix MS which it stores in rows and 
@@ -482,121 +481,78 @@ namespace ConsoleApplication1
         }
         //PCH done new
         
-        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool oldRandom)
+        /// <summary>
+        /// Generates random numbers and puts them in column L of X
+        /// </summary>
+        /// <param name="N">
+        /// Number of rows in X
+        /// </param>
+        /// <param name="L">
+        /// The column of X to be filled with random numbers
+        /// </param>
+        /// <param name="X">
+        /// Matrix to hold the random numbers in column L
+        /// </param>
+        private static void RANDOM(int N, int L, ref double[,] X)
         {
-            if (oldRandom)
+            double[] T = new double[100];
+            int X1;
+            int F1 = 71416;
+            int F2 = 27183;
+            int FT;
+            int K;
+            int A = 6821;
+            int C = 5327;
+            int X0 = 5328;
+            for (int I = 0; I < 100; I++)//do 100
             {
-                double[] T = new double[100];
-                int X1;
-                int F1 = 71416;
-                int F2 = 27183;
-                int FT;
-                int K;
-                int A = 6821;
-                int C = 5327;
-                int X0 = 5328;
-                for (int I = 0; I < 100; I++)//do 100
+                X1 = A * X0 + C;//added + 1
+                if (X1 >= 10000)
                 {
-                    X1 = A * X0 + C;//added + 1
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[I] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 100
-                for (int I = 0; I < N; I++)//do 200
-                {
-                    FT = F1 + F2;
-                    if (FT >= 1000000)
-                    {
-                        FT -= 1000000;
-                    }
-                    F1 = F2;
-                    F2 = FT;
-                    K = FT / 10000;//probably should not have the + 1 but does better with it.
-                    X[I, L] = T[K];
-                    X1 = A * X0 + C;//try a + 1 here too
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[K] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 200
-                T = null;
-            }
-            else
+                    X1 -= 10000;
+                }
+                T[I] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 100
+            for (int I = 0; I < N; I++)//do 200
             {
-                Random randy = new Random(6821);
-                var randVec = new double[N];
-                for (int i = 0; i < N; i++)
+                FT = F1 + F2;
+                if (FT >= 1000000)
                 {
-                    randVec[i] = Math.Abs(randy.NextDouble());
+                    FT -= 1000000;
                 }
-                normalize(ref randVec);
-                for (int i = 0; i < N; i++)
+                F1 = F2;
+                F2 = FT;
+                K = FT / 10000;//probably should not have the + 1 but does better with it.
+                X[I, L] = T[K];
+                X1 = A * X0 + C;//try a + 1 here too
+                if (X1 >= 10000)
                 {
-                    X[i, L] = randVec[i];
+                    X1 -= 10000;
                 }
-            }
-        }
+                T[K] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 200
+            T = null;
+        }//end function Random for BlockLanczos Routine
 
-        private static double[] RANDOM(int N, bool oldRandom)
+        /// <summary>
+        /// Function to generate a normalized vector of length N filled with random numbers
+        /// </summary>
+        /// <param name="N">
+        /// Length of the vector to be returned.
+        /// </param>
+        /// <returns>
+        /// Normalized, random vector of length N.
+        /// </returns>
+        private static double[] RANDOM(int N)
         {
             //initialize vector to be returned
-            var X = new double[N];
-            //if not using new Random routine use old one
-            if (oldRandom)
+            var X = new double[N];            
+            Random randy = new Random(6821);
+            for (int i = 0; i < N; i++)
             {
-                double[] T = new double[100];
-                int X1;
-                int F1 = 71416;
-                int F2 = 27183;
-                int FT;
-                int K;
-                int A = 6821;
-                int C = 5327;
-                int X0 = 5328;
-                for (int I = 0; I < 100; I++)//do 100
-                {
-                    X1 = A * X0 + C;//added + 1
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[I] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 100
-                for (int I = 0; I < N; I++)//do 200
-                {
-                    FT = F1 + F2;
-                    if (FT >= 1000000)
-                    {
-                        FT -= 1000000;
-                    }
-                    F1 = F2;
-                    F2 = FT;
-                    K = FT / 10000;//probably should not have the + 1 but does better with it.
-                    X[I] = T[K];
-                    X1 = A * X0 + C;//try a + 1 here too
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[K] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 200
-                T = null;
-            }
-            //if using new random routine go here
-            else
-            {
-                Random randy = new Random(6821);
-                for (int i = 0; i < N; i++)
-                {
-                    X[i] = randy.NextDouble();
-                }                
+                X[i] = randy.NextDouble();
             }
             //naiveLanczos requires a normalized vector
             normalize(ref X);
@@ -770,7 +726,7 @@ namespace ConsoleApplication1
                 {
                     for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
                     {
-                        RANDOM(N, Q, K, ref X, oldRandom);
+                        RANDOM(N, K, ref X);
                     }
                 }
 
@@ -1056,7 +1012,7 @@ namespace ConsoleApplication1
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
-            var vi = RANDOM(N, false);
+            var vi = RANDOM(N);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
