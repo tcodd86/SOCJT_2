@@ -350,8 +350,6 @@ namespace ConsoleApplication1
 
         public bool blockLanczos { get; private set; }//end naiveLanczos
 
-        public bool oldRandom { get; set; }//end newRandom
-
         /// <summary>
         /// Filepath of matrix file to read.
         /// </summary>
@@ -404,7 +402,6 @@ namespace ConsoleApplication1
             beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
-            oldRandom = false;
             matFile = "matrix.txt";
             useMatFile = false;
             matMade = false;
@@ -720,13 +717,6 @@ namespace ConsoleApplication1
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 blockLanczos = true;
-                            }
-                        }
-                        if (inputf[u].ToUpper() == "OLD_RANDOM")
-                        {
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                oldRandom = true;
                             }
                         }
                         if (inputf[u] == "/")

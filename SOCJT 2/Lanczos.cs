@@ -672,7 +672,7 @@ namespace ConsoleApplication1
         /// array.  Also used as working storage while computing.</param>
         /// <param name="IECODE"></param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
-        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool oldRandom)
+        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par)
         {
             double[] E = new double[Q];
             double[,] C = new double[Q, Q];
@@ -820,7 +820,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;

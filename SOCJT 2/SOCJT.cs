@@ -464,14 +464,14 @@ namespace ConsoleApplication1
                         ITER[i] = input.noIts;
                         evs = new double[input.M];
                         temp = new double[numcolumnsA[i], input.M];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.oldRandom, input.pVector, i, input.filePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.pVector, i, input.filePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
                         IECODE[i] = -1;
-                        ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec, input.oldRandom);
+                        ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
                     }
                  
                     //initialize eigenvalues to have a length.                    
