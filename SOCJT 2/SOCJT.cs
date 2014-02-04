@@ -549,31 +549,10 @@ namespace ConsoleApplication1
             }//end else
 
             //writes the eigenvectors to disk if that has been requested
+            //if NTooBig == true then the separate eigenvector file will be made after the eigenvectors are calculated
             if (input.vecFile && (input.blockLanczos || input.pVector))
             {
-                StringBuilder vecFile = new StringBuilder();
-                vecFile.AppendLine("VecFile " + input.title);
-                vecFile.AppendLine(" ");
-                for (int m = 0; m < zMatrices.Count; m++)
-                {
-                    vecFile.AppendLine("*************************************");
-                    vecFile.AppendLine(" ");
-                    vecFile.AppendLine("j-block " + ((decimal)m + 0.5M));
-                    vecFile.AppendLine(" ");
-                    vecFile.AppendLine("*************************************");
-                    vecFile.AppendLine(" ");
-                    for (int o = 0; o < zMatrices[m].GetLength(1); o++)
-                    {
-                        vecFile.AppendLine("Eigenvector: " + (o + 1));
-                        vecFile.AppendLine(" ");
-                        OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, 0.0);
-                        vecFile.AppendLine(" ");
-                    }
-                    vecFile.AppendLine(" ");
-                }
-                List<string> vecFileOut = new List<string>();
-                vecFileOut.Add(vecFile.ToString());
-                File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
+                writeVecFile(input, zMatrices, JvecsForOutuput);
             }//end if
 
             //put code here to write eigenvectors to file with entire basis set.
@@ -591,6 +570,45 @@ namespace ConsoleApplication1
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
+
+        /// <summary>
+        /// Writes the eigenvectors to a separate file including basis functions with a 0.0 coefficient.
+        /// </summary>
+        /// <param name="input">
+        /// FileInfo object.
+        /// </param>
+        /// <param name="zMatrices">
+        /// Eigenvectors.
+        /// </param>
+        /// <param name="JvecsForOutuput">
+        /// Basis Set.
+        /// </param>
+        public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput)
+        {
+            StringBuilder vecFile = new StringBuilder();
+            vecFile.AppendLine("VecFile " + input.title);
+            vecFile.AppendLine(" ");
+            for (int m = 0; m < zMatrices.Count; m++)
+            {
+                vecFile.AppendLine("*************************************");
+                vecFile.AppendLine(" ");
+                vecFile.AppendLine("j-block " + ((decimal)m + 0.5M));
+                vecFile.AppendLine(" ");
+                vecFile.AppendLine("*************************************");
+                vecFile.AppendLine(" ");
+                for (int o = 0; o < zMatrices[m].GetLength(1); o++)
+                {
+                    vecFile.AppendLine("Eigenvector: " + (o + 1));
+                    vecFile.AppendLine(" ");
+                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, 0.0);
+                    vecFile.AppendLine(" ");
+                }
+                vecFile.AppendLine(" ");
+            }
+            List<string> vecFileOut = new List<string>();
+            vecFileOut.Add(vecFile.ToString());
+            File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
+        }
 
         private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<List<BasisFunction>> JvecsForOutput, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues, bool isQuad)
         {
@@ -628,8 +646,6 @@ namespace ConsoleApplication1
                     }
                     possibleJVals.Add((decimal)n * -1M + (decimal)i * 2M + 0.5M);
                 }//end loop over possible j values
-                //This takes off the last negative j value which is not included in the basis set
-                //possibleJVals.RemoveAt(possibleJVals.Count - 1);
                 possibleJVals.Sort();
 
                 //loop over all of the eigenvalues found
@@ -737,7 +753,7 @@ namespace ConsoleApplication1
         /// <param name="file">
         /// StringBuilder to add the function to.
         /// </param>
-        private static void writeVec(double coefficient, BasisFunction func, StringBuilder file)
+        public static void writeVec(double coefficient, BasisFunction func, StringBuilder file)
         {
             file.AppendLine("\t");
             file.Append(String.Format("{0,10:0.000000}", coefficient));

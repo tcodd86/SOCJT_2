@@ -223,9 +223,9 @@ namespace ConsoleApplication1
         /// <param name="j">
         /// Which eigenvector is being looked at
         /// </param>
-        public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin)
+        public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin, bool overRide = false)
         {
-            bool a1 = SOCJT.isA(jBasisVecsByJ, tempMat, j, input, false);
+            bool a1 = SOCJT.isA(jBasisVecsByJ, tempMat, j, input, overRide);
             if (a1)
             {
                 file.AppendLine("Vector is Type 1");
@@ -246,6 +246,8 @@ namespace ConsoleApplication1
             {
                 if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
                 {
+                    SOCJT.writeVec(tempMat[h, j], jBasisVecsByJ[h], file);
+                    /*
                     file.AppendLine("\t");
                     file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
                     for (int m = 0; m < input.nModes; m++)//goes through each mode
@@ -253,6 +255,7 @@ namespace ConsoleApplication1
                         file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
                     }
                     file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[h].Lambda));
+                    */
                 }
             }
             file.AppendLine("\r");

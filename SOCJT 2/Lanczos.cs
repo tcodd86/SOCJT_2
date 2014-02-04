@@ -844,7 +844,7 @@ namespace ConsoleApplication1
                 //fileDirectory += "\\temp_vecs_" + n + ".tmp"; 
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);                
-                writer = File.CreateText(fileDirectory);
+                //writer = File.CreateText(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, writer);
                 writer.Close();
@@ -856,7 +856,7 @@ namespace ConsoleApplication1
                 {
                     lanczosVecs = new double[N, its];
                 }
-                StreamWriter bogus = new StreamWriter();
+                StreamWriter bogus = null;
                 LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, bogus);
             }
             

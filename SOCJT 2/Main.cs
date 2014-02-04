@@ -111,10 +111,10 @@ namespace ConsoleApplication1
                 }
 
                 //if using block lanczos then use the old random function. See some problems with new random function in some cases when using block routine.
-                if (input.blockLanczos)
-                {
-                    input.oldRandom = true;
-                }
+                //if (input.blockLanczos)
+                //{
+                //    input.oldRandom = true;
+                //}
 
                 //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
@@ -566,44 +566,8 @@ namespace ConsoleApplication1
                     output.AppendLine("Eigenvector" + "\t" + Convert.ToString(j + 1));
                     output.AppendLine(" " + "\r");
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
-                    output.AppendLine(" ");
-                    
-                    //see if this works instead of the whole mess of code below
-                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.evMin);
-
-                    /*
-                    bool a1 = SOCJT.isA(basisSet[i], eVecs[i], j, input, true);
-                    if (a1)
-                    {
-                        output.AppendLine("Vector is Type 1");
-                    }
-                    else
-                    {
-                        output.AppendLine("Vector is Type 2");
-                    }
-                    output.AppendLine(" ");
-
-                    output.Append("Coefficient" + "\t");
-                    for (int h = 0; h < input.nModes; h++)
-                    {
-                        output.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
-                    }
-                    output.Append("lambda");
-                    for (int h = 0; h < basisSet[i].Count; h++)//goes through basis vectors
-                    {
-                        if (eVecs[i][h, j] > evMin || eVecs[i][h, j] < -1.0 * input.evMin)
-                        {
-                            output.AppendLine("\t");
-                            output.Append(String.Format("{0,10:0.000000}", eVecs[i][h, j]));
-                            for (int m = 0; m < input.nModes; m++)//goes through each mode
-                            {
-                                output.Append("\t" + "  " + Convert.ToString(basisSet[i][h].modesInVec[m].v) + "\t" + String.Format("{0,3}", basisSet[i][h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
-                            }
-                            output.Append("\t" + String.Format("{0,4}", basisSet[i][h].Lambda));
-                        }
-                    }
-                    output.AppendLine("\r");
-                    */
+                    output.AppendLine(" ");                    
+                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.evMin, true);
                 }//end j for loop
                 output.AppendLine("\r");
             }//end i loop
@@ -612,6 +576,10 @@ namespace ConsoleApplication1
             List<string> ou = new List<string>();
             ou.Add(output.ToString());
             File.WriteAllLines(fileName, ou);
+            if (input.vecFile)
+            {
+                SOCJT.writeVecFile(input, eVecs, basisSet);
+            }
         }//end eVecGenerator
     }//end class Program
 }//end namespace
