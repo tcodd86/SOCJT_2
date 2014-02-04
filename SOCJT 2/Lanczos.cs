@@ -31,9 +31,8 @@ namespace ConsoleApplication1
 #if DEBUG
         public static long reorthogTime = 0;
 #endif
-        public static int basisSetLimit = 50000;
+        public static int basisSetLimit = 40000;
 
-        //private static double machEps = 2.22E-16;
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
         /// BKLANC computes a block tridiagonal matrix MS which it stores in rows and 
@@ -482,121 +481,78 @@ namespace ConsoleApplication1
         }
         //PCH done new
         
-        private static void RANDOM(int N, int Q, int L, ref double[,] X, bool oldRandom)
+        /// <summary>
+        /// Generates random numbers and puts them in column L of X
+        /// </summary>
+        /// <param name="N">
+        /// Number of rows in X
+        /// </param>
+        /// <param name="L">
+        /// The column of X to be filled with random numbers
+        /// </param>
+        /// <param name="X">
+        /// Matrix to hold the random numbers in column L
+        /// </param>
+        private static void RANDOM(int N, int L, ref double[,] X)
         {
-            if (oldRandom)
+            double[] T = new double[100];
+            int X1;
+            int F1 = 71416;
+            int F2 = 27183;
+            int FT;
+            int K;
+            int A = 6821;
+            int C = 5327;
+            int X0 = 5328;
+            for (int I = 0; I < 100; I++)//do 100
             {
-                double[] T = new double[100];
-                int X1;
-                int F1 = 71416;
-                int F2 = 27183;
-                int FT;
-                int K;
-                int A = 6821;
-                int C = 5327;
-                int X0 = 5328;
-                for (int I = 0; I < 100; I++)//do 100
+                X1 = A * X0 + C;//added + 1
+                if (X1 >= 10000)
                 {
-                    X1 = A * X0 + C;//added + 1
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[I] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 100
-                for (int I = 0; I < N; I++)//do 200
-                {
-                    FT = F1 + F2;
-                    if (FT >= 1000000)
-                    {
-                        FT -= 1000000;
-                    }
-                    F1 = F2;
-                    F2 = FT;
-                    K = FT / 10000;//probably should not have the + 1 but does better with it.
-                    X[I, L] = T[K];
-                    X1 = A * X0 + C;//try a + 1 here too
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[K] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 200
-                T = null;
-            }
-            else
+                    X1 -= 10000;
+                }
+                T[I] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 100
+            for (int I = 0; I < N; I++)//do 200
             {
-                Random randy = new Random(6821);
-                var randVec = new double[N];
-                for (int i = 0; i < N; i++)
+                FT = F1 + F2;
+                if (FT >= 1000000)
                 {
-                    randVec[i] = Math.Abs(randy.NextDouble());
+                    FT -= 1000000;
                 }
-                normalize(ref randVec);
-                for (int i = 0; i < N; i++)
+                F1 = F2;
+                F2 = FT;
+                K = FT / 10000;//probably should not have the + 1 but does better with it.
+                X[I, L] = T[K];
+                X1 = A * X0 + C;//try a + 1 here too
+                if (X1 >= 10000)
                 {
-                    X[i, L] = randVec[i];
+                    X1 -= 10000;
                 }
-            }
-        }
+                T[K] = (double)X1 / 9999.0 - 0.5;
+                X0 = X1;
+            }//do 200
+            T = null;
+        }//end function Random for BlockLanczos Routine
 
-        private static double[] RANDOM(int N, bool oldRandom)
+        /// <summary>
+        /// Function to generate a normalized vector of length N filled with random numbers
+        /// </summary>
+        /// <param name="N">
+        /// Length of the vector to be returned.
+        /// </param>
+        /// <returns>
+        /// Normalized, random vector of length N.
+        /// </returns>
+        private static double[] RANDOM(int N)
         {
             //initialize vector to be returned
-            var X = new double[N];
-            //if not using new Random routine use old one
-            if (oldRandom)
+            var X = new double[N];            
+            Random randy = new Random(6821);
+            for (int i = 0; i < N; i++)
             {
-                double[] T = new double[100];
-                int X1;
-                int F1 = 71416;
-                int F2 = 27183;
-                int FT;
-                int K;
-                int A = 6821;
-                int C = 5327;
-                int X0 = 5328;
-                for (int I = 0; I < 100; I++)//do 100
-                {
-                    X1 = A * X0 + C;//added + 1
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[I] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 100
-                for (int I = 0; I < N; I++)//do 200
-                {
-                    FT = F1 + F2;
-                    if (FT >= 1000000)
-                    {
-                        FT -= 1000000;
-                    }
-                    F1 = F2;
-                    F2 = FT;
-                    K = FT / 10000;//probably should not have the + 1 but does better with it.
-                    X[I] = T[K];
-                    X1 = A * X0 + C;//try a + 1 here too
-                    if (X1 >= 10000)
-                    {
-                        X1 -= 10000;
-                    }
-                    T[K] = (double)X1 / 9999.0 - 0.5;
-                    X0 = X1;
-                }//do 200
-                T = null;
-            }
-            //if using new random routine go here
-            else
-            {
-                Random randy = new Random(6821);
-                for (int i = 0; i < N; i++)
-                {
-                    X[i] = randy.NextDouble();
-                }                
+                X[i] = randy.NextDouble();
             }
             //naiveLanczos requires a normalized vector
             normalize(ref X);
@@ -716,7 +672,7 @@ namespace ConsoleApplication1
         /// array.  Also used as working storage while computing.</param>
         /// <param name="IECODE"></param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
-        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par, bool oldRandom)
+        public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par)
         {
             double[] E = new double[Q];
             double[,] C = new double[Q, Q];
@@ -770,7 +726,7 @@ namespace ConsoleApplication1
                 {
                     for (int K = 0; K < P; K++)//check what RANDOM does to see what ought to go here            
                     {
-                        RANDOM(N, Q, K, ref X, oldRandom);
+                        RANDOM(N, K, ref X);
                     }
                 }
 
@@ -864,7 +820,7 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool oldRandom, bool evsNeeded, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -873,91 +829,38 @@ namespace ConsoleApplication1
             var betas = new double[its];
             betas[0] = 0.0;
 
-            var vi = RANDOM(N, oldRandom);
-            var viminusone = new double[N];
-            var viplusone = new double[N];
-            double[] Axvi = new double[N];
             var lanczosVecs = new double[0,0];
             bool NTooBig = false;
             if (N > basisSetLimit)
             {
                 NTooBig = true;
             }
-            string fileDirectory = file + "temp_vecs_" + n + ".tmp";
-            StreamWriter writer = new StreamWriter(fileDirectory);
-            if(evsNeeded)
+            //now put two different versions here, one for NTooBig and evsNeeded == true
+            //the other for !NTooBig or !evsNeeded            
+            if (NTooBig && evsNeeded)
             {
-                if (!NTooBig)
+                //create file to store the eigenvectors in the directory
+                //Uses a default file name each time and deletes it at the end
+                //fileDirectory += "\\temp_vecs_" + n + ".tmp"; 
+                string fileDirectory = file + "temp_vecs_" + n + ".tmp";
+                StreamWriter writer = new StreamWriter(fileDirectory);                
+                writer = File.CreateText(fileDirectory);
+                writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, writer);
+                writer.Close();
+            }
+            else
+            {
+                //allocate memory for eigenvectors
+                if (evsNeeded)
                 {
                     lanczosVecs = new double[N, its];
                 }
-                else
-                {
-                    //create file to store the eigenvectors in the directory
-                    //Uses a default file name each time and deletes it at the end
-                    //fileDirectory += "\\temp_vecs_" + n + ".tmp";
-                    writer = File.CreateText(fileDirectory);
-                    writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                }
+                StreamWriter bogus = new StreamWriter();
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, bogus);
             }
-            for(int i = 0; i < its; i++)
-            {
-                //do Lanczos iterations here
-                //Axvi will contain the product of A and vi                
-                OP(A, vi, ref Axvi, 1);
-                
-                //assign alpha value for this iteration
-                alphas[i] = vxv(vi, Axvi);
-
-                //if calculating the eigenvectors then store the lanczos vectors here
-                if (evsNeeded)
-                {
-                    //store in memory if small enough
-                    if (!NTooBig)
-                    {
-                        for (int j = 0; j < N; j++)
-                        {
-                            lanczosVecs[j, i] = vi[j];
-                        }
-                    }
-                    //if not, then write them to file
-                    else
-                    {
-                        //write which iteration this is
-                        writer.WriteLine(" ");
-                        writer.WriteLine("START_VEC" + i);
-                        //write the vector to the evFile
-                        for (int j = 0; j < N; j++)
-                        {
-                            writer.WriteLine(vi[j]);
-                        }
-                        writer.WriteLine("END_VEC");
-                        writer.WriteLine(" ");
-                    }
-                }
-
-                //conditional to keep from calculating meaningless values for beta and vi
-                if (i == its - 1)
-                {
-                    Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
-                    break;
-                }
-
-                //calculate viplusone and beta i + 1.
-                viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
-                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
-                for (int j = 0; j < viplusone.Length; j++)
-                {
-                    viplusone[j] /= betas[i + 1];
-                }
-                //now reassign vi vectors for next iteration.
-                viminusone = vi;
-                vi = viplusone;
-
-                //let the user know things are happening
-                Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
-            }
-            writer.Close();
+            
+            
             //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -975,7 +878,6 @@ namespace ConsoleApplication1
             }
 
             //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
-            //double[,] z = new double[N, M];//use this line when ready to implement eigenvectors as well.
             var ZZ = new double[0,0];
             //set flag for eigenvectors
             int zz = 0;
@@ -1041,8 +943,7 @@ namespace ConsoleApplication1
 
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
-            {
-                
+            {                
                 //now generate the eigenvectors by matrix multiplication
                 //temporary storage for eigenvectors
                 var tempEvecs = new double[its, correctEvs.Count];
@@ -1056,7 +957,7 @@ namespace ConsoleApplication1
                 }
                 if (!NTooBig)
                 {
-                    File.Delete(fileDirectory);
+                    //File.Delete(fileDirectory);
                     //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
                     double[,] transEvecs = new double[N, evs.Length];
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
@@ -1067,17 +968,113 @@ namespace ConsoleApplication1
                     //then set equal to z
                     z = transEvecs;
                 }
-                else
+                else//if eigenvectors are not needed
                 {
-                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors to be transformed.
+                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors.
                     z = tempEvecs;
                 }
             }//end if evsNeeded
-            else
-            {
-                File.Delete(fileDirectory);
-            }
+            //else
+            //{
+            //    File.Delete(fileDirectory);
+            //}
         }//end NaiveLanczos
+
+        /// <summary>
+        /// Function which generates the Lanczos matrix and optionally stores or writes to file the Lanczos vectors if necessary.
+        /// </summary>
+        /// <param name="A">
+        /// Sparse matrix being diagonalized
+        /// </param>
+        /// <param name="its">
+        /// Number of iterations for the lanczos routine
+        /// </param>
+        /// <param name="evsNeeded">
+        /// True if eigenvectors will be calculated
+        /// </param>
+        /// <param name="alphas">
+        /// Vector for storing the diagonal of the Lanczos matrix.
+        /// </param>
+        /// <param name="betas">
+        /// Vector for storing the off diagonal of the Lanczos matrix.
+        /// </param>
+        /// <param name="lanczosVecs">
+        /// Array to store the lanczosVecs, should be initialized if evsNeeded and NTooBig == false
+        /// </param>
+        /// <param name="NTooBig">
+        /// True if the basis set is too large to store the Lanczos Vectors in memory and they must be written to file.
+        /// </param>
+        /// <param name="writer">
+        /// StreamWriter for writing LanczosVectors to disc if necessary
+        /// </param>
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, StreamWriter writer)
+        {
+            int N = A.innerobj.m;
+            //initialize vectors to store the various vectors used in the Lanczos iterations
+            var vi = RANDOM(N);
+            var viminusone = new double[N];
+            var viplusone = new double[N];
+            double[] Axvi = new double[N];
+
+            //loop to generate the Lanczos matrix
+            for (int i = 0; i < its; i++)
+            {
+                //do Lanczos iterations here
+                //Axvi will contain the product of A and vi                
+                OP(A, vi, ref Axvi, 1);
+
+                //assign alpha value for this iteration
+                alphas[i] = vxv(vi, Axvi);
+
+                //if calculating the eigenvectors then store the lanczos vectors here
+                if (evsNeeded)
+                {
+                    //store in memory if small enough
+                    if (!NTooBig)
+                    {
+                        for (int j = 0; j < N; j++)
+                        {
+                            lanczosVecs[j, i] = vi[j];
+                        }
+                    }
+                    //if not, then write them to file
+                    else
+                    {
+                        //write which iteration this is
+                        writer.WriteLine(" ");
+                        writer.WriteLine("START_VEC" + i);
+                        //write the vector to the evFile
+                        for (int j = 0; j < N; j++)
+                        {
+                            writer.WriteLine(vi[j]);
+                        }
+                        writer.WriteLine("END_VEC");
+                        writer.WriteLine(" ");
+                    }
+                }//end if evsNeeded
+
+                //conditional to keep from calculating meaningless values for beta and vi
+                if (i == its - 1)
+                {
+                    Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
+                    break;
+                }
+
+                //calculate viplusone and beta i + 1.
+                viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
+                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                for (int j = 0; j < viplusone.Length; j++)
+                {
+                    viplusone[j] /= betas[i + 1];
+                }
+                //now reassign vi vectors for next iteration.
+                viminusone = vi;
+                vi = viplusone;
+
+                //let the user know things are happening
+                Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
+            }//end loop to generate Lanczos matrix
+        }//end LanczosIterations
 
         /// <summary>
         /// Dot product of two vectors
