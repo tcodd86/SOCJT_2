@@ -152,7 +152,7 @@ namespace ConsoleApplication1
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
                                 fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                                matricesMade = true;
+                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
@@ -195,7 +195,7 @@ namespace ConsoleApplication1
                     zMatrices.Add(new double[0, 0]);
                     eigenvalues.Add(new double[0]);
                 }
-
+                matricesMade = true;
                 //handles errors where the basis set is too small
                 if (a.Count > 0)
                 {
