@@ -373,7 +373,7 @@ namespace ConsoleApplication1
                         //clear values for the next iteration
                         linesToWrite = null;
                         stepFile = null;
-                        runner = null;
+                        //runner = null;
                     }//end of steps loop
 
                     //write scan output file including total elapsed time
