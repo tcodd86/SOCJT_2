@@ -610,6 +610,30 @@ namespace ConsoleApplication1
             File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
         }
 
+        /// <summary>
+        /// Writes the eigenvectors to file using the complete basis set for all eigenvectors.
+        /// This means that (in a quadratic calculation) the eigenvectors for an e level
+        /// would include the basis functions with a symmetry and those with neither symmetry.
+        /// This is useful for comparison to calculations where the complete basis set is used.
+        /// </summary>
+        /// <param name="jBasisVecsByJ">
+        /// All basis functions sorted by J value.
+        /// </param>
+        /// <param name="JvecsForOutput">
+        /// Only symmetry allowed basis functions sorted by J (linear) or symmetry (quadratic)
+        /// </param>
+        /// <param name="tempMat">
+        /// The coefficients of the eigenvectors using the JvecsForOutput basis.
+        /// </param>
+        /// <param name="input">
+        /// FileInfo object.
+        /// </param>
+        /// <param name="eigenvalues">
+        /// Calculated eigenvalues.
+        /// </param>
+        /// <param name="isQuad">
+        /// True if this is a quadrtic calculation, false if not.
+        /// </param>
         private static void writeVecComplete(List<List<BasisFunction>> jBasisVecsByJ, List<List<BasisFunction>> JvecsForOutput, List<double[,]> tempMat, FileInfo input, List<double[]> eigenvalues, bool isQuad)
         {
             double ZPE = eigenvalues[0][0];
