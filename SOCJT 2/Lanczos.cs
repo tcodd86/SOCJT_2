@@ -1086,7 +1086,7 @@ namespace ConsoleApplication1
         /// Vector 2
         /// </param>
         /// <returns>
-        /// Scalar product of vectors v and u.
+        /// Scalar product of vectors v and u
         /// </returns>
         private static double vxv(double[] v, double[] u)
         {
