@@ -141,34 +141,6 @@ namespace ConsoleApplication1
                     #endregion
                 }
 
-                if (input.beVecs == true)
-                {
-                    #region CompareEigenvectors
-                    file.AppendLine(" ");
-                    for (int n = 0; n < input.eVecs.Count; n++)
-                    { 
-                        if(input.eVecs[n].Item1 == J)
-                        {
-                            file.AppendLine(" ");
-                            file.AppendLine("Comparing eigenvector " + Convert.ToString(input.eVecs[n].Item2) + " to eigenvector " + Convert.ToString(input.eVecs[n].Item3));
-                            double sum = 0.0;
-                            int pos = 0;
-                            int neg = 0;
-                            double t;
-                            for (int m = 0; m < tempMat.GetLength(0); m++)
-                            {
-                                t = tempMat[m, input.eVecs[n].Item2] * tempMat[m, input.eVecs[n].Item3] > 0 ? pos++ : neg++;
-                                sum += t;
-                            }
-                            file.AppendLine(Convert.ToString(pos) + " basis functions have the same sign and " + Convert.ToString(neg) + " have the opposite sign.");
-                            file.AppendLine("The sum of the products of the cofactors is " + Convert.ToString(sum));
-                        }
-                    }
-                    file.AppendLine(" ");
-                    #endregion
-                }
-
-
                 file.AppendLine("**********************************************************************");
                 file.AppendLine(" ");
 
@@ -394,17 +366,6 @@ namespace ConsoleApplication1
                 }
                 file.AppendLine("/");
                 file.AppendLine("  ");
-            }
-
-            if (input.beVecs)
-            {
-                file.AppendLine("&COMPARE_EIGENVECTORS");
-                for (int n = 0; n < input.eVecs.Count; n++)
-                {
-                    file.AppendLine(Convert.ToString(input.eVecs[n].Item1) + "  " + Convert.ToString(input.eVecs[n].Item2) + "  " + Convert.ToString(input.eVecs[n].Item3));
-                }
-                file.AppendLine("/");
-                file.AppendLine(" ");
             }
 
             linesToWrite.Add(file.ToString());

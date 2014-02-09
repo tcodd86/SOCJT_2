@@ -352,32 +352,17 @@ namespace ConsoleApplication1
         /// <summary>
         /// How many j-blocks should be run in parallel
         /// </summary>
-        private int nParJ;
-        public int parJ
-        {
-            get { return nParJ; }
-            set { nParJ = value; }
-        }//end property parJ
+        public int parJ { get; private set; }
 
         /// <summary>
         /// Minimum value of coefficients to print in eigenvectors
         /// </summary>
-        private double nEvMin;
-        public double evMin
-        {
-            get { return nEvMin; }
-            set { nEvMin = value; }
-        }//end property evMin
+        public double evMin { get; private set; }
 
         /// <summary>
         /// True if SO coupling is nonzero
         /// </summary>
-        private bool nInclSO;
-        public bool inclSO
-        {
-            get { return nInclSO; }
-            set { nInclSO = value; }
-        }//end property inclSO
+        public bool inclSO { get; private set; }
 
         private List<Tuple<decimal, int, int>> neVecs;
         public List<Tuple<decimal, int, int>> eVecs
