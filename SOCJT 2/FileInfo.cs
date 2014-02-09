@@ -85,173 +85,79 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if the eigenvectors should be printed in the output file.
         /// </summary>
-        private bool npVec;
-        public bool pVector
-        {
-            get { return npVec; }
-            set { npVec = value; }
-        }//end property pVector
-
-        /// <summary>
-        /// True if the monitor should be printed.
-        /// </summary>
-        private bool npMonit;
-        public bool pMonit
-        {
-            get { return npMonit; }
-            set { npMonit = value; }
-        }//end property pMonit
-
-        /// <summary>
-        /// True if the derivatives should be printed.
-        /// </summary>
-        private bool npDer;
-        public bool pDerivs
-        {
-            get { return npDer; }
-            set { npDer = value; }
-        }//end property pDerivs
+        public bool pVector { get; set; }  
 
         /// <summary>
         /// True if a file with the eigenvectors should be printed.
         /// </summary>
-        private bool nvecFile;
-        public bool vecFile
-        {
-            get { return nvecFile; }
-            set { nvecFile = value; }
-        }//end property vecFile
+        public bool vecFile { get; private set; }
 
         /// <summary>
         /// Value of the origin to add to the eigenvalues
         /// </summary>
-        private double nOrigin;
-        public double origin
-        {
-            get { return nOrigin; }
-            set { nOrigin = value; }
-        }//end property origin
+        public double origin { get; set; }
 
         /// <summary>
         /// True if the origin should be fit.
         /// </summary>
-        private bool nfitOrigin;
-        public bool fitOrigin
-        {
-            get { return nfitOrigin; }
-            set { nfitOrigin = value; }
-        }//end property fitOrigin
+        public bool fitOrigin { get; private set; }
 
         /// <summary>
         /// True if you want to save a file with the basis set in it.
         /// </summary>
-        private bool nbasisFile;
-        public bool basisFile
-        {
-            get { return nbasisFile; }
-            set { nbasisFile = value; }
-        }//end property basisFile
+        public bool basisFile { get; private set; }
 
         /// <summary>
         /// Number of eigenvalues/eigenvectors to find
         /// </summary>
-        private int nM;
-        public int M
-        {
-            get { return nM; }
-            set { nM = value; }
-        }//end property M
+        public int M { get; private set; }
 
         /// <summary>
         /// Size of block (number of columns) in Block Lanczos
         /// </summary>
-        private int nkFactor;
-        public int kFactor
-        {
-            get { return nkFactor; }
-            set { nkFactor = value; }
-        }//end property kFactor
+        public int kFactor { get; private set; }
 
         /// <summary>
         /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
         /// </summary>
-        private int nnoIts;
-        public int noIts
-        {
-            get { return nnoIts; }
-            set { nnoIts = value; }
-        }//end property noIts
+        public int noIts { get; private set; }
 
         /// <summary>
         /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
         /// </summary>
-        private double ntol;
-        public double tol
-        {
-            get { return ntol; }
-            set { ntol = value; }
-        }//end property tol
+        public double tol { get; private set; }
 
-        private bool nguesses;
-        public bool guesses
-        {
-            get { return nguesses; }
-            set { nguesses = value; }
-        }//end property guesses
+        public bool guesses { get; private set; }
 
         /// <summary>
         /// Name of the fit file to be used for a fit.
         /// </summary>
-        private string nfitFile;
-        public string fitFile
-        {
-            get { return nfitFile; }
-            set { nfitFile = value; }
-        }//end property fitFile
+        public string fitFile { get; private set; }
 
         /// <summary>
         /// F-Tolerance value for LM optimization
         /// </summary>
-        private double nfTol;
-        public double fTol
-        {
-            get { return nfTol; }
-            set { nfTol = value; }
-        }//end property fTol
+        public double fTol { get; private set; }
 
         /// <summary>
         /// X-Tolerance value for LM optimization
         /// </summary>
-        private double nxTol;
-        public double xTol
-        {
-            get { return nxTol; }
-            set { nxTol = value; }
-        }//end property xTol
+        public double xTol { get; private set; }
 
         /// <summary>
         /// G-Tolerance value for LM optimization
         /// </summary>
-        private double ngTol;
-        public double gTol
-        {
-            get { return ngTol; }
-            set { ngTol = value; }
-        }//end property gTol
+        public double gTol { get; private set; }
         
-        private int nmaxFev;
-        public int maxFev
-        {
-            get { return nmaxFev; }
-            set { nmaxFev = value; }
-        }//end property maxFev
+        /// <summary>
+        /// Max number of iterations (steps) in the LM optimizer
+        /// </summary>
+        public int maxFev { get; private set; }
 
-        private double nfactor;
-        public double factor
-        {
-            get { return nfactor; }
-            set { nfactor = value; }
-        }//end property factor
+        /// <summary>
+        /// Factor used for step size in LM optimizer
+        /// </summary>
+        public double factor { get; private set; }
 
         /// <summary>
         /// True if there are cross-terms in the Hamiltonian
@@ -366,8 +272,7 @@ namespace ConsoleApplication1
         /// Constructor for FileInfo object. Sets reasonable values for most properties in case user forgets something in input file.
         /// </summary>
         public FileInfo()
-        {
-            //initialize all booleans to false by default            
+        {            
             fitAzeta = false;
             calcDeriv = false;
             minJBool = false;
@@ -379,19 +284,14 @@ namespace ConsoleApplication1
             includeCrossTerms = false;
             useKappaEta = false;
             blockLanczos = false;
-            matFile = "matrix.txt";
             useMatFile = false;
             matMade = false;
             vecFile = false;
             vecFileComplete = false;
-
+            
+            matFile = "matrix.txt";
             title = "TITLE";
-            origin = 0.0;
-            parMat = 1;
-            nModes = 1;
-            S = 0.5M;
-            Azeta = 0.0;
-            //zetaE = 0.0M;
+            fitFile = "fit.fit";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -400,7 +300,12 @@ namespace ConsoleApplication1
             //S1 and S2 values for 3-fold symmetry
             S1 = 0;
             S2 = 1;
-                        
+            
+            origin = 0.0;
+            parMat = 1;
+            nModes = 1;
+            S = 0.5M;
+            Azeta = 0.0;
             evMin = 0.2;            
             parVec = 1;
             parMat = 1;
@@ -409,7 +314,6 @@ namespace ConsoleApplication1
             kFactor = 2;
             noIts = 10000;
             tol = 0.0001;
-            fitFile = "fit.fit";
             fTol = 0.0;
             xTol = 0.0;
             gTol = 0.0;
@@ -860,6 +764,15 @@ namespace ConsoleApplication1
             return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
         }
 
+        /// <summary>
+        /// To parse a string containing a decimal that may or may not have scientific notation in it.
+        /// </summary>
+        /// <param name="s">
+        /// String to be parsed
+        /// </param>
+        /// <returns>
+        /// Decimal value of parsed string
+        /// </returns>
         public static decimal parseDecimal(string s)
         {
             return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
