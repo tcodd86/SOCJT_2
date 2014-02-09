@@ -670,7 +670,9 @@ namespace ConsoleApplication1
         /// at least Q elements.</param>
         /// <param name="X">X contains the computed eigenvectors.  X should be N x Q
         /// array.  Also used as working storage while computing.</param>
-        /// <param name="IECODE"></param>
+        /// <param name="IECODE">
+        /// Status code to return.
+        /// </param>
         /// <param name="A">A is the sparse matrix being diagonalized.</param>
         public static int MINVAL(int N, int Q, int PINIT, int R, int MMAX, double EPS, int M, ref double[] D, ref double[,] X, ref int IECODE, alglib.sparsematrix A, int par)
         {
@@ -690,18 +692,22 @@ namespace ConsoleApplication1
             if (N < 2)
             {
                 go = false;
+                IECODE = 1;
             }
             if (R < 1)
             {
                 go = false;
+                IECODE = 3;
             }
             if (Q <= R)
             {
                 go = false;
+                IECODE = 4;
             }
             if (Q > N)
             {
                 go = false;
+                IECODE = 6;
             }
 
             if (go)
@@ -798,22 +804,6 @@ namespace ConsoleApplication1
                     PINIT = -P;
                 }
             }//end if(go = true)
-            if (N < 2)
-            {
-                IECODE = 1;
-            }
-            if (R < 1)
-            {
-                IECODE = 3;
-            }
-            if (Q <= R)
-            {
-                IECODE = 4;
-            }
-            if (Q > N)
-            {
-                IECODE = 6;
-            }
         
             MMAX = IMMURN;
             return ITER;
