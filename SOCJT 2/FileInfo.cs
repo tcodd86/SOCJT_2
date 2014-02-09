@@ -7,6 +7,9 @@ using System.Globalization;
 
 namespace ConsoleApplication1
 {
+    /// <summary>
+    /// Class for reading input files and storing values from it.
+    /// </summary>
     class FileInfo
     {
         #region properties
@@ -14,129 +17,65 @@ namespace ConsoleApplication1
         /// <summary>
         /// Number of modes in the calculation
         /// </summary>
-        private int nNModes;
-        public int nModes
-        { 
-            get{ return nNModes; }
-            set { nNModes = value; }
-        }//end property nNModes
+        public int nModes { get; private set; }
 
         /// <summary>
         /// Title of the calculations
         /// </summary>
-        private string nTitle;
-        public string title
-        {
-            get { return nTitle; }
-            set { nTitle = value; }
-        }//end property nTitle
+        public string title { get; private set;}
 
         /// <summary>
         /// Value of spin
         /// </summary>
-        private decimal nS;
-        public decimal S
-        {
-            get { return nS; }
-            set { nS = value; }
-        }//end property S
+        //private decimal nS;
+        public decimal S { get; private set; }
 
         /// <summary>
-        /// Value of a zeta, the SO coupling constant
+        /// Value of a*zeta, the SO coupling constant
         /// </summary>
-        private double nAzeta;
-        public double Azeta
-        {
-            get { return nAzeta; }
-            set { nAzeta = value; }
-        }//end property Azeta
+        public double Azeta { get; set; }
 
         /// <summary>
         /// True if the SO coupling constant is being fit
         /// </summary>
-        private bool nfitAzeta;
-        public bool fitAzeta
-        {
-            get { return nfitAzeta; }
-            set { nfitAzeta = value; }
-        }//end property fitAzeta
+        public bool fitAzeta { get; private set; }
 
         /// <summary>
         /// Maximum value of j to use in the basis set
         /// </summary>
-        private decimal nmaxJ;
-        public decimal maxJ
-        {
-            get { return nmaxJ; }
-            set { nmaxJ = value; }
-        }//end property maxJ
+        public decimal maxJ { get; set; }
 
         /// <summary>
         /// Minimum value of j that should be used in calculations
         /// </summary>
-        private decimal nminJ;
-        public decimal minJ
-        {
-            get { return nminJ; }
-            set { nminJ = value; }
-        }//end property minJ
+        public decimal minJ { get; private set; }
 
         /// <summary>
         /// True if min J is user specified
         /// </summary>
-        private bool nminJBool;
-        public bool minJBool
-        {
-            get { return nminJBool; }
-            set { nminJBool = value; }
-        }//end property calcDeriv
+        public bool minJBool { get; private set; }
 
         /// <summary>
         /// True if the derivatives should be calculated.
         /// </summary>
-        private bool nCalcDeriv;
-        public bool calcDeriv
-        {
-            get { return nCalcDeriv; }
-            set { nCalcDeriv = value; }
-        }//end property calcDeriv
+        public bool calcDeriv { get; private set; }
 
-        private decimal nZetaE;
-        public decimal zetaE
-        {
-            get { return nZetaE; }
-            set { nZetaE = value; }
-        }//end property zetaE
+        //public decimal zetaE { get; private set; }
 
         /// <summary>
         /// Value of S1
         /// </summary>
-        private int nS1;
-        public int S1
-        {
-            get { return nS1; }
-            set { nS1 = value; }
-        }//end property S1
+        public int S1 { get; private set; }
 
         /// <summary>
         /// Value of S2
         /// </summary>
-        private int nS2;
-        public int S2
-        {
-            get { return nS2; }
-            set { nS2 = value; }
-        }//end property S2
+        public int S2 { get; private set; }
 
         /// <summary>
         /// True if the basis set should be printed in the output file.
         /// </summary>
-        private bool nPrintBasis;
-        public bool printBasis
-        {
-            get { return nPrintBasis; }
-            set { nPrintBasis = value; }
-        }//end property printBasis
+        public bool printBasis { get; private set; }
 
         /// <summary>
         /// True if the Hamiltonian should be printed in the output file.
@@ -446,14 +385,7 @@ namespace ConsoleApplication1
             get { return neVecs; }
             set { neVecs = value; }
         }//end property eVecs
-
-        private bool nbeVecs;
-        public bool beVecs
-        {
-            get { return nbeVecs; }
-            set { nbeVecs = value; }
-        }//end property nbeVecs
-
+        
         /// <summary>
         /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
         /// </summary>
@@ -525,7 +457,6 @@ namespace ConsoleApplication1
             AT = false;
             Special = false;
             includeCrossTerms = false;
-            beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
             matFile = "matrix.txt";
@@ -540,7 +471,7 @@ namespace ConsoleApplication1
             nModes = 1;
             S = 0.5M;
             Azeta = 0.0;
-            zetaE = 0.0M;
+            //zetaE = 0.0M;
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -675,11 +606,13 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
+                        /*
                         if (inputf[u].ToUpper() == "ZETAE")
                         {
                             zetaE = parseDecimal(inputf[u + 1]);
                             continue;
                         }
+                        */
                         if (inputf[u].ToUpper() == "S1")
                         {
                             S1 = Convert.ToInt16(inputf[u + 1]);
@@ -986,23 +919,7 @@ namespace ConsoleApplication1
                     }//end CROSS_TERM for
                     #endregion
                 }//end CROSS_TERM if
-
-                if (inputf[i].ToUpper() == "&COMPARE_EIGENVECTORS")
-                {
-                    #region &COMPARE_EIGENVECTORS
-                    beVecs = true;
-                    eVecs = new List<Tuple<decimal,int,int>>();
-                    for (int u = i + 1; ; u += 3)
-                    {
-                        eVecs.Add(new Tuple<decimal, int, int>(parseDecimal(inputf[u]), Convert.ToInt16(inputf[u + 1]),  Convert.ToInt16(inputf[u + 2])));
-                        if (inputf[u + 3].ToUpper() == "/")
-                        {
-                            break;
-                        }
-                    }
-                    #endregion
-                }//end COMPARE_EIGENVECTORS if
-
+                
                 if (inputf[i].ToUpper() == "&SCAN")
                 {
                     #region &SCAN
