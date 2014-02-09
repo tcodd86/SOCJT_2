@@ -80,12 +80,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if the Hamiltonian should be printed in the output file.
         /// </summary>
-        private bool npMatrix;
-        public bool pMatrix
-        {
-            get { return npMatrix; }
-            set { npMatrix = value; }
-        }//end property pMatrix
+        public bool pMatrix { get; private set; }
 
         /// <summary>
         /// True if the eigenvectors should be printed in the output file.
@@ -258,22 +253,10 @@ namespace ConsoleApplication1
             set { nfactor = value; }
         }//end property factor
 
-        private int nprint;
-        public int print
-        {
-            get { return nprint; }
-            set { nprint = value; }
-        }//end property print
-        
         /// <summary>
         /// True if there are cross-terms in the Hamiltonian
         /// </summary>
-        private bool nIncludeCrossTerms;
-        public bool includeCrossTerms
-        {
-            get { return nIncludeCrossTerms; }
-            set { nIncludeCrossTerms = value; }
-        }//end property includeCrossTerms
+        public bool includeCrossTerms { get; private set; }
 
         /// <summary>
         /// True if a scan is being run
@@ -320,18 +303,16 @@ namespace ConsoleApplication1
         /// </summary>
         public bool inclSO { get; private set; }
 
-        private List<Tuple<decimal, int, int>> neVecs;
-        public List<Tuple<decimal, int, int>> eVecs
-        {
-            get { return neVecs; }
-            set { neVecs = value; }
-        }//end property eVecs
+        public List<Tuple<decimal, int, int>> eVecs { get; private set; }
         
         /// <summary>
         /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
         /// </summary>
         public bool useKappaEta { get; set; }//end useKappaEta
 
+        /// <summary>
+        /// List of Scanner objects for scan. Contains, variable to scan, step size, and start value.
+        /// </summary>
         public List<Scanner> scanList;
 
         /// <summary>
@@ -433,8 +414,7 @@ namespace ConsoleApplication1
             xTol = 0.0;
             gTol = 0.0;
             maxFev = 25;
-            factor = 0.001;
-            nprint = 0;            
+            factor = 0.001;        
         }
         
         /// <summary>
