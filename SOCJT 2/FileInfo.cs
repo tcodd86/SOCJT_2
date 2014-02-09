@@ -352,8 +352,9 @@ namespace ConsoleApplication1
             return inputFa;
         }//end method fileRead
 
-        public void setFileInfo(string[] inputf)
+        public void setFileInfo(string[] inputf, string filepath)
         {
+            this.filePath = filePath;
             for (int i = 0; i < inputf.Length; i++)
             {
                 if (inputf[i].ToUpper() == "&GENERAL")

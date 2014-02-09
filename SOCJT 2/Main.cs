@@ -14,16 +14,7 @@ namespace ConsoleApplication1
         {
             try
             {
-                //variable to store filepath
                 string fileDirectory;
-
-                //check to see if running on Mono for linux cluster
-                //bool runningOnMono = Type.GetType("Mono.Runtime") != null;
-                //commented this out and just made it the default method for Release operation
-
-                //meaning it's running .NET on a Windows system -- UPDATE: meaning it's running in DEBUG mode
-                //consider making this the default for Release jobs  -- done
-                //if (!runningOnMono)
 #if DEBUG
                 //prompt user for input directory.  Default value is C:\SOCJT 2
                 Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
@@ -33,7 +24,6 @@ namespace ConsoleApplication1
                     fileDirectory = "C:\\SOCJT 2";
                 }
 
-                //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
                 if (Directory.Exists(fileDirectory) == false)
                 {
                     throw new DirectoryNotFoundException();
@@ -44,7 +34,6 @@ namespace ConsoleApplication1
 
 #endif
 
-                //set the directory for reading and writing files
                 Directory.SetCurrentDirectory(fileDirectory);
 
                 //prompt user to enter input file name
@@ -65,29 +54,21 @@ namespace ConsoleApplication1
 
                 //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
-                //filepath = string.Concat("\\");
                 filepath += "\\";
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
                 string filepathFIT = string.Copy(filepath);
-                //filepathIN = string.Concat(inFileName);
                 filepathIN += inFileName;
-                //filepathOUT = string.Concat(outFile);
                 filepathOUT += outFile;
                 if (filepathOUT == filepathIN)
                 {
                     throw new FileNameError("outFile");
                 }
 
-                //read input file
+                //read and parse input file, then initialize FileInfo object
                 string[] inputFile = FileInfo.fileRead(filepathIN);
-
-                //create new FileInfo object
                 FileInfo input = new FileInfo();
-
-                //set input object data from input file
-                input.setFileInfo(inputFile);
-                input.filePath = filepath;
+                input.setFileInfo(inputFile, filepath);
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
@@ -109,12 +90,6 @@ namespace ConsoleApplication1
                         input.matMade = true;
                     }
                 }
-
-                //if using block lanczos then use the old random function. See some problems with new random function in some cases when using block routine.
-                //if (input.blockLanczos)
-                //{
-                //    input.oldRandom = true;
-                //}
 
                 //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
