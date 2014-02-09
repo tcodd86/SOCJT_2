@@ -24,7 +24,7 @@ namespace ConsoleApplication1
     /// using the same numbering found in do loops in SOCJT for easy comparison.
     /// 
     /// Where the FORTRAN used functions TRED and TRED2 I have used functions from ALGLIB
-    /// PROJECT by Bochkanov Sergey.
+    /// PROJECT by Bochkanov, Sergey.
     /// </summary>
     static class Lanczos
     {
@@ -80,13 +80,12 @@ namespace ConsoleApplication1
             int IL;
 #if DEBUG
             System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
-#endif
-            //I need to pay special attention to this routines loops and their bounds
+#endif            
             for (int L = 0; L < S; L++)//do 90
             {
-                LL = M + (L) * P;//I changed this to L from (L - 1) and took off the + 1
-                LU = M + (L + 1) * P;//I changed this to (L + 1) from L
-                for (int K = LL; K < LU; K++)//do 70 --must be K < LU--
+                LL = M + (L) * P;
+                LU = M + (L + 1) * P;
+                for (int K = LL; K < LU; K++)//do 70
                 {
                     for (int I = 0; I < N; I++)//do 10
                     {
@@ -95,9 +94,9 @@ namespace ConsoleApplication1
 
                     OP(A, U, ref V, par);
                     
-                    if (L == 0)//changed this to 0
+                    if (L == 0)
                     {
-                        for (int I = K; I < LU; I++)//do 12 --changed to I < LU from I <= LU--
+                        for (int I = K; I < LU; I++)//do 12
                         {
                             C[I, K] = 0.0;
                         }//do 12
@@ -109,7 +108,7 @@ namespace ConsoleApplication1
                     }//end if 19 
                     else
                     {
-                        for (int I = K; I < LU; I++)//do 30 --must be I < LU--
+                        for (int I = K; I < LU; I++)//do 30
                         {
                             T = 0.0;
                             for (int J = 0; J < N; J++)//do 20
@@ -118,18 +117,18 @@ namespace ConsoleApplication1
                             }//do 20
                             C[I, K] = T;
                         }//do 30
-                        IT = K - P;//does this value go negative?--no
+                        IT = K - P;
                         for (int I = 0; I < N; I++)//do 60
                         {
                             T = 0.0;
-                            for (int J = IT; J <= K; J++)//do 40 --changed back to J < K from J <= K--
+                            for (int J = IT; J <= K; J++)//do 40
                             {
                                 T += X[I, J] * C[K, J];
                             }//do 40
-                            if (K != LU - 1)//changed this from K < LU - 1
+                            if (K != LU - 1)
                             {
-                                KP1 = K + 1;//took off the + 1
-                                for (int J = KP1; J < LU; J++)//do 50 --must be J < LU--
+                                KP1 = K + 1;
+                                for (int J = KP1; J < LU; J++)//do 50
                                 {
                                     T += X[I, J] * C[J, K];
                                 }//do 50
@@ -137,20 +136,19 @@ namespace ConsoleApplication1
                             V[I] -= T;
                         }//do 60
                     }//end else
-                    //label 61
-                    if (L != S - 1)//changed from L < S - 1
+                    if (L != S - 1)
                     {
                         for (int I = 0; I < N; I++)//do 63
                         {
-                            X[I, K + P] = V[I];//changed back to original and left - 1 off of K + p
+                            X[I, K + P] = V[I];
                         }//do 63
                     }
                 }//do 70
-                if (L == 0)//changed to 0 from 1
+                if (L == 0)
                 {
                     ERR(N, Q, M, P, X, ref E);
                 }
-                if (L < S - 1)//changed from L != S - 1 to L < S - 1
+                if (L < S - 1)
                 {
 #if DEBUG
                     orthogTimer.Start();
@@ -161,8 +159,8 @@ namespace ConsoleApplication1
 #else
                     ORTHG(N, Q, LU, P, ref C, ref X);
 #endif
-                    IL = LU;//took off + 1
-                    int Ir = LU - 1;//changed back to original
+                    IL = LU;
+                    int Ir = LU - 1;
                     for (int J = 0; J < P; J++)
                     {
                         Ir++;
@@ -194,8 +192,7 @@ namespace ConsoleApplication1
         {
             //double CHEPS = 2.22e-16;  This is the value in the original FORTRAN
             //This should be machine epsilon.  I've estimated it here but it could just be calculated ahead of time and passed as a parameter.
-            double CHEPS = 1.11e-16;//SOCJT_2 seems to converge faster no matter what
-            //double CHEPS = machEps;
+            double CHEPS = 1.11e-16;
             int K = 0;
             double T;
             for (int I = 0; I < P; I++)
@@ -209,7 +206,6 @@ namespace ConsoleApplication1
                 {
                     break;
                 }
-                //K = I + 1;//added the plus 1
                 K++;
             }
             NCONV = K;
@@ -223,7 +219,6 @@ namespace ConsoleApplication1
                 ERRC = Math.Sqrt(ERRC * ERRC + T);
             }
         }//end method CNVTST
-        //CNVTST done new
 
         /// <summary>
         /// EIGEN solves the eigenproblem for the symmetric matrix MS of order PS stored
@@ -246,14 +241,14 @@ namespace ConsoleApplication1
             {
                 LIM = I - P;
                 int LM1;
-                if (I <= P)//took off the -1
+                if (I <= P)
                 {
                     LIM = 0;
                 }
                 if (LIM > 0)
                 {
                     LM1 = LIM - 1;
-                    for (int J = 0; J <= LM1; J++)//Changed to <=
+                    for (int J = 0; J <= LM1; J++)
                     {
                         C[I, J] = 0.0;
                     }
@@ -276,7 +271,7 @@ namespace ConsoleApplication1
             double[,] z = new double[PS, PS];
 
             //solve eigenproblem using alglib library
-            alglib.evd.smatrixevd(tempMat, PS, 1, false, ref evs, ref z);//changed to false            
+            alglib.evd.smatrixevd(tempMat, PS, 1, false, ref evs, ref z);         
             //put results back into the expected format for MINVAL routine
             for (int i = 0; i < PS; i++)
             {
@@ -286,11 +281,10 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < PS; j++)
                 {
-                    C[i, j] = z[i, j];//changed this
+                    C[i, j] = z[i, j];
                 }
             }
         }//end EIGEN
-        //EIGEN done new I think
 
         /// <summary>
         /// ERR computes the Euclidean lengths of the vectors stored in the columns
@@ -305,7 +299,7 @@ namespace ConsoleApplication1
         /// <param name="E"></param>
         private static void ERR(int N, int Q, int M, int P, double[,] X, ref double[] E)
         {
-            int MP1 = M + P;//took off the + 1
+            int MP1 = M + P;
             int MPP = M + P + P;
             double T;
             for (int K = MP1; K < MPP; K++)
@@ -386,14 +380,14 @@ namespace ConsoleApplication1
                         T = 0.0;
                         if (KM1 >= 1)
                         {
-                            for (int I = 0; I < KM1; I++)//do 20---changed this to I < KM1 from I <= KM1
+                            for (int I = 0; I < KM1; I++)//do 20
                             {
                                 S = 0.0;
                                 for (int J = 0; J < N; J++)//do 15
                                 {
                                     S += X[J, I] * X[J, K];
                                 }//do 15
-                                if (orig == true & I >= F)//changed to I>=F from I>F CHANGED
+                                if (orig == true & I >= F)
                                 {
                                     B[I, K] = S;
                                 }
@@ -429,7 +423,6 @@ namespace ConsoleApplication1
                 }//end do 50                
             }//end if P != 0;            
         }//end ORTHG
-        //ORTHG done new I think
 
         /// <summary>
         /// Based on the values of N, Q, M, R and NCONV, PCH chooses new values for P and S,
@@ -479,7 +472,6 @@ namespace ConsoleApplication1
                 P = 0;
             }
         }
-        //PCH done new
         
         /// <summary>
         /// Generates random numbers and puts them in column L of X
@@ -506,7 +498,7 @@ namespace ConsoleApplication1
             int X0 = 5328;
             for (int I = 0; I < 100; I++)//do 100
             {
-                X1 = A * X0 + C;//added + 1
+                X1 = A * X0 + C;
                 if (X1 >= 10000)
                 {
                     X1 -= 10000;
@@ -523,9 +515,9 @@ namespace ConsoleApplication1
                 }
                 F1 = F2;
                 F2 = FT;
-                K = FT / 10000;//probably should not have the + 1 but does better with it.
+                K = FT / 10000;
                 X[I, L] = T[K];
-                X1 = A * X0 + C;//try a + 1 here too
+                X1 = A * X0 + C;
                 if (X1 >= 10000)
                 {
                     X1 -= 10000;
@@ -547,14 +539,12 @@ namespace ConsoleApplication1
         /// </returns>
         private static double[] RANDOM(int N)
         {
-            //initialize vector to be returned
             var X = new double[N];            
             Random randy = new Random(6821);
             for (int i = 0; i < N; i++)
             {
                 X[i] = randy.NextDouble();
             }
-            //naiveLanczos requires a normalized vector
             normalize(ref X);
             return X;
         }
@@ -588,13 +578,12 @@ namespace ConsoleApplication1
                     }
                     V[K] = T;
                 }
-                for (int K = 0; K < L; K++)//changed this to K < L from K <= L.
+                for (int K = 0; K < L; K++)
                 {
                     X[I, M + K] = V[K];
                 }
             }
         }//end Rotate
-        //rotate done new
 
         /// <summary>
         /// SECTN transforms the N by P orthonormal matrix X1, say, stored in columns M 
@@ -617,12 +606,12 @@ namespace ConsoleApplication1
         /// <param name="V"></param>
         private static void SECTN(int N, int Q, int M, int P, ref double[,] X, ref double[,] C, ref double[] D, ref double[] U, ref double[] V, alglib.sparsematrix A, int par)
         {
-            int ICOL1 = M - 1;//added this so that ICOL1++ for 1st iteration is 0.
+            int ICOL1 = M - 1;
             int ICOL2;
             double T;
             for (int J = 0; J < P; J++)//do 300
             {
-                ICOL1++;  //PUT IT BACK, -- old comment -- commented this out because not necessary when indexed to 0.
+                ICOL1++;
                 for (int I = 0; I < N; I++)//do 100
                 {
                     U[I] = X[I, ICOL1];
@@ -630,11 +619,11 @@ namespace ConsoleApplication1
 
                 OP(A, U, ref V, par);
 
-                ICOL2 = M - 1;//fixed like above
+                ICOL2 = M - 1;
 
-                for (int I = 0; I <= J; I++)//do 300, changed to I <= J from I < J
+                for (int I = 0; I <= J; I++)//do 300
                 {
-                    ICOL2++;//same as above, indexed to 0
+                    ICOL2++;
                     T = 0.0;
                     for (int K = 0; K < N; K++)//do 200
                     {
@@ -646,7 +635,6 @@ namespace ConsoleApplication1
             EIGEN(Q, M, P, P, ref C, ref D);
             ROTATE(N, Q, M, P, P, C, ref X);
         }//end method SECTN
-        //SECTN done new
 
         /// <summary>
         /// This subroutine is the main subroutine implementing the iterative block lanczos
