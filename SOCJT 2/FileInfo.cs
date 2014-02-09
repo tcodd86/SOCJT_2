@@ -11,6 +11,9 @@ namespace ConsoleApplication1
     {
         #region properties
 
+        /// <summary>
+        /// Number of modes in the calculation
+        /// </summary>
         private int nNModes;
         public int nModes
         { 
@@ -18,6 +21,9 @@ namespace ConsoleApplication1
             set { nNModes = value; }
         }//end property nNModes
 
+        /// <summary>
+        /// Title of the calculations
+        /// </summary>
         private string nTitle;
         public string title
         {
@@ -25,6 +31,9 @@ namespace ConsoleApplication1
             set { nTitle = value; }
         }//end property nTitle
 
+        /// <summary>
+        /// Value of spin
+        /// </summary>
         private decimal nS;
         public decimal S
         {
@@ -32,6 +41,9 @@ namespace ConsoleApplication1
             set { nS = value; }
         }//end property S
 
+        /// <summary>
+        /// Value of a zeta, the SO coupling constant
+        /// </summary>
         private double nAzeta;
         public double Azeta
         {
@@ -39,6 +51,9 @@ namespace ConsoleApplication1
             set { nAzeta = value; }
         }//end property Azeta
 
+        /// <summary>
+        /// True if the SO coupling constant is being fit
+        /// </summary>
         private bool nfitAzeta;
         public bool fitAzeta
         {
@@ -46,6 +61,9 @@ namespace ConsoleApplication1
             set { nfitAzeta = value; }
         }//end property fitAzeta
 
+        /// <summary>
+        /// Maximum value of j to use in the basis set
+        /// </summary>
         private decimal nmaxJ;
         public decimal maxJ
         {
@@ -53,6 +71,9 @@ namespace ConsoleApplication1
             set { nmaxJ = value; }
         }//end property maxJ
 
+        /// <summary>
+        /// Minimum value of j that should be used in calculations
+        /// </summary>
         private decimal nminJ;
         public decimal minJ
         {
@@ -60,6 +81,9 @@ namespace ConsoleApplication1
             set { nminJ = value; }
         }//end property minJ
 
+        /// <summary>
+        /// True if min J is user specified
+        /// </summary>
         private bool nminJBool;
         public bool minJBool
         {
@@ -67,6 +91,9 @@ namespace ConsoleApplication1
             set { nminJBool = value; }
         }//end property calcDeriv
 
+        /// <summary>
+        /// True if the derivatives should be calculated.
+        /// </summary>
         private bool nCalcDeriv;
         public bool calcDeriv
         {
@@ -81,6 +108,9 @@ namespace ConsoleApplication1
             set { nZetaE = value; }
         }//end property zetaE
 
+        /// <summary>
+        /// Value of S1
+        /// </summary>
         private int nS1;
         public int S1
         {
@@ -88,6 +118,9 @@ namespace ConsoleApplication1
             set { nS1 = value; }
         }//end property S1
 
+        /// <summary>
+        /// Value of S2
+        /// </summary>
         private int nS2;
         public int S2
         {
@@ -95,6 +128,9 @@ namespace ConsoleApplication1
             set { nS2 = value; }
         }//end property S2
 
+        /// <summary>
+        /// True if the basis set should be printed in the output file.
+        /// </summary>
         private bool nPrintBasis;
         public bool printBasis
         {
@@ -102,6 +138,9 @@ namespace ConsoleApplication1
             set { nPrintBasis = value; }
         }//end property printBasis
 
+        /// <summary>
+        /// True if the Hamiltonian should be printed in the output file.
+        /// </summary>
         private bool npMatrix;
         public bool pMatrix
         {
@@ -109,6 +148,9 @@ namespace ConsoleApplication1
             set { npMatrix = value; }
         }//end property pMatrix
 
+        /// <summary>
+        /// True if the eigenvectors should be printed in the output file.
+        /// </summary>
         private bool npVec;
         public bool pVector
         {
@@ -116,6 +158,9 @@ namespace ConsoleApplication1
             set { npVec = value; }
         }//end property pVector
 
+        /// <summary>
+        /// True if the monitor should be printed.
+        /// </summary>
         private bool npMonit;
         public bool pMonit
         {
@@ -123,6 +168,9 @@ namespace ConsoleApplication1
             set { npMonit = value; }
         }//end property pMonit
 
+        /// <summary>
+        /// True if the derivatives should be printed.
+        /// </summary>
         private bool npDer;
         public bool pDerivs
         {
@@ -130,6 +178,9 @@ namespace ConsoleApplication1
             set { npDer = value; }
         }//end property pDerivs
 
+        /// <summary>
+        /// True if a file with the eigenvectors should be printed.
+        /// </summary>
         private bool nvecFile;
         public bool vecFile
         {
@@ -137,6 +188,9 @@ namespace ConsoleApplication1
             set { nvecFile = value; }
         }//end property vecFile
 
+        /// <summary>
+        /// Value of the origin to add to the eigenvalues
+        /// </summary>
         private double nOrigin;
         public double origin
         {
@@ -144,6 +198,9 @@ namespace ConsoleApplication1
             set { nOrigin = value; }
         }//end property origin
 
+        /// <summary>
+        /// True if the origin should be fit.
+        /// </summary>
         private bool nfitOrigin;
         public bool fitOrigin
         {
@@ -151,6 +208,9 @@ namespace ConsoleApplication1
             set { nfitOrigin = value; }
         }//end property fitOrigin
 
+        /// <summary>
+        /// True if you want to save a file with the basis set in it.
+        /// </summary>
         private bool nbasisFile;
         public bool basisFile
         {
@@ -158,6 +218,9 @@ namespace ConsoleApplication1
             set { nbasisFile = value; }
         }//end property basisFile
 
+        /// <summary>
+        /// Number of eigenvalues/eigenvectors to find
+        /// </summary>
         private int nM;
         public int M
         {
@@ -165,6 +228,9 @@ namespace ConsoleApplication1
             set { nM = value; }
         }//end property M
 
+        /// <summary>
+        /// Size of block (number of columns) in Block Lanczos
+        /// </summary>
         private int nkFactor;
         public int kFactor
         {
@@ -172,6 +238,9 @@ namespace ConsoleApplication1
             set { nkFactor = value; }
         }//end property kFactor
 
+        /// <summary>
+        /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
+        /// </summary>
         private int nnoIts;
         public int noIts
         {
@@ -179,6 +248,9 @@ namespace ConsoleApplication1
             set { nnoIts = value; }
         }//end property noIts
 
+        /// <summary>
+        /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
+        /// </summary>
         private double ntol;
         public double tol
         {
@@ -193,6 +265,9 @@ namespace ConsoleApplication1
             set { nguesses = value; }
         }//end property guesses
 
+        /// <summary>
+        /// Name of the fit file to be used for a fit.
+        /// </summary>
         private string nfitFile;
         public string fitFile
         {
@@ -200,6 +275,9 @@ namespace ConsoleApplication1
             set { nfitFile = value; }
         }//end property fitFile
 
+        /// <summary>
+        /// F-Tolerance value for LM optimization
+        /// </summary>
         private double nfTol;
         public double fTol
         {
@@ -207,6 +285,9 @@ namespace ConsoleApplication1
             set { nfTol = value; }
         }//end property fTol
 
+        /// <summary>
+        /// X-Tolerance value for LM optimization
+        /// </summary>
         private double nxTol;
         public double xTol
         {
@@ -214,6 +295,9 @@ namespace ConsoleApplication1
             set { nxTol = value; }
         }//end property xTol
 
+        /// <summary>
+        /// G-Tolerance value for LM optimization
+        /// </summary>
         private double ngTol;
         public double gTol
         {
@@ -242,6 +326,9 @@ namespace ConsoleApplication1
             set { nprint = value; }
         }//end property print
         
+        /// <summary>
+        /// True if there are cross-terms in the Hamiltonian
+        /// </summary>
         private bool nIncludeCrossTerms;
         public bool includeCrossTerms
         {
@@ -263,6 +350,9 @@ namespace ConsoleApplication1
             set { nSpecial = value; }
         }//end property Special
 
+        /// <summary>
+        /// True if a scan is being run
+        /// </summary>
         private bool nScan;
         public bool Scan
         {
@@ -270,6 +360,9 @@ namespace ConsoleApplication1
             set { nScan = value; }
         }//end property Scan
 
+        /// <summary>
+        /// Number of steps to run in a scan
+        /// </summary>
         private int nSteps;
         public int Steps
         {
@@ -277,6 +370,9 @@ namespace ConsoleApplication1
             set { nSteps = value; }
         }//end property Steps
 
+        /// <summary>
+        /// How long (in seconds) the Hamiltonian generation took.
+        /// </summary>
         private double nmatGenTime;
         public double matGenTime
         {
@@ -284,6 +380,9 @@ namespace ConsoleApplication1
             set { nmatGenTime = value; }
         }//end property matGenTime
 
+        /// <summary>
+        /// How long (in seconds) the diagonalization took.
+        /// </summary>
         private double ndiagTime;
         public double diagTime
         {
@@ -291,6 +390,9 @@ namespace ConsoleApplication1
             set { ndiagTime = value; }
         }//end property diagTime
 
+        /// <summary>
+        /// How much to parallelize the Hamiltonian matrix generation
+        /// </summary>
         private int nPar;
         public int parMat
         {
@@ -298,6 +400,9 @@ namespace ConsoleApplication1
             set { nPar = value; }
         }//end property par
 
+        /// <summary>
+        /// How much to parallelize the matrix vector multiplication
+        /// </summary>
         private int nParVec;
         public int parVec
         {
@@ -305,6 +410,9 @@ namespace ConsoleApplication1
             set { nParVec = value; }
         }//end property pVec
 
+        /// <summary>
+        /// How many j-blocks should be run in parallel
+        /// </summary>
         private int nParJ;
         public int parJ
         {
@@ -312,6 +420,9 @@ namespace ConsoleApplication1
             set { nParJ = value; }
         }//end property parJ
 
+        /// <summary>
+        /// Minimum value of coefficients to print in eigenvectors
+        /// </summary>
         private double nEvMin;
         public double evMin
         {
@@ -319,6 +430,9 @@ namespace ConsoleApplication1
             set { nEvMin = value; }
         }//end property evMin
 
+        /// <summary>
+        /// True if SO coupling is nonzero
+        /// </summary>
         private bool nInclSO;
         public bool inclSO
         {
@@ -340,15 +454,27 @@ namespace ConsoleApplication1
             set { nbeVecs = value; }
         }//end property nbeVecs
 
+        /// <summary>
+        /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
+        /// </summary>
         public bool useKappaEta { get; set; }//end useKappaEta
 
         public List<Scanner> scanList;
 
+        /// <summary>
+        /// Array containing cross-terms
+        /// </summary>
         public double[,] crossTermMatrix;
 
+        /// <summary>
+        /// Array containing booleans for fitting various cross-terms
+        /// </summary>
         public bool[,] crossTermFit;
 
-        public bool blockLanczos { get; private set; }//end naiveLanczos
+        /// <summary>
+        /// True if using block lanczos instead of naive Lanczos.
+        /// </summary>
+        public bool blockLanczos { get; private set; }//end blockLanczos
 
         /// <summary>
         /// Filepath of matrix file to read.
