@@ -1019,7 +1019,6 @@ namespace ConsoleApplication1
             //loop to generate the Lanczos matrix
             for (int i = 0; i < its; i++)
             {
-                //do Lanczos iterations here
                 //Axvi will contain the product of A and vi                
                 OP(A, vi, ref Axvi, 1);
 
@@ -1209,19 +1208,19 @@ namespace ConsoleApplication1
         /// </param>
         public static void normalize(ref double[,] X)
         {
+            double[] temp = new double[X.GetLength(0)];
             for (int j = 0; j < X.GetLength(1); j++)
             {
-                double sum = 0.0;
                 for (int i = 0; i < X.GetLength(0); i++)
                 {
-                    sum += X[i, j] * X[i, j];
+                    temp[i] = X[i, j];
                 }
-                sum = Math.Sqrt(sum);
+                normalize(ref temp);
                 for (int i = 0; i < X.GetLength(0); i++)
                 {
-                    X[i, j] /= sum;
+                    X[i, j] = temp[i];
                 }
-            }
+            }//end loop over columns
         }//end normalize
-    }
+    }//end class Lanczos
 }
