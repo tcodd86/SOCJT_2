@@ -238,14 +238,14 @@ namespace ConsoleApplication1
                 //turns off the scan function if any values are being fit
                 if (fit == true)
                 {
-                    input.Scan = false;
+                    input.scan = false;
                 }
 
                 SOCJT runner = new SOCJT();
                 FitSOCJT fitt = new FitSOCJT();
 
                 //main subroutine execution when not running a scan
-                if (input.Scan == false)
+                if (input.scan == false)
                 {
                     //initialize variable to hold the output file and initialize it with input file containing original values
                     List<string> linesToWrite = new List<string>();
@@ -287,7 +287,7 @@ namespace ConsoleApplication1
                     List<string> finalOut = new List<string>();
 
                     //for loop to run steps of scan
-                    for (int h = 0; h < input.Steps; h++)
+                    for (int h = 0; h < input.steps; h++)
                     {
                         //basically run the SOCJT subroutine for each step of the scan and save the output file at the end of the loop.
                         List<string> linesToWrite = new List<string>();

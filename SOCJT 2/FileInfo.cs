@@ -275,79 +275,35 @@ namespace ConsoleApplication1
             set { nIncludeCrossTerms = value; }
         }//end property includeCrossTerms
 
-        private bool nAT;
-        public bool AT
-        {
-            get { return nAT; }
-            set { nAT = value; }
-        }//end property AT
-
-        private bool nSpecial;
-        public bool Special
-        {
-            get { return nSpecial; }
-            set { nSpecial = value; }
-        }//end property Special
-
         /// <summary>
         /// True if a scan is being run
         /// </summary>
-        private bool nScan;
-        public bool Scan
-        {
-            get { return nScan; }
-            set { nScan = value; }
-        }//end property Scan
+        public bool scan { get; set; }
 
         /// <summary>
         /// Number of steps to run in a scan
         /// </summary>
-        private int nSteps;
-        public int Steps
-        {
-            get { return nSteps; }
-            set { nSteps = value; }
-        }//end property Steps
+        public int steps { get; set; }
 
         /// <summary>
         /// How long (in seconds) the Hamiltonian generation took.
         /// </summary>
-        private double nmatGenTime;
-        public double matGenTime
-        {
-            get { return nmatGenTime; }
-            set { nmatGenTime = value; }
-        }//end property matGenTime
+        public double matGenTime { get; set; }
 
         /// <summary>
         /// How long (in seconds) the diagonalization took.
         /// </summary>
-        private double ndiagTime;
-        public double diagTime
-        {
-            get { return ndiagTime; }
-            set { ndiagTime = value; }
-        }//end property diagTime
+        public double diagTime { get; set; }
 
         /// <summary>
         /// How much to parallelize the Hamiltonian matrix generation
         /// </summary>
-        private int nPar;
-        public int parMat
-        {
-            get { return nPar; }
-            set { nPar = value; }
-        }//end property par
+        public int parMat { get; private set; }
 
         /// <summary>
         /// How much to parallelize the matrix vector multiplication
         /// </summary>
-        private int nParVec;
-        public int parVec
-        {
-            get { return nParVec; }
-            set { nParVec = value; }
-        }//end property pVec
+        public int parVec { get; private set; }
 
         /// <summary>
         /// How many j-blocks should be run in parallel
@@ -439,8 +395,6 @@ namespace ConsoleApplication1
             printBasis = false;
             pMatrix = false;
             pVector = false;
-            AT = false;
-            Special = false;
             includeCrossTerms = false;
             useKappaEta = false;
             blockLanczos = false;
@@ -591,13 +545,6 @@ namespace ConsoleApplication1
                             }
                             continue;
                         }
-                        /*
-                        if (inputf[u].ToUpper() == "ZETAE")
-                        {
-                            zetaE = parseDecimal(inputf[u + 1]);
-                            continue;
-                        }
-                        */
                         if (inputf[u].ToUpper() == "S1")
                         {
                             S1 = Convert.ToInt16(inputf[u + 1]);
@@ -851,51 +798,13 @@ namespace ConsoleApplication1
                                 row = column;
                                 column = temp;
                             }//end if
-                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
                             crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
                             if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                             {
                                 tbool = true;
                             }//end if
                             crossTermFit[row, column] = tbool;
-                            //j += 8;
                             continue;
-                        }
-
-                        if (inputf[j].ToUpper() == "AT")
-                        {
-                            AT = true;
-                            tbool = false;
-                            row = Convert.ToInt16(inputf[j + 2]) - 1;
-                            column = Convert.ToInt16(inputf[j + 4]) - 1;
-                            if (row < column)
-                            {
-                                temp = row;
-                                row = column;
-                                column = temp;
-                            }//end if
-                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
-                            crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
-                            if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
-                            {
-                                tbool = true;
-                            }//end if
-                            crossTermFit[row, column] = tbool;
-                            //j += 8;
-                            continue;
-                        }
-
-                        if (inputf[j].ToUpper() == "SPECIAL")
-                        {
-                            tbool = false;
-                            Special = true;
-                            //crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
-                            crossTermMatrix[0, 0] = parseDouble(inputf[j + 1]);
-                            if (inputf[j + 3].ToUpper() == "T" || inputf[j + 3].ToUpper() == "TRUE")
-                            {
-                                tbool = true;
-                            }
-                            crossTermFit[0, 0] = tbool;
                         }
                         if (inputf[j] == "/")
                         {
@@ -913,20 +822,18 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "STEPS")
                         {
-                            nSteps = Convert.ToInt32(inputf[u + 1]);
+                            steps = Convert.ToInt32(inputf[u + 1]);
                         }
                         if (inputf[u].ToUpper() == "MODE")
                         {
                             Scanner tempScan = new Scanner();
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.varToFit = inputf[u + 2];
-                            //tempScan.Start = Convert.ToDouble(inputf[u + 3]);
                             tempScan.Start = parseDouble(inputf[u + 3]);
-                            //tempScan.Step = Convert.ToDouble(inputf[u + 4]);
                             tempScan.Step = parseDouble(inputf[u + 4]);
                             scanList.Add(tempScan);
                             tempScan = null;
-                            nScan = true;
+                            scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "CROSS")
@@ -935,13 +842,11 @@ namespace ConsoleApplication1
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.Cross = Convert.ToInt32(inputf[u + 2]);
                             tempScan.varToFit = inputf[u + 3];
-                            //tempScan.Start = Convert.ToDouble(inputf[u + 4]);
                             tempScan.Start = parseDouble(inputf[u + 4]);
-                            //tempScan.Step = Convert.ToDouble(inputf[u + 5]);
                             tempScan.Step = parseDouble(inputf[u + 5]);
                             scanList.Add(tempScan);
                             tempScan = null;
-                            nScan = true;
+                            scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "/")

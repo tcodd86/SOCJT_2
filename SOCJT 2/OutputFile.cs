@@ -351,16 +351,6 @@ namespace ConsoleApplication1
                                 file.AppendLine("JT MODE " + Convert.ToString(i + 1) + " MODE " + Convert.ToString(j + 1) + " = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[i, j]));
                                 file.AppendLine("FIT" + " = " + Convert.ToString(input.crossTermFit[i, j]));
                             }
-                            if (i > j)
-                            {
-                                file.AppendLine("AT MODE " + Convert.ToString(j + 1) + " MODE " + Convert.ToString(i + 1) + " = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[i, j]));
-                                file.AppendLine("FIT" + " = " + Convert.ToString(input.crossTermFit[i, j]));
-                            }
-                            if (input.Special == true && i == j)
-                            {
-                                file.AppendLine("SPECIAL = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[0, 0]));
-                                file.AppendLine("FIT = " + Convert.ToString(input.crossTermFit[0, 0]));
-                            }
                         }
                     }
                 }
