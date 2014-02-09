@@ -820,6 +820,33 @@ namespace ConsoleApplication1
 
         }//end method MinVal
 
+        /// <summary>
+        /// Single vector Lanczos routine with no reorthogonalization. 'Ghost' or 'repeat' eigenvalues are removed using the technique of Cullum
+        /// </summary>
+        /// <param name="evs">
+        /// Vector to store eigenvalues
+        /// </param>
+        /// <param name="z">
+        /// Array to store eigenvectors if needed, in the case that NTooBig == true, this array will contain the eigenvectors of the Lanczos matrix
+        /// </param>
+        /// <param name="A">
+        /// Matrix to be diagonalized.
+        /// </param>
+        /// <param name="its">
+        /// Size of the Lanczos matrix to be generated.
+        /// </param>
+        /// <param name="tol">
+        /// Tolerance to be used when using Cullum technique to check if an eigenvalue is real or a 'ghost'
+        /// </param>
+        /// <param name="evsNeeded">
+        /// True if eigenvectors are needed.
+        /// </param>
+        /// <param name="n">
+        /// Which j-block is being diagonalized. Used in case the Lanczos vectors need to be written to file.
+        /// </param>
+        /// <param name="file">
+        /// FileInfo object
+        /// </param>
         public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, int n, string file)
         {
             int N = A.innerobj.m;
@@ -835,33 +862,26 @@ namespace ConsoleApplication1
             {
                 NTooBig = true;
             }
-            //now put two different versions here, one for NTooBig and evsNeeded == true
-            //the other for !NTooBig or !evsNeeded            
+            //This will create the temp files needed to store the lanczos vectors for the eigenvector calculation        
             if (NTooBig && evsNeeded)
             {
                 //create file to store the eigenvectors in the directory
-                //Uses a default file name each time and deletes it at the end
-                //fileDirectory += "\\temp_vecs_" + n + ".tmp"; 
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
-                StreamWriter writer = new StreamWriter(fileDirectory);                
-                //writer = File.CreateText(fileDirectory);
+                StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
                 LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, writer);
                 writer.Close();
             }
-            else
+            else     //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
             {
-                //allocate memory for eigenvectors
+                //initialize array for eigenvectors if necessary
                 if (evsNeeded)
                 {
                     lanczosVecs = new double[N, its];
                 }
-                StreamWriter bogus = null;
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, bogus);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig);
             }
-            
-            
-            //use inverse iteration on tridiagonal matrix to find the eigenvalues.  Remember to trim first value from Betas.
+                        
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
             double[] tAlphas = new double[its - 1];
@@ -877,9 +897,8 @@ namespace ConsoleApplication1
                 tBetas[i] = betas[i + 2];
             }
 
-            //call ALGLIB function and diagonalize.  use EVs length to determine how many eigenvalues to get.
             var ZZ = new double[0,0];
-            //set flag for eigenvectors
+            //set flag for eigenvectors and initialize eigenvector array if necessary
             int zz = 0;
             if (evsNeeded)
             {
@@ -899,19 +918,21 @@ namespace ConsoleApplication1
             //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
             //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
             //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
-            //As presently implemented this test may miss evs.
             //evs evaluated as correct will be stored in this list
-            //Tuple so that proper eigenvectors can be pulled when that is implemented
+
+            //Tuple so that we know which eigenvectors to pull if necessary
             List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
 
             for (int i = 0; i < tAlphas.Length - 1; i++)
             {
-                //checks to see if the value is in T^2 eigenvalues
+                //check to see if the value is in T^2 eigenvalues
                 bool temp = checkInTT(alphas[i], tAlphas, tol);
+
                 //tells how many times alphas[i] is in alphas, always at least 1
                 int repeater = repeat(i, alphas, tol);
+
                 //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
-                if (repeater == 0)
+                if (repeater == 0)    //means there is some problem in the alphas vectors (probably NaN error)
                 {
                     throw new RepeaterError();
                 }
@@ -923,14 +944,12 @@ namespace ConsoleApplication1
                         correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
                         continue;
                     }
-                }//end if
-                else//means this evalue has a repeat.
+                }
+                else    //means this evalue has a repeat and is a true eigenvalue of A
                 {
-                    //It's assumed here that the repeated value in alphas is in tAlphas as well THIS IS NOT CHECKED!!!
                     correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
-                    //add repeater to i, subtract 1 because i += 1 for each loop anyway.
                     i += repeater - 1;
-                }//end else
+                }
             }
 
             //build array of final eigenvalues to return
@@ -944,7 +963,7 @@ namespace ConsoleApplication1
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
             {                
-                //now generate the eigenvectors by matrix multiplication
+                //generate the eigenvectors by matrix multiplication
                 //temporary storage for eigenvectors
                 var tempEvecs = new double[its, correctEvs.Count];
                 for (int i = 0; i < correctEvs.Count; i++)
@@ -957,7 +976,6 @@ namespace ConsoleApplication1
                 }
                 if (!NTooBig)
                 {
-                    //File.Delete(fileDirectory);
                     //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
                     double[,] transEvecs = new double[N, evs.Length];
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
@@ -968,16 +986,12 @@ namespace ConsoleApplication1
                     //then set equal to z
                     z = transEvecs;
                 }
-                else//if eigenvectors are not needed
+                else
                 {
-                    //if evectors will be generated after the fact then pass back the untransformed eigenvectors.
+                    //if evectors will be generated after the fact then pass back the eigenvectors of the Lanczos matrix for later use
                     z = tempEvecs;
                 }
             }//end if evsNeeded
-            //else
-            //{
-            //    File.Delete(fileDirectory);
-            //}
         }//end NaiveLanczos
 
         /// <summary>
@@ -1005,9 +1019,9 @@ namespace ConsoleApplication1
         /// True if the basis set is too large to store the Lanczos Vectors in memory and they must be written to file.
         /// </param>
         /// <param name="writer">
-        /// StreamWriter for writing LanczosVectors to disc if necessary
+        /// StreamWriter for writing LanczosVectors to disc if necessary, null by default
         /// </param>
-        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, StreamWriter writer)
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, StreamWriter writer = null)
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
@@ -1052,7 +1066,7 @@ namespace ConsoleApplication1
                     }
                 }//end if evsNeeded
 
-                //conditional to keep from calculating meaningless values for beta and vi
+                //to keep from calculating meaningless values for beta and vi
                 if (i == its - 1)
                 {
                     Console.WriteLine("Lanczos iterations completed. \nEntering diagonalization.");
