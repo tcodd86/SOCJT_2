@@ -392,10 +392,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_AZETA")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 fitAzeta = true;
                             }
+                            */
+                            fitAzeta = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MAXJ")
@@ -411,10 +414,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_ORIGIN")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 fitOrigin = true;
                             }
+                            */
+                            fitOrigin = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
@@ -424,10 +430,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "CALC_DERIV")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 calcDeriv = true;
                             }
+                            */
+                            calcDeriv = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "S1")
@@ -442,6 +451,7 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 useKappaEta = true;
@@ -450,6 +460,8 @@ namespace ConsoleApplication1
                             {
                                 useKappaEta = false;
                             }
+                            */
+                            useKappaEta = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -467,50 +479,69 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "PRINT_BASIS")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 printBasis = true;
                             }
+                            */
+                            printBasis = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_MATRIX")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
+                               
                                 pMatrix = true;
                             }
+                            */
+                            pMatrix = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_VEC")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 pVector = true;
                             }
+                            */
+                            pVector = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "USE_MATRIX_FILE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 useMatFile = true;
                             }
+                            */
+                            useMatFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 vecFile = true;
                             }
+                            */
+                            vecFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE_COMPLETE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 vecFileComplete = true;
                             }
+                            */
+                            vecFileComplete = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MATRIX_FILE")
@@ -558,7 +589,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "TOL")
                         {
-                            //tol = Convert.ToDouble(inputf[u + 1]);
                             tol = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -590,10 +620,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 blockLanczos = true;
                             }
+                            */
+                            blockLanczos = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -616,19 +649,16 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FTOL")
                         {
-                            //fTol = Convert.ToDouble(inputf[u + 1]);
                             fTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "XTOL")
                         {
-                            //xTol = Convert.ToDouble(inputf[u + 1]);
                             xTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "GTOL")
                         {
-                            //gTol = Convert.ToDouble(inputf[u + 1]);
                             gTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -639,7 +669,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FACTOR")
                         {
-                            //factor = Convert.ToDouble(inputf[u + 1]);
                             factor = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -684,10 +713,13 @@ namespace ConsoleApplication1
                                 column = temp;
                             }//end if
                             crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
+                            /*
                             if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                             {
                                 tbool = true;
                             }//end if
+                            */
+                            tbool = TorF(inputf[j + 7]);
                             crossTermFit[row, column] = tbool;
                             continue;
                         }
@@ -750,6 +782,25 @@ namespace ConsoleApplication1
                 crossTermFit = new bool[nModes, nModes];
             }
         }//end method setFileInfo
+
+        /// <summary>
+        /// Checks a string to see if it's T or TRUE, converts to boolean value
+        /// </summary>
+        /// <param name="val">
+        /// String to be checked.
+        /// </param>
+        /// <returns>
+        /// True if the string is T or TRUE, false if not
+        /// </returns>
+        private static bool TorF(string val)
+        {
+            bool trfa = false;
+            if (val.ToUpper() == "T" || val.ToUpper() == "TRUE")
+            {
+                trfa = true;
+            }
+            return trfa;
+        }
 
         /// <summary>
         /// To parse a string containing a double that may or may not have scientific notation in it.
