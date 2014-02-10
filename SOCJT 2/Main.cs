@@ -76,7 +76,6 @@ namespace ConsoleApplication1
                 //see if matFile is true, and if so if the matfile exists or not.
                 if (input.useMatFile)
                 {
-                    //create file pointer for the matrix file
                     input.matFilePath = string.Copy(filepath);
                     input.matFilePath += input.matFile;
                     //check that the mat file has a valid path
@@ -113,7 +112,7 @@ namespace ConsoleApplication1
                     }
                 }//end for
 
-                //sets bool isQuad = false if K is zero and fitK is false for all modes.
+                //checks to see if quadratic basis set should be used.
                 bool isQuad = false;
                 for (int i = 0; i < Modes.Count; i++)
                 {
