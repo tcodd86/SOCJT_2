@@ -63,22 +63,6 @@ namespace ConsoleApplication1
             int IComparer<BasisFunction>.Compare(BasisFunction a, BasisFunction b)
             {
                 int val = 0;
-                //start at last mode and check it, if it matches move to next mode
-                //try leaving lambda out of it completely
-                /*
-                //start with lambda values
-                if (a.Lambda > b.Lambda)
-                {
-                    val = 1;
-                    return val;
-                }
-                if (a.Lambda < b.Lambda)
-                {
-                    val = -1;
-                    return val;
-                }
-                //if lambdas are the same then check v and l for each mode until a difference is found
-                */
                 for(int place = a.modesInVec.Count - 1; place >= 0; place--)
                 {
                     //check v
@@ -142,9 +126,6 @@ namespace ConsoleApplication1
         {
             //List of basis functions, to be returned
             List<BasisFunction> hamBasisSet = new List<BasisFunction>();
-
-            //List of BasisByMode objects, this list is n long where n is the number of modes.  Contains
-            //the info for each mode's v and l values
             List<BasisByMode> modesInVec = new List<BasisByMode>();
 
             //this array stores the upper bounds for the countkeeper function
@@ -161,13 +142,11 @@ namespace ConsoleApplication1
                 count[i] = 0;
             }//end for
             
-            //boolean value used to terminate generating BasisFunctions when all possible combinations have been generated
             bool keepGoing = true;
 
-            //loop that runs until all possible combinations of BasisByMode values and Lambda have been generated
+            //runs until all possible combinations of BasisByMode values and Lambda have been generated
             while (keepGoing == true)
             {
-                //resets the list each iteration
                 modesInVec.Clear();
 
                 //adds the BasisByMode objects for each mode for a given set of count[] values
