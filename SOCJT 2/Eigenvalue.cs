@@ -35,6 +35,24 @@ namespace ConsoleApplication1
 
         #endregion
 
+        /// <summary>
+        /// Constructor for Eigenvalue
+        /// </summary>
+        /// <param name="pJa">
+        /// J-block that this eigenvalue is in
+        /// </param>
+        /// <param name="nJa">
+        /// Which eigenvalue this is
+        /// </param>
+        /// <param name="Siga">
+        /// Value of Sigma
+        /// </param>
+        /// <param name="Eva">
+        /// Eigenvalue
+        /// </param>
+        /// <param name="isa1">
+        /// True if symmetric, false if not
+        /// </param>
         public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva, bool isa1)
         {
             pJ = pJa;
