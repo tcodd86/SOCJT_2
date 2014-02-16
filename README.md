@@ -9,4 +9,4 @@ SOCJT 2 may be used to calculate spectra to see the effect of various types of c
 
 SOCJT 2 includes two diagonalization routines, both of which are Lanczos type algorithms. The first uses the Underwood method which is a block Lanczos algorithm. This method was translated from FORTRAN 77 to C# for this project. It has been well tested in both SOCJT and SOCJT 2. The second is a so called 'naive' Lanczos which is the single vector Lanczos algorithm with no reorthogonalization. Spurious eigenvalues arising from loss of orthogonality are eliminated using the method proposed by Jane Cullum. This method is the default but is still being tested and sometimes does not complete. In those cases the block method should be used. The benefit of the naive Lanczos is that it is orders of magnitude faster in most cases than the block method when only the eigenvalues are needed (e.g. for fits).
 
-An instruction manual (in progress) is included in this repository.
+SOCJT 2 has been tested in both Windows and on a Linux cluster runnng Red Hat. An instruction manual (in progress) is included in this repository.
