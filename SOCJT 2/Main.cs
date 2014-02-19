@@ -14,16 +14,7 @@ namespace ConsoleApplication1
         {
             try
             {
-                //variable to store filepath
                 string fileDirectory;
-
-                //check to see if running on Mono for linux cluster
-                //bool runningOnMono = Type.GetType("Mono.Runtime") != null;
-                //commented this out and just made it the default method for Release operation
-
-                //meaning it's running .NET on a Windows system -- UPDATE: meaning it's running in DEBUG mode
-                //consider making this the default for Release jobs  -- done
-                //if (!runningOnMono)
 #if DEBUG
                 //prompt user for input directory.  Default value is C:\SOCJT 2
                 Console.WriteLine("Enter file directory or press enter to use C:\\SOCJT 2");
@@ -33,7 +24,6 @@ namespace ConsoleApplication1
                     fileDirectory = "C:\\SOCJT 2";
                 }
 
-                //if entered directory doesn't exist provide option to create it.  If not, throw error and end execution.
                 if (Directory.Exists(fileDirectory) == false)
                 {
                     throw new DirectoryNotFoundException();
@@ -44,7 +34,6 @@ namespace ConsoleApplication1
 
 #endif
 
-                //set the directory for reading and writing files
                 Directory.SetCurrentDirectory(fileDirectory);
 
                 //prompt user to enter input file name
@@ -65,29 +54,21 @@ namespace ConsoleApplication1
 
                 //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
-                //filepath = string.Concat("\\");
                 filepath += "\\";
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
                 string filepathFIT = string.Copy(filepath);
-                //filepathIN = string.Concat(inFileName);
                 filepathIN += inFileName;
-                //filepathOUT = string.Concat(outFile);
                 filepathOUT += outFile;
                 if (filepathOUT == filepathIN)
                 {
                     throw new FileNameError("outFile");
                 }
 
-                //read input file
+                //read and parse input file, then initialize FileInfo object
                 string[] inputFile = FileInfo.fileRead(filepathIN);
-
-                //create new FileInfo object
                 FileInfo input = new FileInfo();
-
-                //set input object data from input file
-                input.setFileInfo(inputFile);
-                input.filePath = filepath;
+                input.setFileInfo(inputFile, filepath);
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.fitFile);
@@ -95,7 +76,6 @@ namespace ConsoleApplication1
                 //see if matFile is true, and if so if the matfile exists or not.
                 if (input.useMatFile)
                 {
-                    //create file pointer for the matrix file
                     input.matFilePath = string.Copy(filepath);
                     input.matFilePath += input.matFile;
                     //check that the mat file has a valid path
@@ -109,12 +89,6 @@ namespace ConsoleApplication1
                         input.matMade = true;
                     }
                 }
-
-                //if using block lanczos then use the old random function. See some problems with new random function in some cases when using block routine.
-                //if (input.blockLanczos)
-                //{
-                //    input.oldRandom = true;
-                //}
 
                 //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
@@ -138,7 +112,7 @@ namespace ConsoleApplication1
                     }
                 }//end for
 
-                //sets bool isQuad = false if K is zero and fitK is false for all modes.
+                //checks to see if quadratic basis set should be used.
                 bool isQuad = false;
                 for (int i = 0; i < Modes.Count; i++)
                 {
@@ -238,30 +212,27 @@ namespace ConsoleApplication1
                 //turns off the scan function if any values are being fit
                 if (fit == true)
                 {
-                    input.Scan = false;
+                    input.scan = false;
                 }
 
                 SOCJT runner = new SOCJT();
                 FitSOCJT fitt = new FitSOCJT();
 
                 //main subroutine execution when not running a scan
-                if (input.Scan == false)
+                if (input.scan == false)
                 {
-                    //initialize variable to hold the output file and initialize it with input file containing original values
                     List<string> linesToWrite = new List<string>();
                     linesToWrite = OutputFile.inputFileMaker(input, Modes);
 
-                    //if not fitting any variables run SOCJT routine directly
                     if (!fit)
                     {
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                     }
-                    else//else run FitSOCJT routine which will run LM optimizer which will call SOCJT
+                    else
                     {
                         linesToWrite.AddRange(fitt.fit(Modes, isQuad, inputFile, input, filepathFIT));
                     }
 
-                    //end stopwatch for total program time execution and appends the total run time to the output file
                     totalTime.Stop();
                     double TIME = totalTime.ElapsedMilliseconds / 1000D;
                     linesToWrite.Add(" ");
@@ -272,7 +243,6 @@ namespace ConsoleApplication1
                         linesToWrite.Add("Orthog took " + Lanczos.reorthogTime / 1000L + " seconds");
                     }
 #endif
-                    //writes all info to the output file
                     File.WriteAllLines(filepathOUT, linesToWrite);
                     Console.WriteLine("SOCJT Has Completed");
                 }//end no scan
@@ -280,18 +250,12 @@ namespace ConsoleApplication1
                 else//means a scan is being run
                 {
                     #region SCAN
-                    //create a list to store the final output eigenvalues from each iteration of SOCJT
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
-
-                    //create a List to hold the output file information
                     List<string> finalOut = new List<string>();
 
-                    //for loop to run steps of scan
-                    for (int h = 0; h < input.Steps; h++)
+                    for (int h = 0; h < input.steps; h++)
                     {
-                        //basically run the SOCJT subroutine for each step of the scan and save the output file at the end of the loop.
                         List<string> linesToWrite = new List<string>();
-                        //SOCJT runner = new SOCJT();
 
                         //run loop over each variable to be scanned and increment by step size times loop iteration.
                         for (int n = 0; n < input.scanList.Count; n++)
@@ -359,21 +323,16 @@ namespace ConsoleApplication1
 
                         //now make output file for each step
                         linesToWrite = OutputFile.inputFileMaker(input, Modes);
-
-                        //run SOCJT subroutine on this step's values
                         linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
 
-                        //write output file for this step
                         string stepFile = filepathOUT + "_step_" + Convert.ToString(h + 1) + ".out";
                         File.WriteAllLines(stepFile, linesToWrite);
 
                         //add this steps eigenvalues to the scan output file
                         scanList.Add(runner.finalList);
 
-                        //clear values for the next iteration
                         linesToWrite = null;
                         stepFile = null;
-                        //runner = null;
                     }//end of steps loop
 
                     //write scan output file including total elapsed time
@@ -386,7 +345,7 @@ namespace ConsoleApplication1
                     #endregion
                 }//end else for scan
 
-                //code to write matrix file to disc here?
+                //Writes the matrix to file if needed
                 if (input.useMatFile && !input.matMade)
                 {
                     OutputFile.writeMatFile(input);
@@ -481,10 +440,16 @@ namespace ConsoleApplication1
         }//end Main
 
         /// <summary>
-        /// Reads a text file into memory and parses it into a string array.
+        /// Reads from a lanczos vector file and returns the specified vector
         /// </summary>
         /// <param name="filepath">
         /// Filepath of file to be read and parsed.
+        /// </param>
+        /// <param name="n">
+        /// Which vector is needed
+        /// </param>
+        /// <param name="vecIn">
+        /// StreamReader object from reading previous vectors
         /// </param>
         /// <returns>
         /// Array containing all values from text file.
@@ -492,21 +457,15 @@ namespace ConsoleApplication1
         public static double[] vecRead(string filepath, int n, ref StreamReader vecIn)
         {
             List<double> vector = new List<double>();
-            //string[] inputFa = { };
-            //using (StreamReader vecIn = new StreamReader(filepath))
-            //{
-                string lineS;
-                //string[] SOCJTNewLine;
-                //char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
-                while ((lineS = vecIn.ReadLine()) != ("START_VEC" + n))
-                {
-                    continue;
-                }
-                while ((lineS = vecIn.ReadLine()) != "END_VEC")
-                {
-                    vector.Add(FileInfo.parseDouble(lineS));
-                }//end while
-            //}//end StreamReader
+            string lineS;
+            while ((lineS = vecIn.ReadLine()) != ("START_VEC" + n))
+            {
+                continue;
+            }
+            while ((lineS = vecIn.ReadLine()) != "END_VEC")
+            {
+                vector.Add(FileInfo.parseDouble(lineS));
+            }//end while
             return vector.ToArray();
         }//end method vecRead
 
@@ -528,7 +487,6 @@ namespace ConsoleApplication1
                 int dimension = lanczosVector.Length;
                 vecIn.Close();
                 vecIn = new StreamReader(file);
-                //eVecs.Add(new double[dimension, numberOfEigenvalues]);
                 double[,] temp = new double[dimension, numberOfEigenvalues];
                 for (int j = 0; j < iterations; j++)
                 {
@@ -538,7 +496,6 @@ namespace ConsoleApplication1
                         //read in the right vector to memory from the lanczos vector file                    
                         for (int n = 0; n < lanczosVector.Length; n++)
                         {                            
-                            //eVecs[i][n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
                             temp[n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
                         }//end loop over rows of lanczos Vector
                     }//end loop over columns of lanczosEVectors
@@ -571,7 +528,6 @@ namespace ConsoleApplication1
                 }//end j for loop
                 output.AppendLine("\r");
             }//end i loop
-            //code here to write to file
             string fileName = filepath + input.title + "_EVecs.out";
             List<string> ou = new List<string>();
             ou.Add(output.ToString());

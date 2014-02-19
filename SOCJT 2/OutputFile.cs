@@ -27,7 +27,7 @@ namespace ConsoleApplication1
             {
                 //add some asterisks here to make J and S stand out
                 file.AppendLine("J = " + Convert.ToString(J));
-                file.AppendLine("Sigma = " + String.Format("{0,3:0.0}", Sigma));// + Convert.ToString(Sigma));
+                file.AppendLine("Sigma = " + String.Format("{0,3:0.0}", Sigma));
                 //add some asterisks
 
 
@@ -43,7 +43,7 @@ namespace ConsoleApplication1
                 double[] tempEvs = eigenvalues[i].ToArray();
                 for (int j = 0; j < tempEvs.Length; j++)
                 { 
-                    file.AppendLine("\t" + String.Format("{0,10:0.0000}", tempEvs[j]));//  Convert.ToString(tempEvs[j]));
+                    file.AppendLine("\t" + String.Format("{0,10:0.0000}", tempEvs[j]));
                 }//this for loop writes the eigenvalues for each J level
 
                 double[,] tempMat = zMatrices[i];
@@ -112,9 +112,6 @@ namespace ConsoleApplication1
                 {
                     #region PrintMatrixSparse
                     int nonZeroCount = 0;
-                    //int upDiag = 0;
-                    //int numRows = hamMatrix[i].GetLength(1);
-                    //int numRows = sHamMatrix[i].innerobj.m;
                     file.AppendLine("\t");
                     file.AppendLine("\r");
                     file.AppendLine("\t" + "Hamiltonian Matrix");
@@ -140,34 +137,6 @@ namespace ConsoleApplication1
                     file.AppendLine("    " + Convert.ToString(nonZeroCount) + " non-zero matrix elements");
                     #endregion
                 }
-
-                if (input.beVecs == true)
-                {
-                    #region CompareEigenvectors
-                    file.AppendLine(" ");
-                    for (int n = 0; n < input.eVecs.Count; n++)
-                    { 
-                        if(input.eVecs[n].Item1 == J)
-                        {
-                            file.AppendLine(" ");
-                            file.AppendLine("Comparing eigenvector " + Convert.ToString(input.eVecs[n].Item2) + " to eigenvector " + Convert.ToString(input.eVecs[n].Item3));
-                            double sum = 0.0;
-                            int pos = 0;
-                            int neg = 0;
-                            double t;
-                            for (int m = 0; m < tempMat.GetLength(0); m++)
-                            {
-                                t = tempMat[m, input.eVecs[n].Item2] * tempMat[m, input.eVecs[n].Item3] > 0 ? pos++ : neg++;
-                                sum += t;
-                            }
-                            file.AppendLine(Convert.ToString(pos) + " basis functions have the same sign and " + Convert.ToString(neg) + " have the opposite sign.");
-                            file.AppendLine("The sum of the products of the cofactors is " + Convert.ToString(sum));
-                        }
-                    }
-                    file.AppendLine(" ");
-                    #endregion
-                }
-
 
                 file.AppendLine("**********************************************************************");
                 file.AppendLine(" ");
@@ -247,15 +216,6 @@ namespace ConsoleApplication1
                 if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
                 {
                     SOCJT.writeVec(tempMat[h, j], jBasisVecsByJ[h], file);
-                    /*
-                    file.AppendLine("\t");
-                    file.Append(String.Format("{0,10:0.000000}", tempMat[h, j]));
-                    for (int m = 0; m < input.nModes; m++)//goes through each mode
-                    {
-                        file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[h].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[h].modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
-                    }
-                    file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[h].Lambda));
-                    */
                 }
             }
             file.AppendLine("\r");
@@ -291,7 +251,6 @@ namespace ConsoleApplication1
             file.AppendLine("FIT_ORIGIN = " + Convert.ToString(input.fitOrigin));
             file.AppendLine("ORIGIN = " + Convert.ToString(input.origin));
             file.AppendLine("CALC_DERIV" + " = " + Convert.ToString(input.calcDeriv));
-            file.AppendLine("ZETAE" + " = " + String.Format("{0,10:0.00000}", input.zetaE));
             file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.useKappaEta));
             file.AppendLine("S1" + " = " + Convert.ToString(input.S1));
             file.AppendLine("S2" + " = " + Convert.ToString(input.S2));
@@ -360,14 +319,12 @@ namespace ConsoleApplication1
             file.AppendLine("GTOL" + " = " + Convert.ToString(input.gTol));
             file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.maxFev));
             file.AppendLine("FACTOR" + " = " + Convert.ToString(input.factor));
-            //file.AppendLine("NPRINT" + " = " + Convert.ToString(input.print));
             file.AppendLine("/");
             file.AppendLine("  ");
 
             if (input.includeCrossTerms == true)
             {
                 file.AppendLine("&CROSS_TERMS");
-                //file.AppendLine("INCLUDE" + " = " + Convert.ToString(input.includeCrossTerms));
                 for (int i = 0; i < input.nModes; i++)
                 {
                     for (int j = 0; j < input.nModes; j++)
@@ -379,32 +336,11 @@ namespace ConsoleApplication1
                                 file.AppendLine("JT MODE " + Convert.ToString(i + 1) + " MODE " + Convert.ToString(j + 1) + " = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[i, j]));
                                 file.AppendLine("FIT" + " = " + Convert.ToString(input.crossTermFit[i, j]));
                             }
-                            if (i > j)
-                            {
-                                file.AppendLine("AT MODE " + Convert.ToString(j + 1) + " MODE " + Convert.ToString(i + 1) + " = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[i, j]));
-                                file.AppendLine("FIT" + " = " + Convert.ToString(input.crossTermFit[i, j]));
-                            }
-                            if (input.Special == true && i == j)
-                            {
-                                file.AppendLine("SPECIAL = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[0, 0]));
-                                file.AppendLine("FIT = " + Convert.ToString(input.crossTermFit[0, 0]));
-                            }
                         }
                     }
                 }
                 file.AppendLine("/");
                 file.AppendLine("  ");
-            }
-
-            if (input.beVecs)
-            {
-                file.AppendLine("&COMPARE_EIGENVECTORS");
-                for (int n = 0; n < input.eVecs.Count; n++)
-                {
-                    file.AppendLine(Convert.ToString(input.eVecs[n].Item1) + "  " + Convert.ToString(input.eVecs[n].Item2) + "  " + Convert.ToString(input.eVecs[n].Item3));
-                }
-                file.AppendLine("/");
-                file.AppendLine(" ");
             }
 
             linesToWrite.Add(file.ToString());
@@ -445,7 +381,6 @@ namespace ConsoleApplication1
                 }
                 file.AppendLine(" ");
                 file.AppendLine(" ");
-                //write out all eigenvalues for a given j
             }
 
             linesToWrite.Add(file.ToString());
@@ -459,8 +394,7 @@ namespace ConsoleApplication1
         /// FileInfo object containing matrix file name/path.
         /// </param>
         public static void writeMatFile(FileInfo input)
-        { 
-            //writes only the off-diagonal matrices to the file.\
+        {
             StringBuilder file = new StringBuilder();
             for (int i = 0; i < SOCJT.fitHamList.Count; i++)
             {

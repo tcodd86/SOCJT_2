@@ -7,348 +7,234 @@ using System.Globalization;
 
 namespace ConsoleApplication1
 {
+    /// <summary>
+    /// Class for reading input files and storing values from it.
+    /// </summary>
     class FileInfo
     {
         #region properties
 
-        private int nNModes;
-        public int nModes
-        { 
-            get{ return nNModes; }
-            set { nNModes = value; }
-        }//end property nNModes
+        /// <summary>
+        /// Number of modes in the calculation
+        /// </summary>
+        public int nModes { get; private set; }
 
-        private string nTitle;
-        public string title
-        {
-            get { return nTitle; }
-            set { nTitle = value; }
-        }//end property nTitle
+        /// <summary>
+        /// Title of the calculations
+        /// </summary>
+        public string title { get; private set;}
 
-        private decimal nS;
-        public decimal S
-        {
-            get { return nS; }
-            set { nS = value; }
-        }//end property S
+        /// <summary>
+        /// Value of spin
+        /// </summary>
+        //private decimal nS;
+        public decimal S { get; private set; }
 
-        private double nAzeta;
-        public double Azeta
-        {
-            get { return nAzeta; }
-            set { nAzeta = value; }
-        }//end property Azeta
+        /// <summary>
+        /// Value of a*zeta, the SO coupling constant
+        /// </summary>
+        public double Azeta { get; set; }
 
-        private bool nfitAzeta;
-        public bool fitAzeta
-        {
-            get { return nfitAzeta; }
-            set { nfitAzeta = value; }
-        }//end property fitAzeta
+        /// <summary>
+        /// True if the SO coupling constant is being fit
+        /// </summary>
+        public bool fitAzeta { get; private set; }
 
-        private decimal nmaxJ;
-        public decimal maxJ
-        {
-            get { return nmaxJ; }
-            set { nmaxJ = value; }
-        }//end property maxJ
+        /// <summary>
+        /// Maximum value of j to use in the basis set
+        /// </summary>
+        public decimal maxJ { get; set; }
 
-        private decimal nminJ;
-        public decimal minJ
-        {
-            get { return nminJ; }
-            set { nminJ = value; }
-        }//end property minJ
+        /// <summary>
+        /// Minimum value of j that should be used in calculations
+        /// </summary>
+        public decimal minJ { get; private set; }
 
-        private bool nminJBool;
-        public bool minJBool
-        {
-            get { return nminJBool; }
-            set { nminJBool = value; }
-        }//end property calcDeriv
+        /// <summary>
+        /// True if min J is user specified
+        /// </summary>
+        public bool minJBool { get; private set; }
 
-        private bool nCalcDeriv;
-        public bool calcDeriv
-        {
-            get { return nCalcDeriv; }
-            set { nCalcDeriv = value; }
-        }//end property calcDeriv
+        /// <summary>
+        /// True if the derivatives should be calculated.
+        /// </summary>
+        public bool calcDeriv { get; private set; }
 
-        private decimal nZetaE;
-        public decimal zetaE
-        {
-            get { return nZetaE; }
-            set { nZetaE = value; }
-        }//end property zetaE
+        //public decimal zetaE { get; private set; }
 
-        private int nS1;
-        public int S1
-        {
-            get { return nS1; }
-            set { nS1 = value; }
-        }//end property S1
+        /// <summary>
+        /// Value of S1
+        /// </summary>
+        public int S1 { get; private set; }
 
-        private int nS2;
-        public int S2
-        {
-            get { return nS2; }
-            set { nS2 = value; }
-        }//end property S2
+        /// <summary>
+        /// Value of S2
+        /// </summary>
+        public int S2 { get; private set; }
 
-        private bool nPrintBasis;
-        public bool printBasis
-        {
-            get { return nPrintBasis; }
-            set { nPrintBasis = value; }
-        }//end property printBasis
+        /// <summary>
+        /// True if the basis set should be printed in the output file.
+        /// </summary>
+        public bool printBasis { get; private set; }
 
-        private bool npMatrix;
-        public bool pMatrix
-        {
-            get { return npMatrix; }
-            set { npMatrix = value; }
-        }//end property pMatrix
+        /// <summary>
+        /// True if the Hamiltonian should be printed in the output file.
+        /// </summary>
+        public bool pMatrix { get; private set; }
 
-        private bool npVec;
-        public bool pVector
-        {
-            get { return npVec; }
-            set { npVec = value; }
-        }//end property pVector
+        /// <summary>
+        /// True if the eigenvectors should be printed in the output file.
+        /// </summary>
+        public bool pVector { get; set; }  
 
-        private bool npMonit;
-        public bool pMonit
-        {
-            get { return npMonit; }
-            set { npMonit = value; }
-        }//end property pMonit
+        /// <summary>
+        /// True if a file with the eigenvectors should be printed.
+        /// </summary>
+        public bool vecFile { get; private set; }
 
-        private bool npDer;
-        public bool pDerivs
-        {
-            get { return npDer; }
-            set { npDer = value; }
-        }//end property pDerivs
+        /// <summary>
+        /// Value of the origin to add to the eigenvalues
+        /// </summary>
+        public double origin { get; set; }
 
-        private bool nvecFile;
-        public bool vecFile
-        {
-            get { return nvecFile; }
-            set { nvecFile = value; }
-        }//end property vecFile
+        /// <summary>
+        /// True if the origin should be fit.
+        /// </summary>
+        public bool fitOrigin { get; private set; }
 
-        private double nOrigin;
-        public double origin
-        {
-            get { return nOrigin; }
-            set { nOrigin = value; }
-        }//end property origin
+        /// <summary>
+        /// True if you want to save a file with the basis set in it.
+        /// </summary>
+        public bool basisFile { get; private set; }
 
-        private bool nfitOrigin;
-        public bool fitOrigin
-        {
-            get { return nfitOrigin; }
-            set { nfitOrigin = value; }
-        }//end property fitOrigin
+        /// <summary>
+        /// Number of eigenvalues/eigenvectors to find
+        /// </summary>
+        public int M { get; private set; }
 
-        private bool nbasisFile;
-        public bool basisFile
-        {
-            get { return nbasisFile; }
-            set { nbasisFile = value; }
-        }//end property basisFile
+        /// <summary>
+        /// Size of block (number of columns) in Block Lanczos
+        /// </summary>
+        public int kFactor { get; private set; }
 
-        private int nM;
-        public int M
-        {
-            get { return nM; }
-            set { nM = value; }
-        }//end property M
+        /// <summary>
+        /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
+        /// </summary>
+        public int noIts { get; private set; }
 
-        private int nkFactor;
-        public int kFactor
-        {
-            get { return nkFactor; }
-            set { nkFactor = value; }
-        }//end property kFactor
+        /// <summary>
+        /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
+        /// </summary>
+        public double tol { get; private set; }
 
-        private int nnoIts;
-        public int noIts
-        {
-            get { return nnoIts; }
-            set { nnoIts = value; }
-        }//end property noIts
+        public bool guesses { get; private set; }
 
-        private double ntol;
-        public double tol
-        {
-            get { return ntol; }
-            set { ntol = value; }
-        }//end property tol
+        /// <summary>
+        /// Name of the fit file to be used for a fit.
+        /// </summary>
+        public string fitFile { get; private set; }
 
-        private bool nguesses;
-        public bool guesses
-        {
-            get { return nguesses; }
-            set { nguesses = value; }
-        }//end property guesses
+        /// <summary>
+        /// F-Tolerance value for LM optimization
+        /// </summary>
+        public double fTol { get; private set; }
 
-        private string nfitFile;
-        public string fitFile
-        {
-            get { return nfitFile; }
-            set { nfitFile = value; }
-        }//end property fitFile
+        /// <summary>
+        /// X-Tolerance value for LM optimization
+        /// </summary>
+        public double xTol { get; private set; }
 
-        private double nfTol;
-        public double fTol
-        {
-            get { return nfTol; }
-            set { nfTol = value; }
-        }//end property fTol
-
-        private double nxTol;
-        public double xTol
-        {
-            get { return nxTol; }
-            set { nxTol = value; }
-        }//end property xTol
-
-        private double ngTol;
-        public double gTol
-        {
-            get { return ngTol; }
-            set { ngTol = value; }
-        }//end property gTol
+        /// <summary>
+        /// G-Tolerance value for LM optimization
+        /// </summary>
+        public double gTol { get; private set; }
         
-        private int nmaxFev;
-        public int maxFev
-        {
-            get { return nmaxFev; }
-            set { nmaxFev = value; }
-        }//end property maxFev
+        /// <summary>
+        /// Max number of iterations (steps) in the LM optimizer
+        /// </summary>
+        public int maxFev { get; private set; }
 
-        private double nfactor;
-        public double factor
-        {
-            get { return nfactor; }
-            set { nfactor = value; }
-        }//end property factor
+        /// <summary>
+        /// Factor used for step size in LM optimizer
+        /// </summary>
+        public double factor { get; private set; }
 
-        private int nprint;
-        public int print
-        {
-            get { return nprint; }
-            set { nprint = value; }
-        }//end property print
+        /// <summary>
+        /// True if there are cross-terms in the Hamiltonian
+        /// </summary>
+        public bool includeCrossTerms { get; private set; }
+
+        /// <summary>
+        /// True if a scan is being run
+        /// </summary>
+        public bool scan { get; set; }
+
+        /// <summary>
+        /// Number of steps to run in a scan
+        /// </summary>
+        public int steps { get; set; }
+
+        /// <summary>
+        /// How long (in seconds) the Hamiltonian generation took.
+        /// </summary>
+        public double matGenTime { get; set; }
+
+        /// <summary>
+        /// How long (in seconds) the diagonalization took.
+        /// </summary>
+        public double diagTime { get; set; }
+
+        /// <summary>
+        /// How much to parallelize the Hamiltonian matrix generation
+        /// </summary>
+        public int parMat { get; private set; }
+
+        /// <summary>
+        /// How much to parallelize the matrix vector multiplication
+        /// </summary>
+        public int parVec { get; private set; }
+
+        /// <summary>
+        /// How many j-blocks should be run in parallel
+        /// </summary>
+        public int parJ { get; private set; }
+
+        /// <summary>
+        /// Minimum value of coefficients to print in eigenvectors
+        /// </summary>
+        public double evMin { get; private set; }
+
+        /// <summary>
+        /// True if SO coupling is nonzero
+        /// </summary>
+        public bool inclSO { get; private set; }
+
+        public List<Tuple<decimal, int, int>> eVecs { get; private set; }
         
-        private bool nIncludeCrossTerms;
-        public bool includeCrossTerms
-        {
-            get { return nIncludeCrossTerms; }
-            set { nIncludeCrossTerms = value; }
-        }//end property includeCrossTerms
-
-        private bool nAT;
-        public bool AT
-        {
-            get { return nAT; }
-            set { nAT = value; }
-        }//end property AT
-
-        private bool nSpecial;
-        public bool Special
-        {
-            get { return nSpecial; }
-            set { nSpecial = value; }
-        }//end property Special
-
-        private bool nScan;
-        public bool Scan
-        {
-            get { return nScan; }
-            set { nScan = value; }
-        }//end property Scan
-
-        private int nSteps;
-        public int Steps
-        {
-            get { return nSteps; }
-            set { nSteps = value; }
-        }//end property Steps
-
-        private double nmatGenTime;
-        public double matGenTime
-        {
-            get { return nmatGenTime; }
-            set { nmatGenTime = value; }
-        }//end property matGenTime
-
-        private double ndiagTime;
-        public double diagTime
-        {
-            get { return ndiagTime; }
-            set { ndiagTime = value; }
-        }//end property diagTime
-
-        private int nPar;
-        public int parMat
-        {
-            get { return nPar; }
-            set { nPar = value; }
-        }//end property par
-
-        private int nParVec;
-        public int parVec
-        {
-            get { return nParVec; }
-            set { nParVec = value; }
-        }//end property pVec
-
-        private int nParJ;
-        public int parJ
-        {
-            get { return nParJ; }
-            set { nParJ = value; }
-        }//end property parJ
-
-        private double nEvMin;
-        public double evMin
-        {
-            get { return nEvMin; }
-            set { nEvMin = value; }
-        }//end property evMin
-
-        private bool nInclSO;
-        public bool inclSO
-        {
-            get { return nInclSO; }
-            set { nInclSO = value; }
-        }//end property inclSO
-
-        private List<Tuple<decimal, int, int>> neVecs;
-        public List<Tuple<decimal, int, int>> eVecs
-        {
-            get { return neVecs; }
-            set { neVecs = value; }
-        }//end property eVecs
-
-        private bool nbeVecs;
-        public bool beVecs
-        {
-            get { return nbeVecs; }
-            set { nbeVecs = value; }
-        }//end property nbeVecs
-
+        /// <summary>
+        /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
+        /// </summary>
         public bool useKappaEta { get; set; }//end useKappaEta
 
+        /// <summary>
+        /// List of Scanner objects for scan. Contains, variable to scan, step size, and start value.
+        /// </summary>
         public List<Scanner> scanList;
 
+        /// <summary>
+        /// Array containing cross-terms
+        /// </summary>
         public double[,] crossTermMatrix;
 
+        /// <summary>
+        /// Array containing booleans for fitting various cross-terms
+        /// </summary>
         public bool[,] crossTermFit;
 
-        public bool blockLanczos { get; private set; }//end naiveLanczos
+        /// <summary>
+        /// True if using block lanczos instead of naive Lanczos.
+        /// </summary>
+        public bool blockLanczos { get; private set; }//end blockLanczos
 
         /// <summary>
         /// Filepath of matrix file to read.
@@ -386,8 +272,7 @@ namespace ConsoleApplication1
         /// Constructor for FileInfo object. Sets reasonable values for most properties in case user forgets something in input file.
         /// </summary>
         public FileInfo()
-        {
-            //initialize all booleans to false by default            
+        {            
             fitAzeta = false;
             calcDeriv = false;
             minJBool = false;
@@ -396,25 +281,17 @@ namespace ConsoleApplication1
             printBasis = false;
             pMatrix = false;
             pVector = false;
-            AT = false;
-            Special = false;
             includeCrossTerms = false;
-            beVecs = false;
             useKappaEta = false;
             blockLanczos = false;
-            matFile = "matrix.txt";
             useMatFile = false;
             matMade = false;
             vecFile = false;
             vecFileComplete = false;
-
+            
+            matFile = "matrix.txt";
             title = "TITLE";
-            origin = 0.0;
-            parMat = 1;
-            nModes = 1;
-            S = 0.5M;
-            Azeta = 0.0;
-            zetaE = 0.0M;
+            fitFile = "fit.fit";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -423,7 +300,12 @@ namespace ConsoleApplication1
             //S1 and S2 values for 3-fold symmetry
             S1 = 0;
             S2 = 1;
-                        
+            
+            origin = 0.0;
+            parMat = 1;
+            nModes = 1;
+            S = 0.5M;
+            Azeta = 0.0;
             evMin = 0.2;            
             parVec = 1;
             parMat = 1;
@@ -432,13 +314,11 @@ namespace ConsoleApplication1
             kFactor = 2;
             noIts = 10000;
             tol = 0.0001;
-            fitFile = "fit.fit";
             fTol = 0.0;
             xTol = 0.0;
             gTol = 0.0;
             maxFev = 25;
-            factor = 0.001;
-            nprint = 0;            
+            factor = 0.001;        
         }
         
         /// <summary>
@@ -472,8 +352,9 @@ namespace ConsoleApplication1
             return inputFa;
         }//end method fileRead
 
-        public void setFileInfo(string[] inputf)
+        public void setFileInfo(string[] inputf, string filepath)
         {
+            this.filePath = filePath;
             for (int i = 0; i < inputf.Length; i++)
             {
                 if (inputf[i].ToUpper() == "&GENERAL")
@@ -511,10 +392,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_AZETA")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 fitAzeta = true;
                             }
+                            */
+                            fitAzeta = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MAXJ")
@@ -530,10 +414,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_ORIGIN")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 fitOrigin = true;
                             }
+                            */
+                            fitOrigin = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
@@ -543,15 +430,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "CALC_DERIV")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 calcDeriv = true;
                             }
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "ZETAE")
-                        {
-                            zetaE = parseDecimal(inputf[u + 1]);
+                            */
+                            calcDeriv = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "S1")
@@ -566,6 +451,7 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 useKappaEta = true;
@@ -574,6 +460,8 @@ namespace ConsoleApplication1
                             {
                                 useKappaEta = false;
                             }
+                            */
+                            useKappaEta = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -591,50 +479,69 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "PRINT_BASIS")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 printBasis = true;
                             }
+                            */
+                            printBasis = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_MATRIX")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
+                               
                                 pMatrix = true;
                             }
+                            */
+                            pMatrix = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_VEC")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 pVector = true;
                             }
+                            */
+                            pVector = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "USE_MATRIX_FILE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 useMatFile = true;
                             }
+                            */
+                            useMatFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 vecFile = true;
                             }
+                            */
+                            vecFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE_COMPLETE")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 vecFileComplete = true;
                             }
+                            */
+                            vecFileComplete = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MATRIX_FILE")
@@ -682,7 +589,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "TOL")
                         {
-                            //tol = Convert.ToDouble(inputf[u + 1]);
                             tol = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -714,10 +620,13 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
+                            /*
                             if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
                             {
                                 blockLanczos = true;
                             }
+                            */
+                            blockLanczos = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -740,19 +649,16 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FTOL")
                         {
-                            //fTol = Convert.ToDouble(inputf[u + 1]);
                             fTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "XTOL")
                         {
-                            //xTol = Convert.ToDouble(inputf[u + 1]);
                             xTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "GTOL")
                         {
-                            //gTol = Convert.ToDouble(inputf[u + 1]);
                             gTol = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -763,7 +669,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FACTOR")
                         {
-                            //factor = Convert.ToDouble(inputf[u + 1]);
                             factor = parseDouble(inputf[u + 1]);
                             continue;
                         }
@@ -807,51 +712,16 @@ namespace ConsoleApplication1
                                 row = column;
                                 column = temp;
                             }//end if
-                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
                             crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
+                            /*
                             if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
                             {
                                 tbool = true;
                             }//end if
+                            */
+                            tbool = TorF(inputf[j + 7]);
                             crossTermFit[row, column] = tbool;
-                            //j += 8;
                             continue;
-                        }
-
-                        if (inputf[j].ToUpper() == "AT")
-                        {
-                            AT = true;
-                            tbool = false;
-                            row = Convert.ToInt16(inputf[j + 2]) - 1;
-                            column = Convert.ToInt16(inputf[j + 4]) - 1;
-                            if (row < column)
-                            {
-                                temp = row;
-                                row = column;
-                                column = temp;
-                            }//end if
-                            //crossTermMatrix[row, column] = Convert.ToDouble(inputf[j + 5]);
-                            crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
-                            if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
-                            {
-                                tbool = true;
-                            }//end if
-                            crossTermFit[row, column] = tbool;
-                            //j += 8;
-                            continue;
-                        }
-
-                        if (inputf[j].ToUpper() == "SPECIAL")
-                        {
-                            tbool = false;
-                            Special = true;
-                            //crossTermMatrix[0, 0] = Convert.ToDouble(inputf[j + 1]);
-                            crossTermMatrix[0, 0] = parseDouble(inputf[j + 1]);
-                            if (inputf[j + 3].ToUpper() == "T" || inputf[j + 3].ToUpper() == "TRUE")
-                            {
-                                tbool = true;
-                            }
-                            crossTermFit[0, 0] = tbool;
                         }
                         if (inputf[j] == "/")
                         {
@@ -860,23 +730,7 @@ namespace ConsoleApplication1
                     }//end CROSS_TERM for
                     #endregion
                 }//end CROSS_TERM if
-
-                if (inputf[i].ToUpper() == "&COMPARE_EIGENVECTORS")
-                {
-                    #region &COMPARE_EIGENVECTORS
-                    beVecs = true;
-                    eVecs = new List<Tuple<decimal,int,int>>();
-                    for (int u = i + 1; ; u += 3)
-                    {
-                        eVecs.Add(new Tuple<decimal, int, int>(parseDecimal(inputf[u]), Convert.ToInt16(inputf[u + 1]),  Convert.ToInt16(inputf[u + 2])));
-                        if (inputf[u + 3].ToUpper() == "/")
-                        {
-                            break;
-                        }
-                    }
-                    #endregion
-                }//end COMPARE_EIGENVECTORS if
-
+                
                 if (inputf[i].ToUpper() == "&SCAN")
                 {
                     #region &SCAN
@@ -885,20 +739,18 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "STEPS")
                         {
-                            nSteps = Convert.ToInt32(inputf[u + 1]);
+                            steps = Convert.ToInt32(inputf[u + 1]);
                         }
                         if (inputf[u].ToUpper() == "MODE")
                         {
                             Scanner tempScan = new Scanner();
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.varToFit = inputf[u + 2];
-                            //tempScan.Start = Convert.ToDouble(inputf[u + 3]);
                             tempScan.Start = parseDouble(inputf[u + 3]);
-                            //tempScan.Step = Convert.ToDouble(inputf[u + 4]);
                             tempScan.Step = parseDouble(inputf[u + 4]);
                             scanList.Add(tempScan);
                             tempScan = null;
-                            nScan = true;
+                            scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "CROSS")
@@ -907,13 +759,11 @@ namespace ConsoleApplication1
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.Cross = Convert.ToInt32(inputf[u + 2]);
                             tempScan.varToFit = inputf[u + 3];
-                            //tempScan.Start = Convert.ToDouble(inputf[u + 4]);
                             tempScan.Start = parseDouble(inputf[u + 4]);
-                            //tempScan.Step = Convert.ToDouble(inputf[u + 5]);
                             tempScan.Step = parseDouble(inputf[u + 5]);
                             scanList.Add(tempScan);
                             tempScan = null;
-                            nScan = true;
+                            scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "/")
@@ -934,6 +784,25 @@ namespace ConsoleApplication1
         }//end method setFileInfo
 
         /// <summary>
+        /// Checks a string to see if it's T or TRUE, converts to boolean value
+        /// </summary>
+        /// <param name="val">
+        /// String to be checked.
+        /// </param>
+        /// <returns>
+        /// True if the string is T or TRUE, false if not
+        /// </returns>
+        private static bool TorF(string val)
+        {
+            bool trfa = false;
+            if (val.ToUpper() == "T" || val.ToUpper() == "TRUE")
+            {
+                trfa = true;
+            }
+            return trfa;
+        }
+
+        /// <summary>
         /// To parse a string containing a double that may or may not have scientific notation in it.
         /// </summary>
         /// <param name="s">
@@ -947,6 +816,15 @@ namespace ConsoleApplication1
             return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
         }
 
+        /// <summary>
+        /// To parse a string containing a decimal that may or may not have scientific notation in it.
+        /// </summary>
+        /// <param name="s">
+        /// String to be parsed
+        /// </param>
+        /// <returns>
+        /// Decimal value of parsed string
+        /// </returns>
         public static decimal parseDecimal(string s)
         {
             return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
