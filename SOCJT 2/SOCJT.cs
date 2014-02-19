@@ -462,8 +462,8 @@ namespace ConsoleApplication1
                     if (!input.blockLanczos)//means use naiveLanczos routine
                     {
                         ITER[i] = input.noIts;
-                        evs = new double[input.M];
-                        temp = new double[numcolumnsA[i], input.M];
+                        evs = new double[input.M + 1];
+                        temp = new double[numcolumnsA[i], input.M + 1];
                         Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.pVector, i, input.filePath);
                     }
                     else//means use block Lanczos from SOCJT
