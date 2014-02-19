@@ -1113,6 +1113,7 @@ namespace ConsoleApplication1
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
+            betas[0] = 0.0;
 
             //loop to generate the Lanczos matrix
             for (int i = 0; i < its; i++)
@@ -1121,7 +1122,10 @@ namespace ConsoleApplication1
                 OP(A, vi, ref Axvi, 1);
 
                 //assign alpha value for this iteration
-                alphas[i] = vxv(vi, Axvi);
+                //***************************************************************
+                //alphas[i] = vxv(vi, Axvi);                
+                alphas[i] = Alpha_i(Axvi, viminusone, vi, betas[i]);
+                //***************************************************************
 
                 //if calculating the eigenvectors then store the lanczos vectors here
                 if (evsNeeded)
@@ -1159,7 +1163,10 @@ namespace ConsoleApplication1
 
                 //calculate viplusone and beta i + 1.
                 viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
-                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                //***************************************************************
+                //betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                betas[i + 1] = Magnitude(viplusone);
+                //***************************************************************
                 for (int j = 0; j < viplusone.Length; j++)
                 {
                     viplusone[j] /= betas[i + 1];
@@ -1172,6 +1179,34 @@ namespace ConsoleApplication1
                 Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
             }//end loop to generate Lanczos matrix
         }//end LanczosIterations
+
+        /// <summary>
+        /// Calculates alpha according to Cullum 4.3.1
+        /// </summary>
+        /// <param name="Axvi">
+        /// Product of A and vi, vector
+        /// </param>
+        /// <param name="v_iminusone">
+        /// Lanczos Vector from previous iteration
+        /// </param>
+        /// <param name="v_i">
+        /// Lanczos vector from current iteration
+        /// </param>
+        /// <param name="beta_i">
+        /// Beta_i
+        /// </param>
+        /// <returns>
+        /// Alpha_i
+        /// </returns>
+        private static double Alpha_i(double[] Axvi, double[] v_iminusone, double[] v_i, double beta_i)
+        {
+            double[] temp = new double[Axvi.Length];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                temp[i] = Axvi[i] - beta_i * v_iminusone[i];
+            }
+            return vxv(v_i, temp);
+        }
 
         /// <summary>
         /// Dot product of two vectors
@@ -1320,5 +1355,24 @@ namespace ConsoleApplication1
                 }
             }//end loop over columns
         }//end normalize
+
+        /// <summary>
+        /// Calculates the magnitude of a vector
+        /// </summary>
+        /// <param name="vec">
+        /// Vector whose magnitude is to be found
+        /// </param>
+        /// <returns>
+        /// Magnitude of vec.
+        /// </returns>
+        private static double Magnitude(double[] vec)
+        {
+            double sum = 0.0;
+            for (int i = 0; i < vec.Length; i++)
+            {
+                sum += vec[i] * vec[i];
+            }
+            return Math.Sqrt(sum);
+        }
     }//end class Lanczos
 }
