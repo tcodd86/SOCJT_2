@@ -250,7 +250,6 @@ namespace ConsoleApplication1
             file.AppendLine("MAXJ" + " = " + Convert.ToString(input.maxJ));
             file.AppendLine("FIT_ORIGIN = " + Convert.ToString(input.fitOrigin));
             file.AppendLine("ORIGIN = " + Convert.ToString(input.origin));
-            file.AppendLine("CALC_DERIV" + " = " + Convert.ToString(input.calcDeriv));
             file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.useKappaEta));
             file.AppendLine("S1" + " = " + Convert.ToString(input.S1));
             file.AppendLine("S2" + " = " + Convert.ToString(input.S2));

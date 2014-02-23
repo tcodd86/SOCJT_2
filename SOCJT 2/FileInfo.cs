@@ -392,12 +392,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_AZETA")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                fitAzeta = true;
-                            }
-                            */
                             fitAzeta = TorF(inputf[u + 1]);
                             continue;
                         }
@@ -414,29 +408,12 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "FIT_ORIGIN")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                fitOrigin = true;
-                            }
-                            */
                             fitOrigin = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
                         {
                             origin = parseDouble(inputf[u + 1]);
-                            continue;
-                        }
-                        if (inputf[u].ToUpper() == "CALC_DERIV")
-                        {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                calcDeriv = true;
-                            }
-                            */
-                            calcDeriv = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "S1")
