@@ -56,13 +56,6 @@ namespace ConsoleApplication1
         public bool minJBool { get; private set; }
 
         /// <summary>
-        /// True if the derivatives should be calculated.
-        /// </summary>
-        public bool calcDeriv { get; private set; }
-
-        //public decimal zetaE { get; private set; }
-
-        /// <summary>
         /// Value of S1
         /// </summary>
         public int S1 { get; private set; }
@@ -126,8 +119,6 @@ namespace ConsoleApplication1
         /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
         /// </summary>
         public double tol { get; private set; }
-
-        public bool guesses { get; private set; }
 
         /// <summary>
         /// Name of the fit file to be used for a fit.
@@ -274,7 +265,6 @@ namespace ConsoleApplication1
         public FileInfo()
         {            
             fitAzeta = false;
-            calcDeriv = false;
             minJBool = false;
             fitOrigin = false;
             inclSO = false;
@@ -428,16 +418,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                useKappaEta = true;
-                            }
-                            else
-                            {
-                                useKappaEta = false;
-                            }
-                            */
                             useKappaEta = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
@@ -456,68 +436,31 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "PRINT_BASIS")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                printBasis = true;
-                            }
-                            */
                             printBasis = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_MATRIX")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                               
-                                pMatrix = true;
-                            }
-                            */
                             pMatrix = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_VEC")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                pVector = true;
-                            }
-                            */
                             pVector = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "USE_MATRIX_FILE")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                useMatFile = true;
-                            }
-                            */
                             useMatFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                vecFile = true;
-                            }
-                            */
                             vecFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE_COMPLETE")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                vecFileComplete = true;
-                            }
-                            */
                             vecFileComplete = TorF(inputf[u + 1]);
                             continue;
                         }
@@ -597,12 +540,6 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
-                            /*
-                            if (inputf[u + 1].ToUpper() == "T" || inputf[u + 1].ToUpper() == "TRUE")
-                            {
-                                blockLanczos = true;
-                            }
-                            */
                             blockLanczos = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
@@ -690,12 +627,6 @@ namespace ConsoleApplication1
                                 column = temp;
                             }//end if
                             crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
-                            /*
-                            if (inputf[j + 7].ToUpper() == "T" || inputf[j + 7].ToUpper() == "TRUE")
-                            {
-                                tbool = true;
-                            }//end if
-                            */
                             tbool = TorF(inputf[j + 7]);
                             crossTermFit[row, column] = tbool;
                             continue;
