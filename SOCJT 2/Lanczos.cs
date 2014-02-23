@@ -28,9 +28,6 @@ namespace ConsoleApplication1
     /// </summary>
     static class Lanczos
     {
-#if DEBUG
-        public static long reorthogTime = 0;
-#endif
         public static int basisSetLimit = 40000;
 
         /// <summary>
@@ -150,15 +147,7 @@ namespace ConsoleApplication1
                 }
                 if (L < S - 1)
                 {
-#if DEBUG
-                    orthogTimer.Start();
                     ORTHG(N, Q, LU, P, ref C, ref X);
-                    orthogTimer.Stop();
-                    reorthogTime += orthogTimer.ElapsedMilliseconds;
-                    orthogTimer.Reset();
-#else
-                    ORTHG(N, Q, LU, P, ref C, ref X);
-#endif
                     IL = LU;
                     int Ir = LU - 1;
                     for (int J = 0; J < P; J++)
