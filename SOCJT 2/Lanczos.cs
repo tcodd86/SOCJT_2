@@ -875,72 +875,13 @@ namespace ConsoleApplication1
                 tBetas[i] = betas[i + 2];
             }
 
-            var ZZ = new double[0,0];
-            //set flag for eigenvectors and initialize eigenvector array if necessary
-            int zz = 0;
-            if (evsNeeded)
-            {
-                zz = 2;
-                z = new double[its, M];
-            }
-
-            //this is the diagonalization of the complete Lanczos matrix
-            bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, M - 1, ref z);//put in M - 1 for # of eigenpairs to request because for some reason it returns one more than requested
-            evs = alphas;
-            
-            //this is the diagonalization of the Lanczos matrix without the first row and column
-            bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, M, ref ZZ);
-
-            //here I run test from Lanczos book to see if evs are good.  Briefly, 
-            //there are 3 cases to consider:
-            //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
-            //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
-            //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
-            //evs evaluated as correct will be stored in this list
-
-            //Tuple so that we know which eigenvectors to pull if necessary
-            List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
-
-            for (int i = 0; i < tAlphas.Length - 1; i++)
-            {
-                //check to see if the value is in T^2 eigenvalues
-                bool temp = checkInTT(alphas[i], tAlphas, tol);
-
-                //tells how many times alphas[i] is in alphas, always at least 1
-                int repeater = repeat(i, alphas, tol);
-
-                //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
-                if (repeater == 0)    //means there is some problem in the alphas vectors (probably NaN error)
-                {
-                    throw new RepeaterError();
-                }
-                if (repeater == 1)
-                {
-                    //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
-                    if (!temp)
-                    {
-                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                        continue;
-                    }
-                }
-                else    //means this evalue has a repeat and is a true eigenvalue of A
-                {
-                    correctEvs.Add(new Tuple<int,double>(i, alphas[i]));
-                    i += repeater - 1;
-                }
-            }
-
-            //build array of final eigenvalues to return
-            double[] checkedEvs = new double[correctEvs.Count];
-            for (int i = 0; i < checkedEvs.Length; i++)
-            {
-                checkedEvs[i] = correctEvs[i].Item2;
-            }            
-            evs = checkedEvs;
+            //Diagonalize Lanczos Matrix to find M correct eigenvalues
+            LanczosMatrixDiagonalization(ref evs, ref z, tol, M, alphas, nBetas, tAlphas, tBetas, evsNeeded);
 
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
-            {                
+            {       
+                /*
                 //generate the eigenvectors by matrix multiplication
                 //temporary storage for eigenvectors
                 var tempEvecs = new double[its, correctEvs.Count];
@@ -952,11 +893,12 @@ namespace ConsoleApplication1
                         tempEvecs[j, i] = z[j, correctEvs[i].Item1];
                     }
                 }
+                */
                 if (!NTooBig)
                 {
                     //do matrix multiplication of tempEvecs and laczosVecs, results stored in transEvecs which are true eigenvectors.
                     double[,] transEvecs = new double[N, evs.Length];
-                    alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, tempEvecs, 0, 0, 0, 0.0, ref transEvecs, 0, 0);
+                    alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);//changed tempEvecs to z
 
                     //then normalize
                     normalize(ref transEvecs);
@@ -964,13 +906,177 @@ namespace ConsoleApplication1
                     //then set equal to z
                     z = transEvecs;
                 }
+                    /*
                 else
                 {
                     //if evectors will be generated after the fact then pass back the eigenvectors of the Lanczos matrix for later use
                     z = tempEvecs;
                 }
+                */
             }//end if evsNeeded
         }//end NaiveLanczos
+
+        /// <summary>
+        /// Diagonalizes the tridiagonal Lanczos matrix T and the matrix T^2 and finds the true or 'non-spuriou' eigenvalues of T
+        /// </summary>
+        /// <param name="evs">
+        /// Will contain correct eigenvalues on return
+        /// </param>
+        /// <param name="z">
+        /// If eigenvectors are requested, will contain eigenvectors on return
+        /// </param>
+        /// <param name="tol">
+        /// Tolerance used for eigenvalue comparison
+        /// </param>
+        /// <param name="M">
+        /// Number of eigenvalues needed
+        /// </param>
+        /// <param name="alphas">
+        /// Diagonal elements of T
+        /// </param>
+        /// <param name="nBetas">
+        /// Off diagonal elements of T
+        /// </param>
+        /// <param name="tAlphas">
+        /// Diagonal elements of T^2
+        /// </param>
+        /// <param name="tBetas">
+        /// Off diagonal elements of T^2
+        /// </param>
+        /// <param name="zz">
+        /// Flag for ALGLIB function call for diagonalizing T to requeste eigenvalues or not
+        /// </param>
+        /// <param name="correctEvs">
+        /// Tuple to store the positions of the correct eigenvalues so that the correct eigenvectors may be extracted.
+        /// </param>
+        private static void LanczosMatrixDiagonalization(ref double[] evs, ref double[,] z, double tol, int M, double[] alphas, double[] nBetas, double[] tAlphas, double[] tBetas, bool evsNeeded)
+        {
+            //dummy matrix for diagonalization of T^2
+            var ZZ = new double[0, 0];
+
+            int its = alphas.Length;
+            int evsRequested = M * 4;
+            if (evsRequested >= its)
+            {
+                evsRequested = its - its / 5;
+            }
+
+            //Tuple so that we know which eigenvectors to pull if necessary
+            List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
+
+            //since the vectors alphas and tAlphas are overwritten by the diagonaliztion routine but may be needed at a later point they are stored here so that if the diagonalization needs to run
+            //for larger M to get all requested eigenvalues then they can be regenerated.
+            double[] alphOriginal = new double[alphas.Length];
+            double[] tAlphaOriginal = new double[tAlphas.Length];
+            for (int i = 0; i < alphas.Length; i++)
+            {
+                alphOriginal[i] = alphas[i];
+                if (i < tAlphas.Length)
+                {
+                    tAlphaOriginal[i] = tAlphas[i];
+                }
+            }
+
+            int evalsFound = 0;
+            while (evalsFound < M)
+            {
+                correctEvs = new List<Tuple<int, double>>();
+                //set flag for eigenvectors and initialize eigenvector array if necessary
+                int zz = 0;
+                if (evsNeeded)
+                {
+                    zz = 2;
+                    z = new double[its, evsRequested];
+                }
+
+                //if the diagonalization has run then alphas has been replaced by the eigenvalues
+                //reset it and tAlphas to their original values
+                if (alphas.Length != alphOriginal.Length)
+                {
+                    alphas = new double[alphOriginal.Length];
+                    tAlphas = new double[tAlphaOriginal.Length];
+                    for (int i = 0; i < alphOriginal.Length; i++)
+                    {
+                        alphas[i] = alphOriginal[i];
+                        if (i < tAlphaOriginal.Length)
+                        {
+                            tAlphas[i] = tAlphaOriginal[i];
+                        }
+                    }
+                }
+
+                //this is the diagonalization of the complete Lanczos matrix
+                bool test = alglib.smatrixtdevdi(ref alphas, nBetas, alphas.Length, zz, 0, evsRequested, ref z);//changed M - 1 to evsRequested
+                evs = alphas;
+
+                //this is the diagonalization of the Lanczos matrix without the first row and column
+                bool test2 = alglib.smatrixtdevdi(ref tAlphas, tBetas, tAlphas.Length, 0, 0, evsRequested, ref ZZ);//changed M to evsRequested
+
+                //here I run test from Lanczos book to see if evs are good.  Briefly, 
+                //there are 3 cases to consider:
+                //1. The ev is in T^2 and is a multiple ev in Tm: accept ev as good.
+                //2. The ev is in T^2 and is in Tm but not as a multiple: reject ev.
+                //3. The ev is not in T^2 and is not a multiple ev in Tm: accept ev.
+                //evs evaluated as correct will be stored in this list
+
+                for (int i = 0; i < tAlphas.Length - 1; i++)
+                {
+                    //check to see if the value is in T^2 eigenvalues
+                    bool temp = checkInTT(alphas[i], tAlphas, tol);
+
+                    //tells how many times alphas[i] is in alphas, always at least 1
+                    int repeater = repeat(i, alphas, tol);
+
+                    if (repeater == 0)    //means there is some problem in the alphas vectors (probably NaN error)
+                    {
+                        throw new RepeaterError();
+                    }
+                    //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
+                    if (repeater == 1)
+                    {
+                        //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
+                        if (!temp)
+                        {
+                            correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                            continue;
+                        }
+                    }
+                    else    //means this evalue has a repeat and is a true eigenvalue of A
+                    {
+                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                        i += repeater - 1;
+                    }
+                }
+                evalsFound = correctEvs.Count();
+                if (evalsFound < M)
+                {
+                    evsRequested += 10;
+                }
+            }//end while loop
+
+            //build array of final eigenvalues to return
+            double[] checkedEvs = new double[M];
+            for (int i = 0; i < checkedEvs.Length; i++)
+            {
+                checkedEvs[i] = correctEvs[i].Item2;
+            }
+            evs = checkedEvs;
+
+            if (evsNeeded)
+            {
+                //temporary storage for eigenvectors
+                var tempEvecs = new double[its, M];
+                for (int i = 0; i < M; i++)
+                {
+                    for (int j = 0; j < its; j++)
+                    {
+                        //pull only eigenvectors which correspond to a true eigenvalue
+                        tempEvecs[j, i] = z[j, correctEvs[i].Item1];
+                    }
+                }
+                z = tempEvecs;
+            }
+        }//end LanczosMatrixDiagonalization
 
         /// <summary>
         /// Function which generates the Lanczos matrix and optionally stores or writes to file the Lanczos vectors if necessary.
@@ -1007,6 +1113,7 @@ namespace ConsoleApplication1
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
+            betas[0] = 0.0;
 
             //loop to generate the Lanczos matrix
             for (int i = 0; i < its; i++)
@@ -1015,7 +1122,10 @@ namespace ConsoleApplication1
                 OP(A, vi, ref Axvi, 1);
 
                 //assign alpha value for this iteration
-                alphas[i] = vxv(vi, Axvi);
+                //***************************************************************
+                //alphas[i] = vxv(vi, Axvi);                
+                alphas[i] = Alpha_i(Axvi, viminusone, vi, betas[i]);
+                //***************************************************************
 
                 //if calculating the eigenvectors then store the lanczos vectors here
                 if (evsNeeded)
@@ -1053,7 +1163,10 @@ namespace ConsoleApplication1
 
                 //calculate viplusone and beta i + 1.
                 viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
-                betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                //***************************************************************
+                //betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
+                betas[i + 1] = Magnitude(viplusone);
+                //***************************************************************
                 for (int j = 0; j < viplusone.Length; j++)
                 {
                     viplusone[j] /= betas[i + 1];
@@ -1066,6 +1179,34 @@ namespace ConsoleApplication1
                 Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
             }//end loop to generate Lanczos matrix
         }//end LanczosIterations
+
+        /// <summary>
+        /// Calculates alpha according to Cullum 4.3.1
+        /// </summary>
+        /// <param name="Axvi">
+        /// Product of A and vi, vector
+        /// </param>
+        /// <param name="v_iminusone">
+        /// Lanczos Vector from previous iteration
+        /// </param>
+        /// <param name="v_i">
+        /// Lanczos vector from current iteration
+        /// </param>
+        /// <param name="beta_i">
+        /// Beta_i
+        /// </param>
+        /// <returns>
+        /// Alpha_i
+        /// </returns>
+        private static double Alpha_i(double[] Axvi, double[] v_iminusone, double[] v_i, double beta_i)
+        {
+            double[] temp = new double[Axvi.Length];
+            for (int i = 0; i < temp.Length; i++)
+            {
+                temp[i] = Axvi[i] - beta_i * v_iminusone[i];
+            }
+            return vxv(v_i, temp);
+        }
 
         /// <summary>
         /// Dot product of two vectors
@@ -1214,5 +1355,24 @@ namespace ConsoleApplication1
                 }
             }//end loop over columns
         }//end normalize
+
+        /// <summary>
+        /// Calculates the magnitude of a vector
+        /// </summary>
+        /// <param name="vec">
+        /// Vector whose magnitude is to be found
+        /// </param>
+        /// <returns>
+        /// Magnitude of vec.
+        /// </returns>
+        private static double Magnitude(double[] vec)
+        {
+            double sum = 0.0;
+            for (int i = 0; i < vec.Length; i++)
+            {
+                sum += vec[i] * vec[i];
+            }
+            return Math.Sqrt(sum);
+        }
     }//end class Lanczos
 }
