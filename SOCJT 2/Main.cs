@@ -96,124 +96,14 @@ namespace ConsoleApplication1
                     throw new SpinInvalidException();
                 }
 
-                //iterates through the Mode info in the input file and initializes the modes
-                bool tempB = false;
-                List<ModeInfo> Modes = new List<ModeInfo>();
-                for (int i = 0; i < input.nModes; i++)
-                {
-                    Modes.Add(new ModeInfo(i, inputFile, out tempB));
-                    if (tempB)
-                    {
-                        Modes[i].D = 0.5 * Math.Pow(Modes[i].kappa / Modes[i].modeOmega, 2D);
-                        Modes[i].fitD = Modes[i].fitKappa;
-                        Modes[i].K = Modes[i].eta / Modes[i].modeOmega;
-                        Modes[i].fitK = Modes[i].fitEta;
-                        input.useKappaEta = true;
-                    }
-                }//end for
+                //initialize the modes
+                List<ModeInfo> Modes = ModeInitialization(inputFile, input);
 
-                //checks to see if quadratic basis set should be used.
-                bool isQuad = false;
-                for (int i = 0; i < Modes.Count; i++)
-                {
-                    if (Modes[i].fitK == false && Modes[i].K == 0)
-                    {
-                        continue;
-                    }//end if
-                    else
-                    {
-                        isQuad = true;
-                        break;
-                    }
-                }//end for
+                //Determines if the quadratic basis set should be used
+                bool isQuad = IsQuad(input, Modes);
 
-                //this sets isQuad = true if there is a cross quadratic term between an A and E mode
-                if (isQuad == false)
-                {
-                    for (int i = 0; i < input.nModes; i++)
-                    {
-                        if (input.crossTermMatrix == null)
-                        {
-                            break;
-                        }
-                        for (int j = i + 1; j < input.nModes; j++)
-                        {
-                            if (input.crossTermMatrix[j, i] != 0)
-                            {
-                                if (Modes[i].IsAType == true)
-                                {
-                                    if (Modes[j].IsAType == false)
-                                    {
-                                        isQuad = true;
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    if (Modes[j].IsAType == true)
-                                    {
-                                        isQuad = true;
-                                    }
-                                }//end else
-                            }//end if
-                        }//end inner for
-                    }//end outer for
-                }//end if isQuad == false
-
-                //Sets the fit boolean value to true if any values are to be fit
-                bool fit = false;
-                for (int i = 0; i < input.nModes; i++)
-                {
-                    if (input.fitAzeta == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                    if (input.fitOrigin == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                    if (Modes[i].fitOmega == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                    if (Modes[i].fitD == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                    if (Modes[i].fitK == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                    if (Modes[i].fitWEXE == true)
-                    {
-                        fit = true;
-                        break;
-                    }
-                }
-
-                //this checks the cross term fit boolean values
-                if (input.includeCrossTerms == true)
-                {
-                    foreach (bool fitter in input.crossTermFit)
-                    {
-                        if (fitter == true)
-                        {
-                            fit = true;
-                            break;
-                        }
-                    }
-                }
-
-                //turns off the scan function if any values are being fit
-                if (fit == true)
-                {
-                    input.scan = false;
-                }
+                //Determines if any values are being fit
+                bool fit = IsFit(input, Modes);
 
                 SOCJT runner = new SOCJT();
                 FitSOCJT fitt = new FitSOCJT();
@@ -438,6 +328,149 @@ namespace ConsoleApplication1
             }
 #endif
         }//end Main
+
+        private static bool IsFit(FileInfo input, List<ModeInfo> Modes)
+        {
+            //Sets the fit boolean value to true if any values are to be fit
+            bool fit = false;
+            for (int i = 0; i < input.nModes; i++)
+            {
+                if (input.fitAzeta == true)
+                {
+                    fit = true;
+                    break;
+                }
+                if (input.fitOrigin == true)
+                {
+                    fit = true;
+                    break;
+                }
+                if (Modes[i].fitOmega == true)
+                {
+                    fit = true;
+                    break;
+                }
+                if (Modes[i].fitD == true)
+                {
+                    fit = true;
+                    break;
+                }
+                if (Modes[i].fitK == true)
+                {
+                    fit = true;
+                    break;
+                }
+                if (Modes[i].fitWEXE == true)
+                {
+                    fit = true;
+                    break;
+                }
+            }
+
+            //this checks the cross term fit boolean values
+            if (input.includeCrossTerms == true)
+            {
+                foreach (bool fitter in input.crossTermFit)
+                {
+                    if (fitter == true)
+                    {
+                        fit = true;
+                        break;
+                    }
+                }
+            }
+
+            //turns off the scan function if any values are being fit
+            if (fit == true)
+            {
+                input.scan = false;
+            }
+            return fit;
+        }
+
+        private static bool IsQuad(FileInfo input, List<ModeInfo> Modes)
+        {
+            //checks to see if quadratic basis set should be used.
+            bool isQuad = false;
+            for (int i = 0; i < Modes.Count; i++)
+            {
+                if (Modes[i].fitK == false && Modes[i].K == 0)
+                {
+                    continue;
+                }//end if
+                else
+                {
+                    isQuad = true;
+                    break;
+                }
+            }//end for
+
+            //this sets isQuad = true if there is a cross quadratic term between an A and E mode
+            if (isQuad == false)
+            {
+                for (int i = 0; i < input.nModes; i++)
+                {
+                    if (input.crossTermMatrix == null)
+                    {
+                        break;
+                    }
+                    for (int j = i + 1; j < input.nModes; j++)
+                    {
+                        if (input.crossTermMatrix[j, i] != 0)
+                        {
+                            if (Modes[i].IsAType == true)
+                            {
+                                if (Modes[j].IsAType == false)
+                                {
+                                    isQuad = true;
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                if (Modes[j].IsAType == true)
+                                {
+                                    isQuad = true;
+                                }
+                            }//end else
+                        }//end if
+                    }//end inner for
+                }//end outer for
+            }//end if isQuad == false
+            return isQuad;
+        }
+
+        /// <summary>
+        /// Creates and initializes all modes.
+        /// </summary>
+        /// <param name="inputFile">
+        /// The parsed input file.
+        /// </param>
+        /// <param name="input">
+        /// FileInfo object
+        /// </param>
+        /// <returns>
+        /// List of initialized modes.
+        /// </returns>
+        private static List<ModeInfo> ModeInitialization(string[] inputFile, FileInfo input)
+        {
+            //iterates through the Mode info in the input file and initializes the modes
+            bool tempB = false;
+            List<ModeInfo> Modes = new List<ModeInfo>();
+            for (int i = 0; i < input.nModes; i++)
+            {
+                Modes.Add(new ModeInfo(i, inputFile, out tempB));
+                if (tempB)
+                {
+                    Modes[i].D = 0.5 * Math.Pow(Modes[i].kappa / Modes[i].modeOmega, 2D);
+                    Modes[i].fitD = Modes[i].fitKappa;
+                    Modes[i].K = Modes[i].eta / Modes[i].modeOmega;
+                    Modes[i].fitK = Modes[i].fitEta;
+                    input.useKappaEta = true;
+                }
+            }//end for
+            return Modes;
+        }
 
         /// <summary>
         /// Reads from a lanczos vector file and returns the specified vector
