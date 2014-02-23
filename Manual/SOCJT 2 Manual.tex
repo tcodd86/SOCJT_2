@@ -89,7 +89,7 @@
 The program \socjttwo\ has the following
 capabilities: 
 \begin{bulletlist}
-\item Find the lowest energy solutions to the Jahn-Teller Hamiltonian, including linear and quadratic terms as well as bilinear coupling terms between Jahn-Teller active and inactive modes and cross-quadratic Jahn-Teller coupling between two degenerate modes, and spin-orbit coupling, for any molecule in a non-cubic point group.
+\item Find the lowest energy solutions to the Jahn-Teller Hamiltonian, including linear and quadratic terms as well as bilinear coupling terms between Jahn-Teller active and inactive modes, and spin-orbit coupling, for any molecule in a non-cubic point group.
 %\item Compute a number of properties of the state using the eigenvectors, including Coriolis coupling constants and the relative vibronic transition intensities between the Jahn-Teller active state
 %  and a non-degenerate state, or another Jahn-Teller active state.
 \item Any number of Jahn-Teller active and inactive modes can be accommodated, as well as an arbitrary spin state, whether half-integer or integer.
@@ -142,11 +142,9 @@ the \JT\ problem. Of particular importance to our research has been
 the fact that nearly all \JT\ active states so far observed have been
 open shell systems, which in principle all have first-order
 spin-orbit coupling, except for the somewhat rare open shell singlet
-states. It was the purpose of this research to develop a simple
-to use, yet fairly complete, set of computer programs for the analysis of the
-spectroscopic data for \JT\ molecules.
+states. \socjt\ was developed by Timothy Barckholtz and Terry Miller for the analysis of the spectroscopic data for \JT\ molecules. The most recent version of \socjt\ is now over ten years old and has some limitations which are the motivation for the development of \socjttwo.
 
-This manual describes the use and background of \socjttwo\ and is a modified version of the manual written for \socjt by Timothy A. Barckholtz and Terry A. Miller.
+This manual describes the use and background of \socjttwo\ and is a (slightly) modified version of the manual written for \socjt\ by Timothy A. Barckholtz and Terry A. Miller.
 The program \socjttwo\ (an anacronym for {\ul S}pin-{\ul O}rbit {\ul C}oupling
 and {\ul J}ahn-{\ul T}eller; pronounced ``sock-it'') diagonalizes the
 spin-vibronic portion of the Jahn-Teller Hamiltonian, which produces
@@ -167,9 +165,9 @@ active state involved in the electronic transition is a singly
 degenerate or non-Jahn-Teller active degenerate state.
 \end{comment}
 
-This program was written by Terrance Codd between 2011 and 2013 while
+This program was written by Terrance Codd between 2011 and 2014 while
 a graduate student at The Ohio State University, advised by Terry
-Miller. It was written in C$\sharp$ and therefore requires either the .NET framework (Windows) or Mono (OSX and Linux) to run.  Most tests were performed using .NET framework 4.0 on two quad-core Xenon processors with 4 GB of RAM running 64-bit Windows 7 Enterprise.  Some testing with \socjttwo has been done on MNode1, a linux cluster running Red Hat Enterprise 6.1 Linux using Mono 3.2.1.
+Miller. It was written in C$\sharp$ and therefore requires either the .NET framework (Windows) or Mono (OSX and Linux) to run.  Most tests were performed using .NET framework 4.0 on two quad-core Xenon processors with 4 GB of RAM running 64-bit Windows 7 Enterprise.  Some testing with \socjttwo\ has been done on MNode1, a linux cluster running Red Hat Enterprise 6.1 Linux using Mono 3.2.1.
 \begin{comment}
 A version for the Cray
 operating system is available upon request, as is the source code for
@@ -182,10 +180,10 @@ Miller, T. A.  {\it Int. Rev. Phys. Chem.}, {\bf 1998}, {\it 17},
 \socjttwo, by design, suffers many, though not all, of the limitations of \socjt which are described below.
 
 \begin{bulletlist}
-\item \socjttwo cannot handle degeneracies greater than two; i.e., it
+\item \socjttwo\ cannot handle degeneracies greater than two; i.e., it
   does not work for the cubic point groups. It also may not
-  work for molecules with a $C_4$ axis; see the discussion of these
-  point groups in references \citen{tab4} and \citen{jttheory20}.
+  work for molecules with a $C_4$ axis. %; see the discussion of these
+  %point groups in references \citen{tab4} and \citen{jttheory20}.
 \item The program can only properly handle one type of \JT\ active
   mode, with respect to the values of $s_2$. Examination of
   Table 3 of reference \citen{tab4} shows that it is possible to have
@@ -196,7 +194,7 @@ Miller, T. A.  {\it Int. Rev. Phys. Chem.}, {\bf 1998}, {\it 17},
   calculated accurately, but the Coriolis coupling constants will
   likely be erroneously computed. This case should be fairly rare, and
   I have not considered this possibility extensively.
-\item The program has been extensively test against \socjt for the $C_{3v}$/$D_{3h}$ case, and
+\item \socjttwo\ has been extensively test against \socjt\ for the C$_{3\textnormal{v}}$/D$_{3\textnormal{h}}$ case, and
   is believed to be accurate for all other non-cubic point groups.
 \end{bulletlist}
 
@@ -204,7 +202,7 @@ Miller, T. A.  {\it Int. Rev. Phys. Chem.}, {\bf 1998}, {\it 17},
 
 Before describing the input and output of \socjttwo, we briefly summarize
 the Jahn-Teller effect, which serves several purposes. The \JT\ effect
-is over sixty years old, and numerous different approaches have been
+is over 75 years old, and numerous different approaches have been
 taken in the analysis of the vibronic structure of \JT\ active
 molecules. There thus exists a wide variety of notations and
 nomenclatures for all of the different parameters and effects involved
@@ -213,7 +211,7 @@ most important aspects of the problem. For a full description, we
 refer the reader to the masterwork on this problem, reference
 \citen{tab4}. The appendix to this manual includes a table of all of
 the different mathematical symbols used in this work, and, where 
-appropriate, the corresponding input parameter to the \socjttwo program.
+appropriate, the corresponding input parameter to the \socjttwo\ program.
 
 \subsection{Basis set.} The basis set used to compute the vibrational 
 structure of Jahn-Teller states is a product of electronic, vibrational,
@@ -234,7 +232,7 @@ symmetry axis is appended to the basis set.
 Only some vibrational modes of a Jahn-Teller active molecule will show
 the effects of $k^{th}$-order \JT\ coupling. In the mammoth paper
 describing this 
-project, we derived a general method for determining which vibrational
+project, Barckholtz and Miller derived a general method for determining which vibrational
 modes will be \JT\ active. For a given vibrational mode of symmetry
 $e_{s_v}$ and  a given electronic state of symmetry $E_{s_e}$, a value
 for $s_k$ of either 0 or 1 can be chosen to satisfy the equation
@@ -246,7 +244,7 @@ which means the quantity $\left( 2s_e \pm ks_v \right) $
 must be an integer multiple of $n$, where $n$ is the order of the
 principal axis of the molecule. The only variable in equation (\ref{se
   and sv selection rule}) is $s_k$, and the values of $s_k$ ($k=1$ and 2)
-are required input to \socjt . The reader should refer to Table 2 of
+are required input to \socjttwo. The reader should refer to Table 2 of
 reference \citen{tab4} for guidance in choosing values for $s_1$ and
 $s_2$. See also section \ref{section:limitations} for some
 restrictions on these quantities.
@@ -379,7 +377,9 @@ $\left| j,n_{j},\alpha ,\Sigma \right\rangle $ is
 \begin{equation}
 \left| j,n_{j},\alpha ,\Sigma \right\rangle =\sum_{i}\left( c_{i,n_{j},\Sigma }\left|
 \Lambda _{i}\right\rangle 
-\prod\limits_{m=1}^{p}\left| v_{m,i},l_{m,i}\right\rangle \left| \Sigma _i \right\rangle 
+\prod\limits_{m=1}^{p}\left| v_{m,i},l_{m,i}\right\rangle
+\prod\limits_{n=1}^{3N - 6 - 2p}\left| v_{n,i}\right\rangle
+ \left| \Sigma _i \right\rangle 
 \right), \label{eigenvector notation}
 \end{equation}
 where the summation runs over all of the basis functions used in the
@@ -395,7 +395,7 @@ is not always a good quantum number, we have included into the ket the label
 $\alpha $, which is the symmetry species 
 of the state. Note that there are now two subscripts on the quantum numbers $\nu $ and $l$
 in the basis functions of equation (\ref{eigenvector notation}). 
-The first, $m$, corresponds to which vibrational
+The first, $m$ or $n$, corresponds to which vibrational
 mode the quantum number refers while the second, $i$, represents the basis
 function to which the quantum number belongs. 
 
@@ -405,7 +405,9 @@ in its absence, equation (\ref{eigenvector notation}) becomes
 \begin{equation}
 \left| j,n_{j},\alpha \right\rangle \left| \Sigma \right\rangle =
 \sum_{i}\left( c_{i,n_{j} }\left| \Lambda _{i}\right\rangle 
-\prod\limits_{m=1}^{p}\left| v_{m,i},l_{m,i}\right\rangle  \right) 
+\prod\limits_{m=1}^{p}\left| v_{m,i},l_{m,i}\right\rangle  
+\prod\limits_{n=1}^{3N - 6 - 2p}\left| v_{n,i}\right\rangle
+\right) 
 \left| \Sigma \right\rangle . \label{eigenvector notation without sigma}
 \end{equation}
 In the two limits of small spin-orbit coupling or large Jahn-Teller coupling
@@ -419,51 +421,43 @@ input parameters (i.e., a zero or non-zero value of $a\zeta _e$), the
 output of the eigenvectors will be in the form of either equation
 (\ref{eigenvector notation}) or (\ref{eigenvector notation without sigma}).
 
-\subsection{Ham reduction factor.} An important feature of the \socjt\
-program is that it has the 
-capability of directly including spin-orbit coupling along with \JT\
-coupling in the Hamiltonian. Prior to this program, nearly all
-Jahn-Teller calculations in the literature have added spin-orbit 
-coupling to the linear Jahn-Teller Hamiltonian ``after the fact'' via a
-formula initially derived by Child and Longuet-Higgins.\cite{jttheory9} The
-formula is derived by taking the expectation value of $\hat{\cal H}_{SO}$ 
-for the vibronic eigenfunction, computed without including $\hat{\cal H}_{SO}$
-in the Hamiltonian: 
-\begin{equation}
-\left\langle \Sigma \right|
-\left\langle j,n_{j},\alpha \right| \hat{\cal H}_{SO}
-\left| j,n_{j},\alpha \right\rangle \left| \Sigma \right\rangle
-=a\zeta _{e}d_{j,n_{j}}\Sigma \text{, where
-  }d_{j,n_{j}}=\sum_i\Lambda 
-_ic_{i,n_{j}}^{2}.  \label{ham parm definition}
-\end{equation}
-The parameter $d_{j,n_{j}}$ is often called the Ham reduction factor and is usually
-not given with subscripts. However, because each
-vibronic level has a unique value of $d$, we feel it is appropriate to
-assign subscripts to this parameter to identify the eigenfunction to which
-it corresponds. From this formula, the approximate spin-orbit
-splitting, $\Delta E_{j,n_j}^{SO}$ of the $n_{j}^{th}$ energy level of
-the $j^{th}$ symmetry block is  
-\begin{equation}
-\Delta E_{j,n_{j}}^{SO}= E_{j,n_j,\Sigma = +\frac12 } - 
-E_{j,n_j,\Sigma = -\frac12 } = a\zeta _{e}d_{j,n_{j}}.  \label{azetad2}
-\end{equation}
-The quantity $d_{j,n_{j}}$ is contained in the output for each
-eigenvalue and eigenvector computed. These values are printed even
-when spin-orbit coupling or quadratic \JT\ coupling is included in the
-calculation. In these cases, the Ham reduction factor may have little
-relevance to the observed energy levels, and the actual computed
-energies should be used instead of the energies calculated by equation
-(\ref{azetad2}). 
+%\subsection{Ham reduction factor.} An important feature of the \socjt\ program is that it has the capability of directly including spin-orbit coupling along with \JT\ coupling in the Hamiltonian. Prior to this program, nearly all Jahn-Teller calculations in the literature have added spin-orbit coupling to the linear Jahn-Teller Hamiltonian ``after the fact'' via a formula initially derived by Child and Longuet-Higgins.\cite{jttheory9} The formula is derived by taking the expectation value of $\hat{\cal H}_{SO}$ for the vibronic eigenfunction, computed without including $\hat{\cal H}_{SO}$ in the Hamiltonian: 
+%\begin{equation}
+%\left\langle \Sigma \right|
+%\left\langle j,n_{j},\alpha \right| \hat{\cal H}_{SO}
+%\left| j,n_{j},\alpha \right\rangle \left| \Sigma \right\rangle
+%=a\zeta _{e}d_{j,n_{j}}\Sigma \text{, where
+%  }d_{j,n_{j}}=\sum_i\Lambda 
+%_ic_{i,n_{j}}^{2}.  \label{ham parm definition}
+%\end{equation}
+%The parameter $d_{j,n_{j}}$ is often called the Ham reduction factor and is usually
+%not given with subscripts. However, because each
+%vibronic level has a unique value of $d$, we feel it is appropriate to
+%assign subscripts to this parameter to identify the eigenfunction to which
+%it corresponds. From this formula, the approximate spin-orbit
+%splitting, $\Delta E_{j,n_j}^{SO}$ of the $n_{j}^{th}$ energy level of
+%the $j^{th}$ symmetry block is  
+%\begin{equation}
+%\Delta E_{j,n_{j}}^{SO}= E_{j,n_j,\Sigma = +\frac12 } - 
+%E_{j,n_j,\Sigma = -\frac12 } = a\zeta _{e}d_{j,n_{j}}.  \label{azetad2}
+%\end{equation}
+%The quantity $d_{j,n_{j}}$ is contained in the output for each
+%eigenvalue and eigenvector computed. These values are printed even
+%when spin-orbit coupling or quadratic \JT\ coupling is included in the
+%calculation. In these cases, the Ham reduction factor may have little
+%relevance to the observed energy levels, and the actual computed
+%energies should be used instead of the energies calculated by equation
+%(\ref{azetad2}). 
 
-\subsection{Coriolis and spin-rotation parameters.} 
-One last quantity remains to be defined, and that is the Coriolis
-coupling constant, which is defined by the Coriolis Hamiltonian,
-\begin{equation}
-\hat{\cal H}_{COR} = -2A \left( \hat{L}_z + \hat{G}_z \right)
-\hat{N}_z .
-\label{HCOR}
-\end{equation}
+%\subsection{Coriolis and spin-rotation parameters.} 
+%One last quantity remains to be defined, and that is the Coriolis
+%coupling constant, which is defined by the Coriolis Hamiltonian,
+%\begin{equation}
+%\hat{\cal H}_{COR} = -2A \left( \hat{L}_z + \hat{G}_z \right)
+%\hat{N}_z .
+%\label{HCOR}
+%\end{equation}
+\begin{comment}
 As we discussed in detail elsewhere,\cite{tab4,tab11} the Coriolis
 coupling has a strong dependence on the spin-orbit coupling, and is
 quite closely related to the spin-rotation parameter $\epsilon
@@ -526,6 +520,7 @@ For each eigenvalue and eigenvector computed, a value of $\zeta _t$ is
 computed by either equation (\ref{Hcor evaluation line 3}) or 
 (\ref{Hcor with spin}), which allows the quantities $\Delta \zeta _t $
 and then $\frac{\epsilon _{aa}^{2v}}{2A}$ to be computed.
+\end{comment}
 
 \section{Input} \label{section:input}
 
@@ -544,9 +539,9 @@ Within each \&NAMELIST the input variables are assigned their initial
 values, and separated by returns, spaces or tabs. Each \&NAMELIST group is separated from
 the previous by a '/'. C$\sharp$ does not suffer the same weaknesses of FORTRAN for file I/O
 so the number of spaces and alignment of decimals for the input parameters is unimportant.
-Where a boolean value is required \socjttwo checks for a T or TRUE (in upper or lower case)
-and if that is not found the default value of FALSE is used. Any input files for \socjt will work
-with \socjttwo however there are some capabilities in \socjt not included in \socjttwo such as 
+Where a boolean value is required \socjttwo\ checks for a T or TRUE (in upper or lower case)
+and if that is not found the default value of FALSE is used. Any input files for \socjt\ will work
+with \socjttwo\ however there are some capabilities in \socjt not included in \socjttwo\ such as 
 computation of spectra and those sections will be ignored. The order of the variables in
 the \&NAMELIST does not matter, nor does the order of the \&NAMELIST
 groups in the input file itself.
@@ -577,9 +572,7 @@ calculation. The default values are
   S = 0.5
   AZETA = 0.0
   FIT_AZETA = FALSE
-  ZETAE = 1.0
   MAXJ = 7.5
-  CALC_DERIV = FALSE
   USE_KAPPA_ETA = FALSE
   S1 = 0
   S2 = 1
@@ -603,8 +596,8 @@ calculation. The default values are
 \item[FIT\_AZETA] Whether or not to fit $a\zeta _e$ in the fitting
   routines. Boolean.
 
-\item[ZETAE] The value of $\zeta _e$ for the state, used only in the
-  calculation of the Coriolis coupling constant. Real.
+%\item[ZETAE] The value of $\zeta _e$ for the state, used only in the
+%  calculation of the Coriolis coupling constant. Real.
 
 \item[MAXJ] The maximum value of $j$ to be used in the
   calculation. For linear Jahn-Teller coupling only, this is the
@@ -616,20 +609,20 @@ calculation. The default values are
   effective value becomes the closest half-integer value, rounding
   down. Real.
 
-\item[CALC\_DERIV] Boolean variable that determines whether the
-  derivatives of the energies with respect to the various parameters
-  (vibrational frequencies, coupling constants, etc.) should be
-  calculated. The calculation of the derivatives of the eigenvalues with
-  respect to the parameters has probably not been adequately tested,
-  and no guarantee is made that they are accurate. Boolean.
+%\item[CALC\_DERIV] Boolean variable that determines whether the
+%  derivatives of the energies with respect to the various parameters
+%  (vibrational frequencies, coupling constants, etc.) should be
+%  calculated. The calculation of the derivatives of the eigenvalues with
+%  respect to the parameters has probably not been adequately tested,
+%  and no guarantee is made that they are accurate. Boolean.
   
   \item[USE\_KAPPA\_ETA] Boolean variable that is true if $\kappa$ (KAPPA) and 
   $\eta$ (ETA) will be used for the linear and quadratic Jahn-Teller coupling
   terms instead of D and K. This is false by default and may be left out of the
   input file if D and K are to be used. There is a simple relationship between
-  $kappa$ and $eta$ and D and K which was derived by John Stanton. Within
-  \socjttwo these are converted to D and K. This is purely a matter of user convenience
-  when $kappa$ and $eta$ would be easier to use. Boolean.
+  $\kappa$ and $\eta$ and D and K which was derived by John Stanton. Within
+  \socjttwo\ these are converted to D and K. This is purely a matter of user convenience
+  when $\kappa$ and $\eta$ would be easier to use. Boolean.
 
 \item[s1] Value of s$_1$ according to equation (\ref{se and sv
     selection rule}). This choice has no bearing on the calculated
@@ -665,7 +658,6 @@ the input file. The default values are
   FIT_WEXE = FALSE
   ISATYPE = FALSE
   MODEA_OMEGA = 0.0
-  MODEZETA = 0.0
   /
 \end{verbatim}
 
@@ -720,9 +712,9 @@ If using USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MO
   electronic spectra, and in the files generated to produce
   simulations of these spectra. Real, \wn .
 
-\item[MODEZETA] The Coriolis coupling constant for this vibrational
-  mode, used only in the calculation of the Coriolis coupling constant
-  for the (spin-)vibronic level. Dimensionless, real.
+%\item[MODEZETA] The Coriolis coupling constant for this vibrational
+%  mode, used only in the calculation of the Coriolis coupling constant
+%  for the (spin-)vibronic level. Dimensionless, real.
 
 \end{description}
 
@@ -749,15 +741,12 @@ specified tolerance.
 
 For the simple Lanczos routine K\_FACTOR is not used and the other parameters described above
 have slightly different uses. NOITS is the number of Lanczos iterations run, and therefore, the
-size of the Lanczos matrix generated. This routine does not use any orthogonalization so some
+size of the Lanczos matrix generated. This routine uses numerically stable versions of the Lanczos recursions (CITE CULLUM) but does not use any orthogonalization so some
 eigenvalues will be repeats and others will be spurious values which do not correspond to actual
-eigenvalues of the Hamiltonian. These duplicate and spurious values are removed after diagonalization
-by a test. For this reason the M used should be larger than the number of eigenvalues actually
-desired. How much larger depends on the number of iterations as more spurious and duplicate
-eigenvalues will be generated as more iterations are run. TOL for the simple Lanczos is used
+eigenvalues of the Hamiltonian. These duplicate and spurious values are removed after diagonalization. M is the same as for the block routine and specifies how many eigenvalues should be calculated. TOL for the simple Lanczos is used
 in the test to remove duplicate and spurious eigenvalues. Any eigenvalue within TOL of another
 is removed as a duplicate and this is the same test used to remove spurious values. A value
-of 10$^{-6}$ works for most cases but it may be necessary to use a smaller value.
+of 10$^{-6}$ works for most cases but it may be necessary to use a smaller value. This test may cause eigenvalues which are degenerate within TOL with another eigenvalue of the same symmetry to be wrongly discarded. This is unfortunately unavoidable since we are using the Cullum test to remove spurious eigenvalues.
 
 Defaults are
 
@@ -765,8 +754,8 @@ Defaults are
  &SOLVE_INFO
   M = 10
   K_FACTOR = 2
-  NOITS = 10000
-  TOL = 0.0001
+  NOITS = 2000
+  TOL = 0.000001
   PARVEC = 1
   PARMAT = 1
   PARJ = 2
@@ -794,9 +783,9 @@ Defaults are
 
 \item[TOL] This is the relative tolerance to which
   the eigenvalues are found, such that $\frac{\Delta \epsilon
-    }{\epsilon } < $TOL. A value of TOL less than 0.0001 is highly
+    }{\epsilon } < $TOL. A value of TOL less than 0.000001 is highly
   recommended, as this will, in general, result in energies calculated
-  to within 1 \wn . For the simple Lanczos a value not larger than 10$^(-6)$
+  to within 0.1 \wn . For the simple Lanczos a value not larger than 10$^{-6}$
   should be used. Real.
   
 \item[PARVEC] This is the degree of parallelization to be used in
