@@ -312,8 +312,8 @@ namespace ConsoleApplication1
             parJ = 2;
             M = 5;
             kFactor = 2;
-            noIts = 10000;
-            tol = 0.0001;
+            noIts = 2000;
+            tol = 0.000001;
             fTol = 0.0;
             xTol = 0.0;
             gTol = 0.0;
