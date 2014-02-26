@@ -226,7 +226,6 @@ namespace ConsoleApplication1
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
-                //this tells how much time has passed this could be used to time out different parts of code      
 
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.parJ;
@@ -236,14 +235,7 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-                        /*
-                        int tempDynVar2 = -1 * dynVar2;                        
-                        if (i == jBasisVecsByJ.Count - dynVar1 - 1)
-                        {
-                            //try this to see if this makes it so that all of the proper symmetry basis functions are included in the j = 1.5 blocks
-                            tempDynVar2 -= 1;
-                        }
-                        */
+
                         //for (int v = tempDynVar2; v <= dynVar2; v++)
                         for (int v = -dynVar2; v <= dynVar2; v++)                        
                         {
@@ -257,19 +249,18 @@ namespace ConsoleApplication1
                                 throw new MatrixFileError();
                             }
                         }
-                        //made specialHam matrix the default and not optional
+                        //if matrices aren't made then generate all of them
                         if (!matricesMade)
                         {
                             fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
                         }                        
-                        else//this makes sure that the diagonal portion is regenerated on each call.
+                        else//If they are made then just generate the diagonal elements.
 	                    {
                             fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                    }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
                         numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
-                        //checks to make sure that
                         if (numcolumnsA[i - jBasisVecsByJ.Count / 2] < input.M)
                         {
                             a.Add(0);
@@ -588,7 +579,7 @@ namespace ConsoleApplication1
             StringBuilder vecFile = new StringBuilder();
             vecFile.AppendLine("VecFile " + input.title);
             vecFile.AppendLine(" ");
-            for (int m = 0; m < zMatrices.Count; m++)
+            for (int m = 0; m < zMatrices.Count; m++)◘
             {
                 vecFile.AppendLine("*************************************");
                 vecFile.AppendLine(" ");
