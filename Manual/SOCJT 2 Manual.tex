@@ -978,74 +978,126 @@ cause errors.
 \subsection{Output of \socjttwo }
 
 The description of the output file uses as its example the output of
-the {\tt test1} input file contained in the file
+the {\tt test} input file contained in the file
 distribution. Hopefully the examples and accompanying descriptions are
 sufficient to explain the output. The name of the output file is {\tt
   filename.out}, where {\tt filename} is the name of the input file.
 
 \subsubsection{Preamble}
 
-The output of the main program \socjttwo begins with the time the
-calculation began,
+The output of the main program \socjttwo begins with the \&GENERAL and \&MODE\_INFO and all other relavent namelist groups
+from the input file. 
+
+This is immediately followed by a time report for the matrix generation and Lanczos routine. These times represent the total time for the Hamiltonian generation function and Lanczos routines for all $j$-blocks.
+
 \begin{verbatim}
- It is 171236.280 on 19990805
+Time Report:
+Matrix generation took       0.14 seconds.
+The Lanczos routines took       1.94 seconds.
 \end{verbatim}
-The time is given in the form {\tt hhmmss.\#\#\#} to signify the
-hour, minute, seconds, and fraction of a second. The date is given in
-the form {\tt yyyymmdd} for the year, month, and day.
 
-Following a header, the \&GENERAL and \&MODE\_INFO namelist groups
-from the input file are given. Some additional information regarding
-the input parameters and PES are tabulated:
-\begin{verbatim}
- A*zeta_e =      -25.347877587660860
- Parameters for each Jahn-Teller active mode:
- Mode #  V(min)   V(max)     Omega(E)    wexe    D       K        JTSE  Omega(A)
- 
-  1        0        5         573.00      .00    .023    .010    13.18    585.00
-  2        0       10         263.00      .00    .435    .000   114.40    239.00
- 
- Total linear Jahn-Teller Stabilization energy =   127.58
- Total quadratic Jahn-Teller Stabilization energy =      .13
- Total linear JTSE including spin-orbit coupling =   108.94
-\end{verbatim}
-The numbering of the modes in the table are based on the order of the
-\&MODE\_INFO namelist groups in the input file. The numbering given in
-the table will be the numbering of the vibrational modes for the rest
-of the output file.
+%The numbering of the modes in the table are based on the order of the
+%\&MODE\_INFO namelist groups in the input file. The numbering given in
+%the table will be the numbering of the vibrational modes for the rest
+%of the output file.
 
-The column of the table entitled {\tt JTSE} is the Jahn-Teller
-stabilization energy for the mode; i.e., it is the energy of equation
-(\ref{def of epsilon1}), and does not include the effects of
-spin-orbit or quadratic \JT\ coupling.
+%The column of the table entitled {\tt JTSE} is the Jahn-Teller
+%stabilization energy for the mode; i.e., it is the energy of equation
+%(\ref{def of epsilon1}), and does not include the effects of
+%spin-orbit or quadratic \JT\ coupling.
 
-The next few lines regurgitate the remaining input namelist groups, 
- \&IO\_INFO, \&SOLVE\_INFO, \&SPECTRA, and all of the \&UV\_INFO
- groups. 
 
-Lastly, a few sentences summarize the type of calculation being
-performed,
-\begin{verbatim}
- Quadratic JT Program
- Spin-orbit being added
-\end{verbatim}
 
 \subsubsection{Each $j$ block}
 
 At this point, the output begins to cycle through all of the blocks of
-the Hamiltonian, beginning with $j=\frac12 $ and working up to
+the Hamiltonian, beginning with $j=\frac{1}{2} $ and working up to
 $maxj$. Each block is begun by a header, such as
 \begin{verbatim}
- ********************
- ********************
- **                **
- **     J =  .5    **
- **  Sigma =  -.5  **
- **                **
- ********************
- ********************
+ 
+J = 0.5
+Sigma = -0.5
+ 
 \end{verbatim}
-followed by the number of basis functions in this block.
+
+\paragraph{Eigenvalues}
+This is followed by the eigenvalues for this $j$-block listed in ascending order.
+
+\begin{verbatim}
+
+	-4496.0158
+	-3753.9625
+	-3327.7389
+	-3149.8039
+	-3011.9181
+	-2589.5634
+	-2407.2378
+	-2313.2245
+	-2269.8802
+	-1949.2045
+	-1855.8557
+	-1850.9386
+	-1664.3674
+	-1562.2320
+	-1527.8450
+	-1207.4203
+	-1166.3317
+	-1113.0771
+	-1111.8316
+	 -921.2819
+	 
+\end{verbatim}
+
+And then the number of basis functions, nonzero matrix elements and how many iterations the Lanczos routine took.
+
+\begin{verbatim}
+ 
+Number of basis functions: 2211
+Number of non-zero matrix elements: 19711
+ 
+Lanczos routine took 2500 iterations to complete.
+
+\end{verbatim}
+
+\paragraph{Eigenvectors}
+The eigenvectors are listed next. The eigenvalue is listed in the first line and then the coefficient minimum is stated. The next line says "Vector is Type" and then either a 1 or 2. This refers to the symmetry of the eigenvector with respect to the sign of the coefficients of basis functions with the same values of v but values of l and lambda differing by a factor of -1. If the coefficients have the same sign it is listed as Type 1, and if they have opposite sign it is listed as Type 1. This is primarily useful in the $j$-blocks with $a_1/a_2$ symmetry since they will be Type 1 and Type 2 respectively. This determination is made by finding the largest coefficient in the eigenvector and then finding its 'partner,' which is the basis function with all angular momentum terms having an opposite sign. The signs of these two basis functions are used for the determination. I have probably not tested this as well as I ought to have but it seems to have been correct so far.
+
+\begin{verbatim}
+ 
+Eigenvalue	1 = -4496.0158 
+
+Eigenvector: (Only vectors with coefficients larger than 0.1 are shown)
+ 
+Vector is Type 2
+ 
+Coefficient	v(1)	l(1)	v(2)	l(2) lambda	
+ -0.125926	  0	  	0	  	2	 	-2	  -1	
+  0.149059	  0	  	0	  	3	 	-3	   1	
+ -0.201217	  0	  	0	  	4	 	-2	  -1	
+  0.194645	  0	  	0	  	5	 	-3	   1	
+ -0.199012	  0	  	0	  	6	 	-2	  -1	
+  0.168118	  0	  	0	  	7	 	-3	   1	
+ -0.148091	  0	  	0	  	8	 	-2	  -1	
+  0.113444	  0	  	0	  	9	 	-3	   1	
+ -0.163008	  0	  	0	  	1	  	1	  -1	
+  0.232706	  0	  	0	  	2	  	0	   1	
+ -0.268804	  0	  	0	  	3	  	1	  -1	
+  0.287202	  0	  	0	  	4	  	0	   1	
+ -0.275230	  0	  	0	  	5	  	1	  -1	
+  0.251192	  0	  	0	  	6	  	0	   1	
+ -0.212858	  0	  	0	  	7	  	1	  -1	
+  0.174573	  0	  	0	  	8	  	0	   1	
+ -0.135180	  0	  	0	  	9	  	1	  -1	
+  0.102294	  0	  	0	  	10	  	0	   1	
+  0.109817	  0	  	0	  	3	  	3	   1	
+ -0.118085	  0	  	0	  	4	  	4	  -1	
+  0.158248	  0	  	0	  	5	  	3	   1	
+ -0.143477	  0	  	0	  	6	  	4	  -1	
+  0.145425	  0	  	0	  	7	  	3	   1	
+ -0.116949	  0	  	0	  	8	  	4	  -1	
+  0.102188	  0	  	0	  	9	  	3	   1
+
+\end{verbatim}
 
 \paragraph{Basis set}
 The next section of the output is the listing of each basis function
@@ -1053,12 +1105,13 @@ included in this block of the Hamiltonian, and is only printed if the
 value of $print\_basis$ has been set to {\tt .true.}. The output is of
 the form
 \begin{verbatim}
-Basis Fxn #  v(1)  l(1)  v(2)  l(2)  Lam  2*Sig
- 
-     1         0     0     1     1     1    -1
-     2         0     0     3     1     1    -1
-     3         0     0     5     1     1    -1
-     4         0     0     7     1     1    -1
+Basis Fxn #	v(1)	l(1)	v(2)	l(2)	lambda	Sigma	
+	1	  0	  0	  14	-14	  -1	-0.5	
+	2	  1	  0	  14	-14	  -1	-0.5	
+	3	  2	  0	  14	-14	  -1	-0.5	
+	4	  3	  0	  14	-14	  -1	-0.5	
+	5	  4	  0	  14	-14	  -1	-0.5
+	...	
 \end{verbatim}
 and continues through all of the basis functions. The columns give the
 principal quantum number $v_i$ and the vibrational angular quantum
