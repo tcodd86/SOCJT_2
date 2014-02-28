@@ -132,7 +132,7 @@ namespace ConsoleApplication1
                         }
                         if (inputF[u] == "MODED")
                         {
-                            nD = FileInfo.parseDouble(inputF[u + 1]);
+                            D = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEK")
