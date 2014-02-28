@@ -27,18 +27,18 @@ namespace ConsoleApplication1
         /// <summary>
         /// Value of spin
         /// </summary>
-        //private decimal nS;
+        private decimal _S;
         public decimal S
         {
-            get { return S; } 
+            get { return _S; } 
             private set
             {
                 //check that spin is integer or half integer only
-                if (S % 0.5M != 0M)
+                if (value % 0.5M != 0M)
                 {
                     throw new InvalidInput("S");
                 }
-                S = value;
+                _S = value;
             } 
         }
 
@@ -55,32 +55,34 @@ namespace ConsoleApplication1
         /// <summary>
         /// Maximum value of j to use in the basis set
         /// </summary>
+        private decimal _maxJ;
         public decimal maxJ
         {
-            get { return maxJ; }
+            get { return _maxJ; }
             set 
             {
-                if (maxJ % 0.5M != 0M)
+                if (value % 0.5M != 0M)
                 {
                     throw new InvalidInput("MAXJ");
                 }
-                maxJ = value;
+                _maxJ = value;
             }
         }
 
         /// <summary>
         /// Minimum value of j that should be used in calculations
         /// </summary>
+        private decimal _minJ;
         public decimal minJ
         {
-            get { return minJ; }
+            get { return _minJ; }
             set
             {
-                if (minJ % 0.5M != 0M)
+                if (value % 0.5M != 0M)
                 {
                     throw new InvalidInput("MINJ");
                 }
-                minJ = value;
+                _minJ = value;
             }
         }
 
@@ -92,32 +94,34 @@ namespace ConsoleApplication1
         /// <summary>
         /// Value of S1
         /// </summary>
+        private int _S1;
         public int S1
         {
-            get { return S1; }
+            get { return _S1; }
             set
             {
-                if (S1 != 0 || S1 != 1)
+                if (value != 0 && value != 1)
                 {
                     throw new InvalidInput("S1");
                 }
-                S1 = value;
+                _S1 = value;
             }
         }
 
         /// <summary>
         /// Value of S2
         /// </summary>
+        private int _S2;
         public int S2
         {
-            get { return S2; }
+            get { return _S2; }
             set
             {
-                if (S2 != 0 || S2 != 1)
+                if (value != 0 && value != 1)
                 {
                     throw new InvalidInput("S2");
                 }
-                S2 = value;
+                _S2 = value;
             }
         }
 
