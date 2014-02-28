@@ -16,14 +16,28 @@ namespace ConsoleApplication1
         public double modeOmega
         {
             get { return nModeOmega; }
-            set { nModeOmega = value; }
+            set 
+            {
+                if (value < 0.0)
+                {
+                    throw new InvalidInput("omega");
+                }                
+                nModeOmega = value; 
+            }
         }//end property modeOmega
 
         private double nD;
         public double D
         {
             get { return nD; }
-            set { nD = value; }
+            set 
+            {
+                if (value < 0.0)
+                {
+                    throw new InvalidInput("D (linear JT constant)");
+                }
+                nD = value; 
+            }
         }//end property D
 
         private double nK;
@@ -44,6 +58,14 @@ namespace ConsoleApplication1
         public int modeVMax
         {
             get { return nmodeVMax; }
+            private set
+            {
+                if (value < 0)
+                {
+                    throw new InvalidInput("MODEVMAX");
+                }
+                nmodeVMax = value;
+            }
         }//end property modeVMax
 
         private bool nfitOmega;
@@ -127,7 +149,7 @@ namespace ConsoleApplication1
                     {
                         if (inputF[u] == "MODEOMEGA")
                         {
-                            nModeOmega = FileInfo.parseDouble(inputF[u + 1]);
+                            modeOmega = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODED")
@@ -137,17 +159,17 @@ namespace ConsoleApplication1
                         }
                         if (inputF[u] == "MODEK")
                         {
-                            nK = FileInfo.parseDouble(inputF[u + 1]);
+                            K = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEWEXE")
                         {
-                            nwExe = FileInfo.parseDouble(inputF[u + 1]);
+                            wExe = FileInfo.parseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEVMAX")
                         {
-                            nmodeVMax = Convert.ToInt32(inputF[u + 1]);
+                            modeVMax = Convert.ToInt32(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEA_OMEGA")
