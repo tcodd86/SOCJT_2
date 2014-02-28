@@ -90,11 +90,13 @@ namespace ConsoleApplication1
                     }
                 }
 
+                /*
                 //check that spin is integer or half integer only
                 if (input.S % 0.5M != 0M)
                 {
                     throw new SpinInvalidException();
                 }
+                */
 
                 //initialize the modes
                 List<ModeInfo> Modes = ModeInitialization(inputFile, input);
@@ -288,9 +290,9 @@ namespace ConsoleApplication1
                 Console.Write(a.eMessage);
                 Console.ReadLine();
             }
-            catch (SpinInvalidException)
+            catch (InvalidInput a)
             {
-                Console.WriteLine("S has an incorrect value.  S must be either integer or half integer.");
+                Console.WriteLine(a.eMessage);
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }

@@ -579,7 +579,7 @@ namespace ConsoleApplication1
             StringBuilder vecFile = new StringBuilder();
             vecFile.AppendLine("VecFile " + input.title);
             vecFile.AppendLine(" ");
-            for (int m = 0; m < zMatrices.Count; m++)◘
+            for (int m = 0; m < zMatrices.Count; m++)
             {
                 vecFile.AppendLine("*************************************");
                 vecFile.AppendLine(" ");
