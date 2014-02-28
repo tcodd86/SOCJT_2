@@ -43,7 +43,7 @@ namespace ConsoleApplication1
         public string eMessage { get; private set; }
         public InvalidInput(string Mess)
         {
-            eMessage = Mess + " has an invalid value. Please check your input file.\n S, MAXJ, and MINJ must be integer or half integer.";
+            eMessage = Mess + " has an invalid value. Please check your input file.";
         }
     }
 
