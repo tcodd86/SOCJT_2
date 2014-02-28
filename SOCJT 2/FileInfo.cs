@@ -17,7 +17,16 @@ namespace ConsoleApplication1
         /// <summary>
         /// Number of modes in the calculation
         /// </summary>
-        public int nModes { get; private set; }
+        private int _nModes;
+        public int nModes 
+        {
+            get { return _nModes; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "NMODES");
+                _nModes = value;
+            }
+        }
 
         /// <summary>
         /// Title of the calculations
@@ -61,7 +70,8 @@ namespace ConsoleApplication1
             get { return _maxJ; }
             set 
             {
-                if (value % 0.5M != 0M)
+                NonnegativeCheck(value, 0M, "MAXJ");
+                if (value % 0.5M != 0M || value < 0.5M)
                 {
                     throw new InvalidInput("MAXJ");
                 }
@@ -78,6 +88,7 @@ namespace ConsoleApplication1
             get { return _minJ; }
             set
             {
+                NonnegativeCheck(value, 0M, "MINJ");
                 if (value % 0.5M != 0M)
                 {
                     throw new InvalidInput("MINJ");
@@ -163,22 +174,58 @@ namespace ConsoleApplication1
         /// <summary>
         /// Number of eigenvalues/eigenvectors to find
         /// </summary>
-        public int M { get; private set; }
+        private int _M;
+        public int M 
+        {
+            get { return _M; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "M");
+                _M = value;
+            }
+        }
 
         /// <summary>
         /// Size of block (number of columns) in Block Lanczos
         /// </summary>
-        public int kFactor { get; private set; }
+        private int _kFactor;
+        public int kFactor 
+        {
+            get { return _kFactor; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "K_FACTOR");
+                _kFactor = value;
+            }
+        }
 
         /// <summary>
         /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
         /// </summary>
-        public int noIts { get; private set; }
+        private int _noIts;
+        public int noIts 
+        {
+            get { return _noIts; }
+            private set 
+            { 
+                NonnegativeCheck(value, 0, "NOITS");
+                _noIts = value;
+            }
+        }
 
         /// <summary>
         /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
         /// </summary>
-        public double tol { get; private set; }
+        private double _tol;
+        public double tol 
+        {
+            get { return _tol; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "TOL");
+                _tol = value;
+            }
+        }
 
         /// <summary>
         /// Name of the fit file to be used for a fit.
@@ -188,27 +235,72 @@ namespace ConsoleApplication1
         /// <summary>
         /// F-Tolerance value for LM optimization
         /// </summary>
-        public double fTol { get; private set; }
+        private double _fTol;
+        public double fTol 
+        {
+            get { return _fTol; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "FTOL");
+                _fTol = value;
+            }
+        }
 
         /// <summary>
         /// X-Tolerance value for LM optimization
         /// </summary>
-        public double xTol { get; private set; }
+        private double _xTol;
+        public double xTol
+        {
+            get { return _xTol; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "XTOL");
+                _xTol = value;
+            }
+        }
 
         /// <summary>
         /// G-Tolerance value for LM optimization
         /// </summary>
-        public double gTol { get; private set; }
+        private double _gTol;
+        public double gTol
+        {
+            get { return _gTol; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "GTOL");
+                _gTol = value;
+            }
+        }
         
         /// <summary>
         /// Max number of iterations (steps) in the LM optimizer
         /// </summary>
-        public int maxFev { get; private set; }
+        private int _maxFev;
+        public int maxFev
+        {
+            get { return _maxFev; }
+            private set 
+            {
+                NonnegativeCheck(value, 0, "MAXFEV");
+                _maxFev = value;
+            }
+        }
 
         /// <summary>
         /// Factor used for step size in LM optimizer
         /// </summary>
-        public double factor { get; private set; }
+        private double _factor;
+        public double factor
+        {
+            get { return _factor; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "FACTOR");
+                _factor = value;
+            }
+        }
 
         /// <summary>
         /// True if there are cross-terms in the Hamiltonian
@@ -223,7 +315,16 @@ namespace ConsoleApplication1
         /// <summary>
         /// Number of steps to run in a scan
         /// </summary>
-        public int steps { get; set; }
+        private int _steps;
+        public int steps
+        {
+            get { return _steps; }
+            set
+            {
+                NonnegativeCheck(value, 0, "SCAN STEPS");
+                _steps = value;
+            }
+        }
 
         /// <summary>
         /// How long (in seconds) the Hamiltonian generation took.
@@ -238,22 +339,58 @@ namespace ConsoleApplication1
         /// <summary>
         /// How much to parallelize the Hamiltonian matrix generation
         /// </summary>
-        public int parMat { get; private set; }
+        private int _parMat;
+        public int parMat
+        {
+            get { return _parMat; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "PARMAT");
+                _parMat = value;
+            }
+        }
 
         /// <summary>
         /// How much to parallelize the matrix vector multiplication
         /// </summary>
-        public int parVec { get; private set; }
+        private int _parVec;
+        public int parVec
+        {
+            get { return _parVec; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "PARVEC");
+                _parVec = value;
+            }
+        }
 
         /// <summary>
         /// How many j-blocks should be run in parallel
         /// </summary>
-        public int parJ { get; private set; }
+        private int _parJ;
+        public int parJ
+        {
+            get { return _parJ; }
+            private set
+            {
+                NonnegativeCheck(value, 0, "PARJ");
+                _parJ = value;
+            }
+        }
 
         /// <summary>
         /// Minimum value of coefficients to print in eigenvectors
         /// </summary>
-        public double evMin { get; private set; }
+        private double _evMin;
+        public double evMin
+        {
+            get { return _evMin; }
+            private set
+            {
+                NonnegativeCheck(value, 0.0, "EVMIN");
+                _evMin = value;
+            }
+        }
 
         /// <summary>
         /// True if SO coupling is nonzero
@@ -809,6 +946,29 @@ namespace ConsoleApplication1
             catch
             {
                 throw new InvalidInput("A numerical item");
+            }
+        }
+
+        /// <summary>
+        /// To save me from writing negative value checks for every single parameter.
+        /// </summary>
+        /// <typeparam name="T">
+        /// Anyhing implementing the IComparable Interface
+        /// </typeparam>
+        /// <param name="val">
+        /// Parameter to be checked.
+        /// </param>
+        /// <param name="zero">
+        /// Value to be checked against. Should be zero of the same type as val
+        /// </param>
+        /// <param name="s">
+        /// String representation of the parameter so that if an error is thrown a description can be given.
+        /// </param>
+        public static void NonnegativeCheck<T>(T val, T zero, string s) where T : IComparable<T>
+        {
+            if (val.CompareTo(zero) < 0)
+            {
+                throw new InvalidInput(s);
             }
         }
     }//class FileInfo
