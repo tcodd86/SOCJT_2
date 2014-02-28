@@ -28,7 +28,19 @@ namespace ConsoleApplication1
         /// Value of spin
         /// </summary>
         //private decimal nS;
-        public decimal S { get; private set; }
+        public decimal S
+        {
+            get { return S; } 
+            private set
+            {
+                //check that spin is integer or half integer only
+                if (S % 0.5M != 0M)
+                {
+                    throw new InvalidInput("S");
+                }
+                S = value;
+            } 
+        }
 
         /// <summary>
         /// Value of a*zeta, the SO coupling constant
@@ -43,12 +55,34 @@ namespace ConsoleApplication1
         /// <summary>
         /// Maximum value of j to use in the basis set
         /// </summary>
-        public decimal maxJ { get; set; }
+        public decimal maxJ
+        {
+            get { return maxJ; }
+            set 
+            {
+                if (maxJ % 0.5M != 0M)
+                {
+                    throw new InvalidInput("MAXJ");
+                }
+                maxJ = value;
+            }
+        }
 
         /// <summary>
         /// Minimum value of j that should be used in calculations
         /// </summary>
-        public decimal minJ { get; private set; }
+        public decimal minJ
+        {
+            get { return minJ; }
+            set
+            {
+                if (minJ % 0.5M != 0M)
+                {
+                    throw new InvalidInput("MINJ");
+                }
+                minJ = value;
+            }
+        }
 
         /// <summary>
         /// True if min J is user specified
@@ -58,12 +92,34 @@ namespace ConsoleApplication1
         /// <summary>
         /// Value of S1
         /// </summary>
-        public int S1 { get; private set; }
+        public int S1
+        {
+            get { return S1; }
+            set
+            {
+                if (S1 != 0 || S1 != 1)
+                {
+                    throw new InvalidInput("S1");
+                }
+                S1 = value;
+            }
+        }
 
         /// <summary>
         /// Value of S2
         /// </summary>
-        public int S2 { get; private set; }
+        public int S2
+        {
+            get { return S2; }
+            set
+            {
+                if (S2 != 0 || S2 != 1)
+                {
+                    throw new InvalidInput("S2");
+                }
+                S2 = value;
+            }
+        }
 
         /// <summary>
         /// True if the basis set should be printed in the output file.
@@ -721,7 +777,14 @@ namespace ConsoleApplication1
         /// </returns>
         public static double parseDouble(string s)
         {
-            return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+            try
+            {
+                return Double.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+            }
+            catch
+            {
+                throw new InvalidInput("A numerical item");
+            }
         }
 
         /// <summary>
@@ -735,7 +798,14 @@ namespace ConsoleApplication1
         /// </returns>
         public static decimal parseDecimal(string s)
         {
-            return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+            try
+            {
+                return Decimal.Parse(s, NumberStyles.AllowExponent | NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint);
+            }
+            catch
+            {
+                throw new InvalidInput("A numerical item");
+            }
         }
     }//class FileInfo
 }//end namespace
