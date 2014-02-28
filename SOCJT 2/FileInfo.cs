@@ -760,7 +760,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// True if the string is T or TRUE, false if not
         /// </returns>
-        private static bool TorF(string val)
+        public static bool TorF(string val)
         {
             bool trfa = false;
             if (val.ToUpper() == "T" || val.ToUpper() == "TRUE")
