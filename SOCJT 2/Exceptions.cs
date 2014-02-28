@@ -38,11 +38,12 @@ namespace ConsoleApplication1
         }
     }
 
-    class SpinInvalidException : ApplicationException
+    class InvalidInput : ApplicationException
     {
-        public SpinInvalidException()
-        { 
-            //empty body
+        public string eMessage { get; private set; }
+        public InvalidInput(string Mess)
+        {
+            eMessage = Mess + " has an invalid value. Please check your input file.\n S, MAXJ, and MINJ must be integer or half integer.";
         }
     }
 
