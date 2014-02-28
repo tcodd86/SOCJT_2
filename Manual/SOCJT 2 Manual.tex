@@ -539,30 +539,27 @@ Within each \&NAMELIST the input variables are assigned their initial
 values, and separated by returns, spaces or tabs. Each \&NAMELIST group is separated from
 the previous by a '/'. C$\sharp$ does not suffer the same weaknesses of FORTRAN for file I/O
 so the number of spaces and alignment of decimals for the input parameters is unimportant.
-Where a boolean value is required \socjttwo\ checks for a T or TRUE (in upper or lower case)
-and if that is not found the default value of FALSE is used. Any input files for \socjt\ will work
-with \socjttwo\ however there are some capabilities in \socjt not included in \socjttwo\ such as 
+Where a boolean value is required \socjttwo\ checks for a {\tt T} or {\tt TRUE} (in upper or lower case)
+and if that is not found the default value of {\tt FALSE} is used. Any input files for \socjt\ will work
+with \socjttwo. However, there are some capabilities in \socjt\ not included in \socjttwo\ such as 
 computation of spectra and those sections will be ignored. The order of the variables in
 the \&NAMELIST does not matter, nor does the order of the \&NAMELIST
-groups in the input file itself.
+groups in the input file itself. Order only comes into play for the {\tt \&MODE\_INFO} namelists as they will be labeled numerically based upon their order in the input file.
 
 The \&NAMELIST groups are separated by their function. There will be one each of
-\&GENERAL, \&SOLVE\_INFO and \&IO\_INFO. There will be as many \&MODE\_INFO groups as there are active modes
-(specified by the variable $nmodes$ in \&GENERAL). If any group is not included,
-a default set of parameters will be used. The \&FIT\_INFO, \&SCAN and \&CROSS\_TERMS 
-are only necessary to include when needed. Likewise, if more than one
-\&NAMELIST group is included in the input file, only the first will be
-used. 
+{\tt \&GENERAL}, {\tt \&SOLVE\_INFO} and {\tt \&IO\_INFO}. There will be as many {\tt \&MODE\_INFO} groups as there are active modes
+(specified by the variable {\tt NMODES}  in {\tt \&GENERAL}). If any group is not included,
+a default set of parameters will be used. The {\tt \&FIT\_INFO}, {\tt \&SCAN} and {\tt \&CROSS\_TERMS} 
+may be left out when unneeded. If more than one
+\&NAMELIST group, except for {\tt \&MODE\_INFO}, is included in the input file the values from the second will overwrite the those from the first. 
 
-%BEWARE: There is only some error checking in the input file. It is
-%quite possible that the ``garbage in garbage out'' principle
-%applies. For example, values of ${\bf S}$ that are not either integer
-%or half-integer may cause the program to crash or give nonsensical
-%results.
-
+BEWARE: There is only some error checking in the input file. It is
+quite possible that the ``garbage in garbage out'' principle
+applies. The values which are explicitly checked for correctness are noted below in their description. Where a numerical value is needed, such as for {\tt AZETA}, a check is done to ensure that it is a number and if it is not, an error is thrown but there are no sanity checks to see that it is a physically reasonable value.
+\newpage
 \subsection{\&GENERAL}
 
-The \&GENERAL namelist group sets the general parameters for the
+The {\tt \&GENERAL} namelist group sets the general parameters for the
 calculation. The default values are
 
 \begin{verbatim}
@@ -592,7 +589,7 @@ calculation. The default values are
   zero, half-integer, or integer. This is checked and will throw an error if incorrect value is provided.
 
 \item[AZETA] The value of $a\zeta _e$ in a spin-orbit state. If
-  $a\zeta_e$ is zero, then the value of $S$ does not matter. Real.
+  $a\zeta_e$ is zero, then the value of {\tt S} does not matter. Real.
 
 \item[FIT\_AZETA] Whether or not to fit $a\zeta _e$ in the fitting
   routines. Boolean.
@@ -605,10 +602,8 @@ calculation. The default values are
   maximum value of $j$ for which the diagonalizations will be
   performed. For quadratic Jahn-Teller coupling calculations, this is
   the maximum value of $j$ to be included in the matrices. For
-  quadratic \JT\ coupling, maxj should be at least 7.5. This value
-  must be half-integer; if something else is used, I believe the
-  effective value becomes the closest half-integer value, rounding
-  down. Real.
+  quadratic \JT\ coupling, {\tt MAXJ} should be at least 7.5. This value
+  must be half-integer or an error will be thrown. Real.
 
 %\item[CALC\_DERIV] Boolean variable that determines whether the
 %  derivatives of the energies with respect to the various parameters
@@ -618,26 +613,24 @@ calculation. The default values are
 %  and no guarantee is made that they are accurate. Boolean.
   \item[FIT\_ORIGIN] Boolean variable to fit origin or not. For some spectra the uncertainty in the origin may be large relative to the uncertainty in the positions of the vibronic transitions. In these cases the origin may be fit to eliminate systematic error arising from an incorrect frequency. Boolean.
   
-  \item[ORIGIN] The offset of the origin relative to the assumed value used to generate the vibrational frequencies in the .fit file. Can also be used without fitting to make reported values match experimental values for excited electronic states by including te origin frequency. Real.
+  \item[ORIGIN] The offset of the origin relative to the assumed value used to generate the vibrational frequencies in the .fit file. Can also be used without fitting to make reported values match experimental values for excited electronic states by including the origin frequency. Real.
   
   
-  \item[USE\_KAPPA\_ETA] Boolean variable that is true if $\kappa$ (KAPPA) and 
-  $\eta$ (ETA) will be used for the linear and quadratic Jahn-Teller coupling
+  \item[USE\_KAPPA\_ETA] Boolean variable that is true if $\kappa$ ({\tt KAPPA}) and 
+  $\eta$ ({\tt ETA}) will be used for the linear and quadratic Jahn-Teller coupling
   terms instead of D and K. This is false by default and may be left out of the
   input file if D and K are to be used. There is a simple relationship between
   $\kappa$ and $\eta$ and D and K which was derived by John Stanton. Within
   \socjttwo\ these are converted to D and K. This is purely a matter of user convenience
   when $\kappa$ and $\eta$ would be easier to use. Boolean.
 
-\item[s1] Value of s$_1$ according to equation (\ref{se and sv
+\item[S1] Value of s$_1$ according to equation (\ref{se and sv
     selection rule}). This choice has no bearing on the calculated
   energies of the spin-vibronic levels, only the relative phases of
   the electronic and vibrational contributions to the Coriolis
-  coupling constant of each level. While the value should be either 0
-  or 1, any even or odd number will work as if they were 0 or 1,
-  respectively. Integer. 
+  coupling constant of each level. The value must be either 0 or 1. If any other value is used an error will be thrown. Integer. 
 
-\item[s2] Value of s$_2$ according to equation (\ref{se and sv
+\item[S2] Value of s$_2$ according to equation (\ref{se and sv
     selection rule}). See above, and section \ref{section:limitations}
   for a discussion of the limitations on this parameter.
 
@@ -645,10 +638,10 @@ calculation. The default values are
 
 \subsection{\&MODE\_INFO}
 
-For each vibrational mode, a \&MODE\_INFO must exist, otherwise
+For each vibrational mode, a {\tt \&MODE\_INFO} must exist, otherwise
 default parameters are used that will cause spurious results for the
-user. There must therefore be NMODES \&MODE\_INFO namelist groups in
-the input file. The default values are
+user. There must therefore be at least {\tt NMODES} {\tt \&MODE\_INFO} namelist groups in
+the input file. If there are more than {\tt NMODES} {\tt \&MODE\_INFO} namelist groups the extras will be ignored. The default values are
 
 \begin{verbatim}
  &MODE_INFO
@@ -666,7 +659,7 @@ the input file. The default values are
   /
 \end{verbatim}
 
-If USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MODEK, FIT\_D, and FIT\_K by the following.
+If {\tt USE\_KAPPA\_ETA = TRUE} in the {\tt \&GENERAL} section, then replace {\tt MODED}, {\tt MODEK}, {\tt FIT\_D}, and {\tt FIT\_K} by the following.
 
 \begin{verbatim}
   KAPPA = 0.0
@@ -679,10 +672,7 @@ If USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MODEK, F
 
 \item[MODEVMAX] Maximum value of v for this vibrational mode. In
   general, the lower the vibrational frequency and the larger the \JT\
-  coupling constants, the larger this number needs to be. In practice,
-  a value never less than 2 is useful, even for the modes with very
-  large frequencies and low coupling constants (such as C-H stretches
-  often are). Integer.
+  coupling constants, the larger this number needs to be.
 
 \item[MODEOMEGA] Vibrational frequency, in \wn , for the mode. Real.
 
@@ -691,7 +681,7 @@ If USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MODEK, F
 \item[MODED] Linear \JT\ coupling constant for the mode, as defined in
   equations (\ref{E min, no spin orbit}) to (\ref{E max, no spin
     orbit}). This value is usually considered to be positive. I have
-  not tested the effect of a negative value of $moded$ in the
+  not tested the effect of a negative value of {\tt MODED} in the
   program. Dimensionless, real.
 
 \item[MODEK] Quadratic \JT\ coupling constant for the mode, as
@@ -708,7 +698,7 @@ If USE\_KAPPA\_ETA = TRUE in the \&GENERAL section, then replace MODED, MODEK, F
   
 \item[ISATYPE] Boolean value to indicate if this mode is a degenerate (default) or
   nondegenerate (A type). If TRUE, then the mode is treated a nondegenerate for the purposes
-  of building the basis set and any values entered for D or K (ETA or KAPPA) are ignored. Boolean.
+  of building the basis set and any values entered for {\tt D} or {\tt K} ({\tt ETA} or {\tt KAPPA}) are ignored. Boolean.
 
 \item[MODEA\_OMEGA] The value of the vibrational frequency of this
   mode in the non-degenerate state to or from which electronic
