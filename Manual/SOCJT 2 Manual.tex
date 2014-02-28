@@ -672,17 +672,15 @@ If {\tt USE\_KAPPA\_ETA = TRUE} in the {\tt \&GENERAL} section, then replace {\t
 
 \item[MODEVMAX] Maximum value of v for this vibrational mode. In
   general, the lower the vibrational frequency and the larger the \JT\
-  coupling constants, the larger this number needs to be.
+  coupling constants, the larger this number needs to be. A negative value will throw an error.
 
-\item[MODEOMEGA] Vibrational frequency, in \wn , for the mode. Real.
+\item[MODEOMEGA] Vibrational frequency, in \wn , for the mode. A negative value will throw an error. Real.
 
 \item[MODEWEXE] Anharmonicity for the mode, in \wn . Real.
 
 \item[MODED] Linear \JT\ coupling constant for the mode, as defined in
   equations (\ref{E min, no spin orbit}) to (\ref{E max, no spin
-    orbit}). This value is usually considered to be positive. I have
-  not tested the effect of a negative value of {\tt MODED} in the
-  program. Dimensionless, real.
+    orbit}). This value is usually considered to be positive. A negative value will throw an error. Dimensionless, real.
 
 \item[MODEK] Quadratic \JT\ coupling constant for the mode, as
   defined in equations (\ref{E min, no spin orbit}) to (\ref{E max, no spin
@@ -715,7 +713,7 @@ If {\tt USE\_KAPPA\_ETA = TRUE} in the {\tt \&GENERAL} section, then replace {\t
 
 \subsection{\&SOLVE\_INFO}
 
-The \&SOLVE\_INFO namelist group contains parameters used in the
+The {\tt \&SOLVE\_INFO} namelist group contains parameters used in the
 diagonalization routines. In general, the default values should be
 adequate for the simple Lanczos routine, which is the default, except for M,
 which the user must choose. 
@@ -726,22 +724,22 @@ automatically. The benefits of this routine are that it is guaranteed to find al
 of the eigenvalues with no spurious values and if the eigenvectors are requested
 it does not take any extra time to do so.  The drawback of this routine is that it
 may take up to 100x longer than the simple Lanczos routine. For the block routine
-K\_FACTOR is the size of the blocks used, NOITS is the maximum number of iterations
-that will run and TOL is the tolerance used to define when an eigenpair has converged.
-When using the block routine, the runtime may be dependent upon K\_FACTOR and while
+{\tt K\_FACTOR} is the size of the blocks used, {\tt NOITS} is the maximum number of iterations
+that will run and {\tt TOL} is the tolerance used to define when an eigenpair has converged.
+When using the block routine, the runtime may be dependent upon {\tt K\_FACTOR} and while
 I have found 2 to be adequate in most cases a larger value may run faster.  For a 
-larger K\_FACTOR less iterations will be required but they will take longer.  The routine
-completes when either NOITS is exceeded or all eigenvalues requested converge to the 
+larger {\tt K\_FACTOR} less iterations will be required but they will take longer.  The routine
+completes when either {\tt NOITS} is exceeded or all eigenvalues requested converge to the 
 specified tolerance.
 
-For the simple Lanczos routine K\_FACTOR is not used and the other parameters described above
-have slightly different uses. NOITS is the number of Lanczos iterations run, and therefore, the
+For the simple Lanczos routine {\tt K\_FACTOR} is not used and the other parameters described above
+have slightly different uses. {\tt NOITS} is the number of Lanczos iterations run, and therefore, the
 size of the Lanczos matrix generated. This routine uses numerically stable versions of the Lanczos recursions (CITE CULLUM) but does not use any orthogonalization so some
 eigenvalues will be repeats and others will be spurious values which do not correspond to actual
-eigenvalues of the Hamiltonian. These duplicate and spurious values are removed after diagonalization. M is the same as for the block routine and specifies how many eigenvalues should be calculated. TOL for the simple Lanczos is used
-in the test to remove duplicate and spurious eigenvalues. Any eigenvalue within TOL of another
+eigenvalues of the Hamiltonian. These duplicate and spurious values are removed after diagonalization. {\tt M} is the same as for the block routine and specifies how many eigenvalues should be calculated. {\tt TOL} for the simple Lanczos is used
+in the test to remove duplicate and spurious eigenvalues. Any eigenvalue within {\tt TOL} of another
 is removed as a duplicate and this is the same test used to remove spurious values. A value
-of 10$^{-6}$ works for most cases but it may be necessary to use a smaller value. This test may cause eigenvalues which are degenerate within TOL with another eigenvalue of the same symmetry to be wrongly discarded. This is unfortunately unavoidable since we are using the Cullum test to remove spurious eigenvalues.
+of 10$^{-6}$ works for most cases but it may be necessary to use a smaller value. This test may cause eigenvalues which are degenerate within {\tt TOL} with another eigenvalue of the same symmetry to be wrongly discarded. This is unfortunately unavoidable since we are using the Cullum test to remove spurious eigenvalues.
 
 Defaults are
 
