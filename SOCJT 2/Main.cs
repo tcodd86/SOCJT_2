@@ -276,6 +276,12 @@ namespace ConsoleApplication1
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
+            catch (InvalidInput a)
+            {
+                Console.WriteLine(a.eMessage);
+                Console.WriteLine("Press enter to terminate the program.");
+                Console.ReadLine();
+            }
 #if !DEBUG
             catch (IndexOutOfRangeException)
             {
@@ -288,12 +294,6 @@ namespace ConsoleApplication1
             catch (BasisSetTooSmallException a)
             {
                 Console.Write(a.eMessage);
-                Console.ReadLine();
-            }
-            catch (InvalidInput a)
-            {
-                Console.WriteLine(a.eMessage);
-                Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }
             catch (AEAnharmonicTermException)
