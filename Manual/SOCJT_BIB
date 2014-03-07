@@ -1,0 +1,28 @@
+% This file was created with JabRef 2.9.2.
+% Encoding: Cp1252
+
+@ARTICLE{A-bar-e001,
+  author = {Timothy A. Barckholtz and Terry A. Miller},
+  title = {The calculation of spectroscopic Jahn-Teller parameters by ab initio
+	methods},
+  journal = {J. Phys. Chem. A},
+  year = {1999},
+  volume = {103},
+  pages = {2321-2336},
+  owner = {tcodd},
+  timestamp = {2014.03.05}
+}
+
+@ARTICLE{barckholtz,
+  author = {Timothy A. Barckholtz and Terry A. Miller},
+  title = {Quantitative insights about molecules exhibiting Jahn-Teller and
+	related effects},
+  journal = {International Reviews in Physical Chemistry},
+  year = {1998},
+  volume = {17},
+  pages = {435-524},
+  number = {4},
+  owner = {tcodd},
+  timestamp = {2012.07.05}
+}
+
