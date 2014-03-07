@@ -836,6 +836,9 @@ as how the eigenvectors should be printed. Defaults are
 \item[EV\_MIN] The minimum value of the weight for a basis function to be 
   printed in the eigenvectors. Double.
 
+\item[VEC\_FILE] If {\tt TRUE} a separate file with the eigenvectors will be created. The name of this file will be the {\tt \&TITLE} from the {\tt \&GENERAL} \&NAMESPACE plus ``\_vec.out'' This prints all coefficients, not just those larger than {\tt \&EV\_MIN}. Boolean.
+
+\item[VEC\_FILE\_COMPLETE] If {\tt TRUE} a file similar to that for {\tt VEC\_FILE} will be created. The difference is that the complete basis set is used in this output file. Since the Hamiltonian is block diagonal and many basis functions will never have nonzero values by symmetry typically only a portion of the possible basis functions are included in the calculation. However, in some cases it may be beneficial to have the entire basis set. I mostly used this for comparisons to John Stanton's \ai\ calculations. The name of this file will be the {\tt \&TITLE} from the {\tt \&GENERAL} \&NAMESPACE plus ``\_CompleteVector.out'' Boolean.
 \end{description}
 
 
@@ -885,7 +888,7 @@ the jacobian.
  be converged. See section \ref{section:fitting} for more
  information regarding these parameters. All real.
  
- More information for these can be found in the documentation for the Levenberg-Marquardt algorithm at ALGLIB.net.
+ More information for these can be found in the documentation for the Levenberg-Marquardt algorithm at ALGLIB.net.\cite{alglib}
 
 \item[MAXFEV] Maximum number of iterations for the fitting
   procedure. Integer.
@@ -964,7 +967,7 @@ cause errors.
 \subsection{Output of \socjttwo }
 
 The description of the output file uses as its example the output of
-the {\tt test} input file contained in the file
+the {\tt test.txt} input file contained in the file
 distribution. Hopefully the examples and accompanying descriptions are
 sufficient to explain the output. The name of the output file is {\tt
   filename.out}, where {\tt filename} is the name of the input file.
@@ -1048,7 +1051,7 @@ Lanczos routine took 2500 iterations to complete.
 \end{verbatim}
 
 \paragraph{Eigenvectors}
-The eigenvectors are listed next. The eigenvalue is listed in the first line and then the coefficient minimum is stated. The next line says {\tt Vector is Type} and then either the number 1 or 2. This refers to the symmetry of the eigenvector with respect to the sign of the coefficients of basis functions with the same values of v but values of l and lambda differing by a factor of -1. If the coefficients have the same sign it is listed as Type 1, and if they have opposite sign it is listed as Type 1. This is primarily useful in the $j$-blocks with $a_1/a_2$ symmetry since they will be Type 1 and Type 2 respectively. This determination is made by finding the largest coefficient in the eigenvector and then finding its 'partner,' which is the basis function with all v values the same and all angular momentum terms having an opposite sign. The signs of these two basis functions are used for the determination. I have probably not tested this as well as I ought to have but it seems to have been correct so far.
+The eigenvectors are listed next. The eigenvalue is listed in the first line and then the coefficient minimum is stated. The next line says {\tt Vector is Type} and then either the number 1 or 2. This refers to the symmetry of the eigenvector with respect to the sign of the coefficients of basis functions with the same values of v but values of l and lambda differing by a factor of -1. If the coefficients have the same sign it is listed as Type 1, and if they have opposite sign it is listed as Type 1. This is primarily useful in the $j$-blocks with $a_1/a_2$ symmetry since they will be Type 1 and Type 2 respectively. This determination is made by finding the largest coefficient in the eigenvector and then finding its `partner,' which is the basis function with all v values the same and all angular momentum terms having an opposite sign. The signs of these two basis functions are used for the determination. I have probably not tested this as well as I ought to have but it seems to have been correct so far.
 
 \begin{verbatim}
  
@@ -1105,7 +1108,7 @@ $\Sigma $.
 
 \paragraph{Hamiltonian matrix}
 After the basis set. This
-number is actually the number of non-zero matrix elements in the lower
+number is actually the number of non-zero matrix elements in the upper
 half of the matrix. If the value of {\tt PRINT\_MATRIX} has been set to
 {\tt TRUE} then all of the non-zero matrix elements will be printed
 out,
@@ -1132,8 +1135,7 @@ given indicating what the problem was. For the most part, the only
 error message that will be encountered in normal practice in the
 message indicating the maximum number of iterations was exceeded. In
 this case, the calculation should be resubmitted with a larger value
-of {\tt NOITS}. It may or may not help to include the eigenvalues and
-eigenvectors that were found as initial guesses. Even if an error was
+of {\tt NOITS}. Even if an error was
 encountered, the eigenvalues and eigenvectors for the solutions that
 were found will be listed.
 
@@ -1189,7 +1191,7 @@ The column for {\tt Symm} will only be included if either the Block Lanczos (Und
 \subsection{Fitting output}
 
 When the non-linear least squares routines are used, \socjttwo\ is
-executed at least once for each iteration of the fitting routine. Since numerical derivatives are calculated for each parameter being fit the \socjttwo\ routine may run many times for a given iteration. Secant updates are used to build a model of the Jacobian which is recalculated only when the model is found to be wrong. For more information see the documentation of the Levenberg-Marquardt optimizer at ALGLIB.net. At the end of
+executed at least once for each iteration of the fitting routine. Since numerical derivatives are calculated for each parameter being fit the \socjttwo\ routine may run many times for a given iteration. Secant updates are used to build a model of the Jacobian which is recalculated only when the model is found to be wrong. For more information see the documentation of the Levenberg-Marquardt optimizer at ALGLIB.net\cite{alglib}. At the end of
 the fitting, output similar to the following is generated:
 \begin{verbatim}
 Fit report below...
@@ -1239,29 +1241,29 @@ Correlation coefficient matrix:
 
 The termination type is listed as one of the stopping conditions being met which may be one of the tolerance values in the input file or the maximum number of iterations was reached. The number of iterations is actually the number of steps the optimizer took while the number of times the eigenvalues were calculated is how many times the main \socjttwo\ routine was run. In the event that the block Lanczos routine is not used and the eigenvectors are requested they will only be calculated at the end of the fit in order to save time. Additionally, the Hamiltonian is only generated once, at the first iteration, and then stored in such a way that it may be quickly regenerated by multiplying it by the appropriate parameter.
 
-The covariance matrix is estimated from the Jacobian and the uncertainties are taken as the square roots of the diagonal entries in the covariance matrix. This is also used to generate the correlation matrix. The rows and columns of this matrix follow the same order as the uncertainties.
+The covariance matrix is estimated from the Jacobian and the uncertainties of the best fit parameters are taken as the square roots of the diagonal entries in the covariance matrix. This is also used to generate the correlation matrix. The rows and columns of this matrix follow the same order as the uncertainties.
 
 Following this table, all of the namelist groups are printed with the
 final fit values, so that these lines can be copied into an input file
 and the program started from these values.
 
-\subsection{Auxiliary files} \label{section:outputaux}
+%\subsection{Auxiliary files} \label{section:outputaux}
 
-There are several additional files that may be generated by \socjt :
-{\tt filename.uv.\#.txt}, {\tt filename.basis.}$j.\Sigma $, and {\tt
-  filename.vecs.}$j\Sigma $. The filenames are constructed by
-appending brief notations to the {\tt filename} of the input file. For
-the electronic transition intensites, the files are numbered according
-to the \&UV\_INFO namelist groups. The basis set and vector files,
-used in subsequent calculations by \socjt\ (as guesses to the
-diagonalization routines) or by \etoe\ have a slightly more
-complicated format. Following the appendation of {\tt .basis.} or {\tt
-  .vecs.}, the value of $j$ is appended. If spin-orbit coupling was
-included in the calculation, a ``{\tt m}'' or ``{\tt p}'' is appended
-to indicate the sign of the value of $\Sigma $, which follows, for the
-basis set or eigenvectors that are being written. While cumbersome,
-these filenames allow for all of the required information to be stored
-in a useable format.
+%There are several additional files that may be generated by \socjt :
+%{\tt filename.uv.\#.txt}, {\tt filename.basis.}$j.\Sigma $, and {\tt
+%  filename.vecs.}$j\Sigma $. The filenames are constructed by
+%appending brief notations to the {\tt filename} of the input file. For
+%the electronic transition intensites, the files are numbered according
+%to the \&UV\_INFO namelist groups. The basis set and vector files,
+%used in subsequent calculations by \socjt\ (as guesses to the
+%diagonalization routines) or by \etoe\ have a slightly more
+%complicated format. Following the appendation of {\tt .basis.} or {\tt
+%  .vecs.}, the value of $j$ is appended. If spin-orbit coupling was
+%included in the calculation, a ``{\tt m}'' or ``{\tt p}'' is appended
+%to indicate the sign of the value of $\Sigma $, which follows, for the
+%basis set or eigenvectors that are being written. While cumbersome,
+%these filenames allow for all of the required information to be stored
+%in a useable format.
 
 
 \paragraph{Basis set and vector files}
@@ -1335,7 +1337,7 @@ If any of the parameters {\tt FIT\_AZETA}, {\tt FIT\_OMEGA}, {\tt FIT\_D}, {\tt 
 or {\tt FIT\_WEXE} are true, then the fitting routines will be executed. If
 they are all false, then the eigenvalues will be computed only once,
 and the program will be terminated. The fitting routines invoke a Levenberg-Marquardt
-non-linear least squares algorithm CITE ALGLIB to optimize the input parameters. The fitting
+non-linear least squares algorithm from the ALGLIB library\cite{alglib} to optimize the input parameters. The fitting
 procedures use as their starting point the values of $a\zeta _e$,
 $\omega _{e,i}$, and so on that are given in the input file.
 
