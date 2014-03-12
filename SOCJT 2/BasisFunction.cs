@@ -29,6 +29,11 @@ namespace ConsoleApplication1
         }//end property lambda
 
         /// <summary>
+        /// HashCode for storing basis function positions.
+        /// </summary>
+        public string HashCode { get; private set; }
+
+        /// <summary>
         /// List of Basis objects to store information for each mode
         /// </summary>
         public List<BasisByMode> modesInVec = new List<BasisByMode>();
@@ -53,6 +58,7 @@ namespace ConsoleApplication1
             }
             nJ = (decimal)l + ((decimal)lam) / 2M;
             Lambda = lam;
+            HashCode = GenerateHashCode(basis, nJ, lam);
         }//end constructor
 
         /// <summary>
@@ -200,5 +206,47 @@ namespace ConsoleApplication1
                 }//end else
             }//end if
         }//end method countKeeper
+
+        /// <summary>
+        /// Function to generate hashcode string for BasisFunction object
+        /// </summary>
+        /// <param name="Modes">
+        /// List of BasisByMode objects representing modes in the BasisFunction
+        /// </param>
+        /// <param name="J">
+        /// value of J
+        /// </param>
+        /// <param name="Lambda">
+        /// Value of Lambda
+        /// </param>
+        /// <returns>
+        /// String to be used as key for position lookup in dictionary
+        /// </returns>
+        private string GenerateHashCode(List<BasisByMode> Modes, decimal J, int Lambda)
+        {
+            string s = "";
+            for (int i = 0; i < Modes.Count; i++)
+            {
+                s += Modes[i].v;
+                s += Modes[i].l;
+            }
+            s += J;
+            s += Lambda;
+            return s;
+        }
+
+        /// <summary>
+        /// Public interface to find hashcode of a given basis function
+        /// </summary>
+        /// <param name="a">
+        /// Basis function for which the hashcode is desired
+        /// </param>
+        /// <returns>
+        /// Key of basisfunction as a string
+        /// </returns>
+        public string GenerateHashCode(BasisFunction a)
+        {
+            return GenerateHashCode(a.modesInVec, a.J, a.Lambda);
+        }
     }//end class JBasisVector
 }
