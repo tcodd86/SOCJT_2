@@ -469,6 +469,7 @@ namespace ConsoleApplication1
             //Lists to store the positions of the A and E vecs with cross-terms coupling
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
+            List<int> EVecPos = new List<int>();
             //List to store the alglib sparse matrices for each variable
             var matList = new List<alglib.sparsematrix>();
             //The Tuple stores the row and column of the matrix element in the two int values and the value at that matrix element as the double
@@ -508,6 +509,11 @@ namespace ConsoleApplication1
                 if (basisVectorsByJ[0].modesInVec[i].symmetryIsA)
                 {
                     modeVals[i, 4] = 1.0;
+                }
+                else
+                {
+                    modeVals[i, 4] = 2.0;
+                    EVecPos.Add(i);
                 }
             }//end loop to make modeVals[,] array
 
@@ -603,16 +609,67 @@ namespace ConsoleApplication1
                 //indexes n and m are for the rows and columns of the matrix respectively
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
+                    //Basic Layout:
+                    //Run loop over emodes
+                    //first, assign hashInt values to those from vlLambda
+                    int[] hashInt = new int[nModes * 2 + 1];
+                    for (int a = 0; a < hashInt.Length; a++)
+                    {
+                        hashInt[a] = vlLambda[n, a];
+                    }
+                    for (int eModes = 0; eModes < EVecPos.Count; eModes++)
+                    {
+                        //now check each EVecPos mode for a linear element by taking vlLambda[n, ] and changing the values appropriately to find a linear element. Store in tempint
+                        int[] tempInt = (int[])hashInt.Clone();
+                        //put in for loop over +/- 1 for lvalue in linear element -----DON'T NEED, l Only decreases
+                        DeltaVL(ref tempInt, EVecPos[eModes], 1, -1, nModes);
+                        //tempInt[EVecPos[eModes]] += 1;//change to v, can only have v + 1 for this.
+                        //tempInt[EVecPos[eModes + nModes]] -= 1;
+                        //then generate hashcode for this basis value
+                        //if it exists, then assign it to the linear value
+                        string hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                        int m;
+                        double temp;
+                        if (BasisPositions.TryGetValue(hashCode, out m))
+                        {
+                            temp = Math.Sqrt(((double)vlLambda[n, EVecPos[eModes]] - (double)vlLambda[n, EVecPos[eModes] + nModes] + 2D));
+                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
+                            matrixPos[2 * EVecPos[eModes]].Add(ttTemp);
+                        }
+
+                        //check for either quadratic element
+                        //reset tempInt values for Quadratic elements
+                        tempInt = (int[])hashInt.Clone();
+                        //for bottom matrix element on page
+                        DeltaVL(ref tempInt, EVecPos[eModes], 2, -2, nModes);
+                        hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                        if (BasisPositions.TryGetValue(hashCode, out m))
+                        {
+                            //quadratic stuff
+                            temp = (1 / 4D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] - vlLambda[n, nModes + EVecPos[eModes]] + 4D) * (vlLambda[n, EVecPos[eModes]] - vlLambda[n, nModes + EVecPos[eModes]] + 2)));
+                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                            matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                        }
+
+                        //reset tempInt values for Quadratic elements
+                        tempInt = (int[])hashInt.Clone();
+                        //for middle matrix element on page
+                        DeltaVL(ref tempInt, EVecPos[eModes], 0, -2, nModes);
+                        hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                        if (BasisPositions.TryGetValue(hashCode, out m))
+                        {
+                            //quadratic stuff
+                            temp = (1D / 2D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] - vlLambda[n, nModes + EVecPos[eModes]] + 2) * (vlLambda[n, EVecPos[eModes]] + vlLambda[n, EVecPos[eModes] + nModes])));
+                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                            matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                        }
+                    }//end loop over E-modes
+
+                    //if Bilinear
+                    //check for bilinear element Possibly just call bilinear matrix element function from here.
+
                     for (int m = n + 1; m < matSize; m++)
                     {
-                        //Basic Layout:
-                        //Run loop over emodes
-                            //in loop check for linear element
-                            //check for either quadratic element
-                            //if Bilinear
-                                //check for bilinear element Possibly just call bilinear matrix element function from here.
-                        
-
                         double temp;
                         if (vlLambda[n, nModes * 2] == vlLambda[m, nModes * 2])//Delta Lambda must be +/- 1
                         {
@@ -871,6 +928,11 @@ namespace ConsoleApplication1
             return matList;
         }//end method genMatrix
 
+        private static void DeltaVL(ref int[] vlArray, int Mode, int deltaV, int deltaL, int nModes)
+        {
+            vlArray[Mode] += deltaV;
+            vlArray[Mode + nModes] += deltaL;
+        }
 
         /// <summary>
         /// This function initializes the biAVecPos and biEVecPos lists which tell which A and E vecs have cross-term coupling.  Also finds if there is any bilinear coupling.
