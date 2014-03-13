@@ -58,7 +58,7 @@ namespace ConsoleApplication1
             }
             nJ = (decimal)l + ((decimal)lam) / 2M;
             Lambda = lam;
-            HashCode = GenerateHashCode(basis, nJ, lam);
+            HashCode = GenerateHashCode(basis, lam);
         }//end constructor
 
         /// <summary>
@@ -222,7 +222,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// String to be used as key for position lookup in dictionary
         /// </returns>
-        private string GenerateHashCode(List<BasisByMode> Modes, decimal J, int Lambda)
+        private string GenerateHashCode(List<BasisByMode> Modes, int Lambda)
         {
             string s = "";
             for (int i = 0; i < Modes.Count; i++)
@@ -230,7 +230,6 @@ namespace ConsoleApplication1
                 s += Modes[i].v;
                 s += Modes[i].l;
             }
-            s += J;
             s += Lambda;
             return s;
         }
@@ -246,7 +245,31 @@ namespace ConsoleApplication1
         /// </returns>
         public string GenerateHashCode(BasisFunction a)
         {
-            return GenerateHashCode(a.modesInVec, a.J, a.Lambda);
+            return GenerateHashCode(a.modesInVec, a.Lambda);
+        }
+
+        /// <summary>
+        /// Function to generate necessary HashCode based on a vlLambda array and the number of modes
+        /// </summary>
+        /// <param name="vlLambda">
+        /// Array with values of v and l for each mode and lambda and J
+        /// </param>
+        /// <param name="nModes">
+        /// Number of modes in the calculation
+        /// </param>
+        /// <returns>
+        /// String representing the needed key.
+        /// </returns>
+        public static string GenerateHashCode(int[] vlLambda, int nModes)
+        {
+            string s = "";
+            for (int i = 0; i < nModes; i += 2)
+            {
+                s += vlLambda[i];
+                s += vlLambda[i + nModes];
+            }
+            s += vlLambda[nModes * 2];
+            return s;
         }
     }//end class JBasisVector
 }
