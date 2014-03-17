@@ -151,12 +151,13 @@ namespace ConsoleApplication1
                             }
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
-                                fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                                
+                                //fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
+                                fitHamList[i] = GenHamMat.genMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
-                                fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
+                                //fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
+                                fitHamList[i][0] = GenHamMat.genMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
                             }
                             numcolumnsA[i] = nColumns;
                             if (numcolumnsA[i] < input.M)
@@ -252,11 +253,13 @@ namespace ConsoleApplication1
                         //if matrices aren't made then generate all of them
                         if (!matricesMade)
                         {
-                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);                        
+                            //fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, false);       
                         }                        
                         else//If they are made then just generate the diagonal elements.
 	                    {
-                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
+                            //fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                    }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;

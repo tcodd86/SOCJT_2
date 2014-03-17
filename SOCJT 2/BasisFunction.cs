@@ -263,7 +263,7 @@ namespace ConsoleApplication1
         public static string GenerateHashCode(int[] vlLambda, int nModes)
         {
             string s = "";
-            for (int i = 0; i < nModes; i += 2)
+            for (int i = 0; i < nModes; i ++)
             {
                 s += vlLambda[i];
                 s += vlLambda[i + nModes];

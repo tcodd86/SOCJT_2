@@ -605,7 +605,7 @@ namespace ConsoleApplication1
                 //these arrays will store the differences in v and l between two different basis functions
                 int[] vdiff = new int[nModes];
                 int[] ldiff = new int[nModes];
-                bool exit = false;
+                //bool exit = false;
                 //indexes n and m are for the rows and columns of the matrix respectively
                 for (int n = range.Item1; n < range.Item2; n++)
                 {
@@ -621,22 +621,26 @@ namespace ConsoleApplication1
                     {
                         //now check each EVecPos mode for a linear element by taking vlLambda[n, ] and changing the values appropriately to find a linear element. Store in tempint
                         int[] tempInt = (int[])hashInt.Clone();
-                        //put in for loop over +/- 1 for lvalue in linear element -----DON'T NEED, l Only decreases
-                        DeltaVL(ref tempInt, EVecPos[eModes], 1, -1, nModes);
-                        //tempInt[EVecPos[eModes]] += 1;//change to v, can only have v + 1 for this.
-                        //tempInt[EVecPos[eModes + nModes]] -= 1;
-                        //then generate hashcode for this basis value
-                        //if it exists, then assign it to the linear value
-                        string hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                        //put in for loop over +/- 1 for lvalue in linear element -----DON'T NEED, l Only decreases                        
                         int m;
                         double temp;
-                        if (BasisPositions.TryGetValue(hashCode, out m))
+                        string hashCode;
+                        for(int ll = -1; ll < 2; ll += 2)
                         {
-                            temp = Math.Sqrt(((double)vlLambda[n, EVecPos[eModes]] - (double)vlLambda[n, EVecPos[eModes] + nModes] + 2D));
-                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                            matrixPos[2 * EVecPos[eModes]].Add(ttTemp);
+                            tempInt = (int[])hashInt.Clone();
+                            DeltaVL(ref tempInt, EVecPos[eModes], 1, ll, nModes);
+                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                            //tempInt[EVecPos[eModes]] += 1;//change to v, can only have v + 1 for this.
+                            //tempInt[EVecPos[eModes + nModes]] -= 1;
+                            //then generate hashcode for this basis value
+                            //if it exists, then assign it to the linear value                            
+                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            {
+                                temp = Math.Sqrt(((double)vlLambda[n, EVecPos[eModes]] + ll * (double)vlLambda[n, EVecPos[eModes] + nModes] + 2D));//changed from - to + ll
+                                Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
+                                matrixPos[2 * EVecPos[eModes]].Add(ttTemp);
+                            }
                         }
-
                         //check for either quadratic element
                         //reset tempInt values for Quadratic elements
                         tempInt = (int[])hashInt.Clone();
@@ -663,11 +667,23 @@ namespace ConsoleApplication1
                             Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
                             matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
                         }
+
+                        tempInt = (int[])hashInt.Clone();
+                        //for top matrix element on page
+                        DeltaVL(ref tempInt, EVecPos[eModes], -2, -2, nModes);
+                        hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                        if (BasisPositions.TryGetValue(hashCode, out m))
+                        {
+                            int sign = -1;
+                            temp = (1 / 4D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] - sign * vlLambda[n, nModes + EVecPos[eModes]]) * (vlLambda[n, EVecPos[eModes]] - sign * vlLambda[n, nModes + EVecPos[eModes]] - 2)));
+                            Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                            matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                        }
                     }//end loop over E-modes
 
                     //if Bilinear
                     //check for bilinear element Possibly just call bilinear matrix element function from here.
-
+                    /*
                     for (int m = n + 1; m < matSize; m++)
                     {
                         double temp;
@@ -906,11 +922,11 @@ namespace ConsoleApplication1
                             }
                         }//end quadratic elements if    
                         #endregion
-                    }//column for loop
+                    }//column for loop//*/
                 }//row for loop
             }//end anonymous function in parallel for loop
             );//end parallel for
-
+            
             //actually add all of the matrix elements to the matrices
             //Start at 0 because matrixPos only has off diagonal elements.  Add elements to matList[i + 1] because matList already has diagonal elements in position 0.
             for (int i = 0; i < matrixPos.Count; i++)
@@ -932,6 +948,7 @@ namespace ConsoleApplication1
         {
             vlArray[Mode] += deltaV;
             vlArray[Mode + nModes] += deltaL;
+            vlArray[2 * nModes] *= -1;
         }
 
         /// <summary>
