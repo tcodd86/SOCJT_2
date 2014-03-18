@@ -265,8 +265,8 @@ namespace ConsoleApplication1
             string s = "";
             for (int i = 0; i < nModes; i ++)
             {
-                s += vlLambda[i];
-                s += vlLambda[i + nModes];
+                s += vlLambda[i] + " ";
+                s += vlLambda[i + nModes] + " ";
             }
             s += vlLambda[nModes * 2];
             return s;
