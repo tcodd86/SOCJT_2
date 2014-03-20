@@ -21,62 +21,33 @@ namespace ConsoleApplication1
         /// <summary>
         /// Value of v, the principal vibrational quantum number
         /// </summary>
-        private int V;
-        public int v
-        {
-            get { return V; }
-            //set { nv = value; }
-        }//end property nv
+        public int V { get; private set; }
 
         /// <summary>
         /// Value of omega
         /// </summary>
-        private double ModeOmega;
-        public double modeOmega
-        {
-            get { return ModeOmega; }
-            //set { nModeOmega = value; }
-        }//end property nModeOmega
+        public double ModeOmega { get; private set; }
 
         /// <summary>
         /// Boolean indicating whether this is a nondegenerate mode (true) or degenerate mode (false)
         /// </summary>
-        private bool SymmetryIsA;
-        public bool symmetryIsA
-        {
-            get { return SymmetryIsA; }
-            //set { nsymmetryIsA = value; }
-        }//end property symmetry
+        public bool SymmetryIsA { get; private set; }
 
         /// <summary>
         /// Value of the anharmonicity
         /// </summary>
-        private double Anharmonicity;
-        public double anharmonicity
-        {
-            get { return Anharmonicity; }
-            //set { nAnharmonicity = value; }
-        }//end property anharmonicity
+        //private double Anharmonicity;
+        public double Anharmonicity { get; private set; }
 
         /// <summary>
         /// Value of D
         /// </summary>
-        private double nDBasis;
-        public double DBasis
-        {
-            get { return nDBasis; }
-            //set { nDBasis = value; }
-        }//end property DBasis
+        public double DBasis { get; private set; }
 
         /// <summary>
         /// Value of K
         /// </summary>
-        private double nKBasis;
-        public double KBasis
-        {
-            get { return nKBasis; }
-            //set { nKBasis = value; }
-        }//end property KBasis
+        public double KBasis { get; private set; }
         #endregion properties
 
         /// <summary>
@@ -114,8 +85,8 @@ namespace ConsoleApplication1
             V = v;
             ModeOmega = modeOmega;
             Anharmonicity = anharmonicity;
-            nDBasis = D;
-            nKBasis = K;
+            DBasis = D;
+            KBasis = K;
         }
 
         /// <summary>

@@ -101,7 +101,7 @@ namespace ConsoleApplication1
                         file.Append("\t" + Convert.ToString(j + 1));
                         for(int m = 0; m < input.nModes; m++)//goes through each mode
                         {
-                            file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][j].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][j].modesInVec[m].L));
+                            file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][j].modesInVec[m].V) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][j].modesInVec[m].L));
                         }
                         file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[i][j].Lambda) + "\t" + String.Format("{0,3:0.0}", Sigma));
                     }
@@ -166,7 +166,7 @@ namespace ConsoleApplication1
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Ev) + "\t" + Convert.ToString(finalList[i].pJ) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sig) + "\t" + Convert.ToString(finalList[i].nJ) + "\t" + (input.blockLanczos ? (finalList[i].isa1 ? "1" : "2") : input.pVector ? (finalList[i].isa1 ? "1" : "2") : ""));
+                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Evalue) + "\t" + Convert.ToString(finalList[i].JBlock) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sigma) + "\t" + Convert.ToString(finalList[i].Number) + "\t" + (input.blockLanczos ? (finalList[i].IsA1 ? "1" : "2") : input.pVector ? (finalList[i].IsA1 ? "1" : "2") : ""));
                 l++;
             }
             linesToWrite.Add(file.ToString());
@@ -357,9 +357,9 @@ namespace ConsoleApplication1
             decimal jMax = 0.5M;
             for (int i = 0; i < allOut[0].Length; i++)
             {
-                if (allOut[0][i].pJ > jMax)
+                if (allOut[0][i].JBlock > jMax)
                 {
-                    jMax = allOut[0][i].pJ;
+                    jMax = allOut[0][i].JBlock;
                 }//end if
             }            
 
@@ -372,9 +372,9 @@ namespace ConsoleApplication1
                     file.AppendLine(" ");
                     for (int k = 0; k < allOut[j].Length; k++)
                     {
-                        if (allOut[j][k].pJ == i)
+                        if (allOut[j][k].JBlock == i)
                         {
-                            file.Append(Convert.ToString(allOut[j][k].Ev) + "\t");
+                            file.Append(Convert.ToString(allOut[j][k].Evalue) + "\t");
                         }
                     }
                 }

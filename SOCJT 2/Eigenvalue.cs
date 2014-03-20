@@ -11,27 +11,27 @@ namespace ConsoleApplication1
         /// <summary>
         /// J block that this eigenvalue is in
         /// </summary>
-        public decimal pJ { get; private set; }
+        public decimal JBlock { get; private set; }
 
         /// <summary>
         /// Which eigenvalue this is in the j-block
         /// </summary>
-        public int nJ { get; set; }
+        public int Number { get; set; }
 
         /// <summary>
         /// Value of Sigma (total spin)
         /// </summary>
-        public decimal Sig { get; private set; }
+        public decimal Sigma { get; private set; }
 
         /// <summary>
         /// Eigenvalue
         /// </summary>
-        public double Ev { get; set; }
+        public double Evalue { get; set; }
 
         /// <summary>
-        /// True if symmetric (a1)
+        /// True if symmetric (a1 symmetry)
         /// </summary>
-        public bool isa1 { get; private set; }
+        public bool IsA1 { get; private set; }
 
         #endregion
 
@@ -55,11 +55,11 @@ namespace ConsoleApplication1
         /// </param>
         public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva, bool isa1)
         {
-            pJ = pJa;
-            nJ = nJa;
-            Sig = Siga;
-            Ev = Eva;
-            this.isa1 = isa1;
+            JBlock = pJa;
+            Number = nJa;
+            Sigma = Siga;
+            Evalue = Eva;
+            IsA1 = isa1;
         }//end constructor
     }//end class Eigenvalue
 }

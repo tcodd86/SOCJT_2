@@ -59,7 +59,7 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < nModes; j++)
                 {
-                    vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].v;
+                    vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].V;
                     vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
                 vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
@@ -71,12 +71,12 @@ namespace ConsoleApplication1
             var modeVals = new double[nModes, 5];
             for (int i = 0; i < nModes; i++)
             {
-                modeVals[i, 0] = basisVectorsByJ[0].modesInVec[i].modeOmega;
-                modeVals[i, 1] = basisVectorsByJ[0].modesInVec[i].anharmonicity;
+                modeVals[i, 0] = basisVectorsByJ[0].modesInVec[i].ModeOmega;
+                modeVals[i, 1] = basisVectorsByJ[0].modesInVec[i].Anharmonicity;
                 modeVals[i, 2] = basisVectorsByJ[0].modesInVec[i].DBasis;
                 modeVals[i, 3] = basisVectorsByJ[0].modesInVec[i].KBasis;
                 modeVals[i, 4] = 2.0;//degeneracy = 2 by default
-                if (basisVectorsByJ[0].modesInVec[i].symmetryIsA)
+                if (basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
                 {
                     modeVals[i, 4] = 1.0;
                 }
@@ -112,7 +112,7 @@ namespace ConsoleApplication1
             //loop through each mode to see if a sparse matrix is needed for D and K
             for (int i = 0; i < nModes; i++)
             {
-                if (!basisVectorsByJ[0].modesInVec[i].symmetryIsA)
+                if (!basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
                 { 
                     //means this mode is degenerate, add matrices for D and K
                     alglib.sparsematrix tempMat = new alglib.sparsematrix();
@@ -488,7 +488,7 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < nModes; j++)
                 {
-                    vlLambda[i, j] = hashStorage[j] = basisVectorsByJ[i].modesInVec[j].v;
+                    vlLambda[i, j] = hashStorage[j] = basisVectorsByJ[i].modesInVec[j].V;
                     vlLambda[i, j + nModes] = hashStorage[j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
                 vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
@@ -501,12 +501,12 @@ namespace ConsoleApplication1
             var modeVals = new double[nModes, 5];
             for (int i = 0; i < nModes; i++)
             {
-                modeVals[i, 0] = basisVectorsByJ[0].modesInVec[i].modeOmega;
-                modeVals[i, 1] = basisVectorsByJ[0].modesInVec[i].anharmonicity;
+                modeVals[i, 0] = basisVectorsByJ[0].modesInVec[i].ModeOmega;
+                modeVals[i, 1] = basisVectorsByJ[0].modesInVec[i].Anharmonicity;
                 modeVals[i, 2] = basisVectorsByJ[0].modesInVec[i].DBasis;
                 modeVals[i, 3] = basisVectorsByJ[0].modesInVec[i].KBasis;
                 modeVals[i, 4] = 2.0;//degeneracy = 2 by default
-                if (basisVectorsByJ[0].modesInVec[i].symmetryIsA)
+                if (basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
                 {
                     modeVals[i, 4] = 1.0;
                 }
@@ -547,7 +547,7 @@ namespace ConsoleApplication1
             //loop through each mode to see if a sparse matrix is needed for D and K
             for (int i = 0; i < nModes; i++)
             {
-                if (!basisVectorsByJ[0].modesInVec[i].symmetryIsA)
+                if (!basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
                 {
                     //means this mode is degenerate, add matrices for D and K
                     alglib.sparsematrix tempMat = new alglib.sparsematrix();
@@ -848,7 +848,7 @@ namespace ConsoleApplication1
             biEVecPos = new List<int>();
             for (int i = 0; i < nModes; i++)
             {
-                if (modesInVec[i].symmetryIsA == true)
+                if (modesInVec[i].SymmetryIsA == true)
                 {
                     AVecPos.Add(i);
                     containsAVecs = true;

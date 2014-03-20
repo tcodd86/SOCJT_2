@@ -11,22 +11,12 @@ namespace ConsoleApplication1
         /// <summary>
         /// Value of j
         /// </summary>
-        private decimal nJ;
-        public decimal J
-        {
-            get { return nJ; }
-            set { nJ = value; }
-        }//end property J
+        public decimal J { get; private set; }
 
         /// <summary>
         /// Value of Lambda, label used to distinguish betwen two components of degenerate electronic state
         /// </summary>
-        private int nlambda;
-        public int Lambda
-        {
-            get { return nlambda; }
-            set { nlambda = value; }
-        }//end property lambda
+        public int Lambda { get; private set; }
 
         /// <summary>
         /// HashCode for storing basis function positions.
@@ -56,7 +46,7 @@ namespace ConsoleApplication1
             {
                 l += basis[i].L;
             }
-            nJ = (decimal)l + ((decimal)lam) / 2M;
+            J = (decimal)l + ((decimal)lam) / 2M;
             Lambda = lam;
             HashCode = GenerateHashCode(basis, lam);
         }//end constructor
@@ -64,7 +54,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// Class to implement IComparer interface for BasisFunctions for sorting
         /// </summary>
-        private class sortBasisFunctionsHelper : IComparer<BasisFunction>
+        private class SortBasisFunctionsHelper : IComparer<BasisFunction>
         {
             int IComparer<BasisFunction>.Compare(BasisFunction a, BasisFunction b)
             {
@@ -72,12 +62,12 @@ namespace ConsoleApplication1
                 for(int place = a.modesInVec.Count - 1; place >= 0; place--)
                 {
                     //check v
-                    if (a.modesInVec[place].v > b.modesInVec[place].v)
+                    if (a.modesInVec[place].V > b.modesInVec[place].V)
                     {
                         val = 1;
                         break;
                     }
-                    if (a.modesInVec[place].v < b.modesInVec[place].v)
+                    if (a.modesInVec[place].V < b.modesInVec[place].V)
                     {
                         val = -1;
                         break;
@@ -105,9 +95,9 @@ namespace ConsoleApplication1
         /// <returns>
         /// IComparer for custom sorting of BasisFunction objects
         /// </returns>
-        public static IComparer<BasisFunction> sortBasisFunctions()
+        public static IComparer<BasisFunction> SortBasisFunctions()
         {
-            return (IComparer<BasisFunction>) new BasisFunction.sortBasisFunctionsHelper();
+            return (IComparer<BasisFunction>) new BasisFunction.SortBasisFunctionsHelper();
         }//and sortBasisFunctions
 
         /// <summary>
@@ -128,7 +118,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of all possible JBasisVector objects.
         /// </returns>
-        static public List<BasisFunction> genJVecs(List<List<BasisByMode>> basisByMode, int numModes, decimal minJ, decimal maxJ)
+        static public List<BasisFunction> GenJVecs(List<List<BasisByMode>> basisByMode, int numModes, decimal minJ, decimal maxJ)
         {
             //List of basis functions, to be returned
             List<BasisFunction> hamBasisSet = new List<BasisFunction>();
@@ -162,7 +152,7 @@ namespace ConsoleApplication1
                 }//end for
 
                 //call to function to increase count by one
-                countKeeper(ref count, 0, maxValues, ref keepGoing);
+                CountKeeper(ref count, 0, maxValues, ref keepGoing);
 
                 //This generates the same basis vector with Lambda = +1 and -1
                 for (int i = -1; i < 2; i += 2)
@@ -188,7 +178,7 @@ namespace ConsoleApplication1
         /// <param name="n">
         /// Gives index of array to be incremented (corrsponds to which mode).
         /// </param>
-        static private void countKeeper(ref int[] count, int n, int[] ints, ref bool keepGoing)
+        static private void CountKeeper(ref int[] count, int n, int[] ints, ref bool keepGoing)
         {
             count[n] += 1;
             if (count[n] == ints[n])
@@ -198,7 +188,7 @@ namespace ConsoleApplication1
                 {
                     count[n] = 0;
                     n += 1;
-                    countKeeper(ref count, n, ints, ref keepGoing);
+                    CountKeeper(ref count, n, ints, ref keepGoing);
                 }//end if
                 else
                 {
@@ -227,7 +217,7 @@ namespace ConsoleApplication1
             string s = "";
             for (int i = 0; i < Modes.Count; i++)
             {
-                s += Modes[i].v;
+                s += Modes[i].V;
                 s += Modes[i].L;
             }
             s += Lambda;

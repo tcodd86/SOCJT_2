@@ -77,7 +77,7 @@ namespace ConsoleApplication1
             }//end for            
 
             //Generates all of the JBasisVectors to be used in calculation.
-            List<BasisFunction> hamiltonianVecs = BasisFunction.genJVecs(basisByMode, input.nModes, jMin, jMax);
+            List<BasisFunction> hamiltonianVecs = BasisFunction.GenJVecs(basisByMode, input.nModes, jMin, jMax);
             //hamiltonianVecs are the total list of all J vectors in the Hamiltonian
 
             //Sorts the hamiltonianVecs by J and puts them into a List of Lists of JBasisVectors.
@@ -777,7 +777,7 @@ namespace ConsoleApplication1
             file.Append(String.Format("{0,10:0.000000}", coefficient));
             for (int m = 0; m < func.modesInVec.Count; m++)//goes through each mode
             {
-                file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].v) + "\t" + String.Format("{0,3}", func.modesInVec[m].L));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].V) + "\t" + String.Format("{0,3}", func.modesInVec[m].L));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
             }
             file.Append("\t" + String.Format("{0,4}", func.Lambda));
         }//end of function writeVec
@@ -810,7 +810,7 @@ namespace ConsoleApplication1
                     for(int j = 0; j < jBasisVec.modesInVec.Count; j++)
                     {
                     
-                        if (jBasisVec.modesInVec[j].v == eigenvector[i].modesInVec[j].v && jBasisVec.modesInVec[j].L == eigenvector[i].modesInVec[j].L)
+                        if (jBasisVec.modesInVec[j].V == eigenvector[i].modesInVec[j].V && jBasisVec.modesInVec[j].L == eigenvector[i].modesInVec[j].L)
                         {
                             if (j == jBasisVec.modesInVec.Count - 1)
                             {
@@ -886,7 +886,7 @@ namespace ConsoleApplication1
             }
             Eigenvalue[] eigenarray = eigen.ToArray();
             bubbleSort(ref eigenarray);
-            double ZPE = eigenarray[0].Ev;
+            double ZPE = eigenarray[0].Evalue;
             int[] temp = new int[evs.Count];
             for (int i = 0; i < evs.Count; i++)
             {
@@ -894,7 +894,7 @@ namespace ConsoleApplication1
             }
             for (int i = 0; i < eigenarray.Length; i++)
             {
-                eigenarray[i].Ev = eigenarray[i].Ev - ZPE;
+                eigenarray[i].Evalue = eigenarray[i].Evalue - ZPE;
             }
             int SOnumb = (int)(-2M * S) + 1;
             if (inclSO == false)
@@ -903,10 +903,10 @@ namespace ConsoleApplication1
             }
             for (int i = 0; i < eigenarray.Length; i++)
             {
-                int Snumb = (int)(eigenarray[i].Sig - S);
-                int j = (int)(eigenarray[i].pJ - 0.5M);
+                int Snumb = (int)(eigenarray[i].Sigma - S);
+                int j = (int)(eigenarray[i].JBlock - 0.5M);
                 int place = j * SOnumb + Snumb;
-                eigenarray[i].nJ = temp[place];
+                eigenarray[i].Number = temp[place];
                 temp[place]++;
             }
             return eigenarray;
@@ -950,7 +950,7 @@ namespace ConsoleApplication1
                 {
                     for (int n = 0; n < input.nModes; n++)
                     {
-                        tempVL[n * 2] = jBasisVecsByJ[m].modesInVec[n].v;
+                        tempVL[n * 2] = jBasisVecsByJ[m].modesInVec[n].V;
                         tempVL[n * 2 + 1] = jBasisVecsByJ[m].modesInVec[n].L;
                     }
                     tempVL[input.nModes * 2] = jBasisVecsByJ[m].Lambda;
@@ -965,7 +965,7 @@ namespace ConsoleApplication1
                     int tempInt = 0;
                     for (int v = 0; v < input.nModes; v++)
                     {
-                        if (jBasisVecsByJ[m].modesInVec[v].v == tempVL[v * 2])
+                        if (jBasisVecsByJ[m].modesInVec[v].V == tempVL[v * 2])
                         {
                             if (jBasisVecsByJ[m].modesInVec[v].L == -1 * tempVL[v * 2 + 1])
                             {
@@ -1003,7 +1003,7 @@ namespace ConsoleApplication1
                 j++;
                 for (int i = 0; i < arr.Length - j; i++)
                 {
-                    if (arr[i].Ev > arr[i + 1].Ev)
+                    if (arr[i].Evalue > arr[i + 1].Evalue)
                     {
                         tmp = arr[i];
                         arr[i] = arr[i + 1];

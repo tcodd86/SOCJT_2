@@ -315,7 +315,7 @@ namespace ConsoleApplication1
             file.AppendLine("FitFile Value" + "\t" + "Calculated Value" + "\t" + "Exp - Calc" + "\t" + "(Exp - Calc)^2");
             for (int i = 0; i < error.Length; i++)
             {
-                file.AppendLine(String.Format("{0,13:0.000}", userInput[i].Ev + Masterly.nInput.origin) + "\t" + String.Format("{0,13:0.000}", userInput[i].Ev + Masterly.nInput.origin - error[i]) + "\t" + "\t" + String.Format("{0,9:0.000}", error[i]) + "\t" + String.Format("{0,11:0.000}", Math.Pow(error[i], 2D)));
+                file.AppendLine(String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.origin) + "\t" + String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.origin - error[i]) + "\t" + "\t" + String.Format("{0,9:0.000}", error[i]) + "\t" + String.Format("{0,11:0.000}", Math.Pow(error[i], 2D)));
             }
             file.AppendLine("  ");
             file.AppendLine("RMS Error = " + String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.origin) / userInput.Length))));
@@ -508,20 +508,20 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < socjtOut.Length; j++)
                 {
-                    if (exp[i].pJ == socjtOut[j].pJ)
+                    if (exp[i].JBlock == socjtOut[j].JBlock)
                     {
-                        if (exp[i].nJ == socjtOut[j].nJ)
+                        if (exp[i].Number == socjtOut[j].Number)
                         {
-                            if (exp[i].Sig == socjtOut[j].Sig)
+                            if (exp[i].Sigma == socjtOut[j].Sigma)
                             {
                                 if (raw == false)
                                 {
-                                    errors.Add(Math.Pow((exp[i].Ev + origin) - socjtOut[j].Ev, 2D));//took out ZPE
+                                    errors.Add(Math.Pow((exp[i].Evalue + origin) - socjtOut[j].Evalue, 2D));//took out ZPE
                                     break;
                                 }
                                 if (raw == true)
                                 {
-                                    errors.Add((exp[i].Ev + origin) - socjtOut[j].Ev);//took out ZPE
+                                    errors.Add((exp[i].Evalue + origin) - socjtOut[j].Evalue);//took out ZPE
                                     break;
                                 }
                             }
@@ -556,11 +556,11 @@ namespace ConsoleApplication1
             {
                 for (int j = 0; j < socjtOut.Length; j++)
                 {
-                    if (exp[i].pJ == socjtOut[j].pJ)
+                    if (exp[i].JBlock == socjtOut[j].JBlock)
                     {
-                        if (exp[i].nJ == socjtOut[j].nJ)
+                        if (exp[i].Number == socjtOut[j].Number)
                         {
-                            RMS += Math.Pow((exp[i].Ev + origin) - socjtOut[j].Ev, 2D);
+                            RMS += Math.Pow((exp[i].Evalue + origin) - socjtOut[j].Evalue, 2D);
                             //h = j;
                             break;
                         }
