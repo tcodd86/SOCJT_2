@@ -135,17 +135,17 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             
             //add any matrices needed for cross-terms
-            if (input.crossTermMatrix != null)
+            if (input.CrossTermMatrix != null)
             {
                 for (int i = 0; i < nModes; i++)
                 {
                     for (int j = 0; j < nModes; j++)
                     {
                         //add a new sparsematrix for each nonzero cross-term element
-                        if (input.crossTermMatrix[i, j] != 0.0)
+                        if (input.CrossTermMatrix[i, j] != 0.0)
                         {
                             alglib.sparsematrix tempMat = new alglib.sparsematrix();
                             alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);
@@ -570,17 +570,17 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
 
             //add any matrices needed for cross-terms
-            if (input.crossTermMatrix != null)
+            if (input.CrossTermMatrix != null)
             {
                 for (int i = 0; i < nModes; i++)
                 {
                     for (int j = 0; j < nModes; j++)
                     {
                         //add a new sparsematrix for each nonzero cross-term element
-                        if (input.crossTermMatrix[i, j] != 0.0)
+                        if (input.CrossTermMatrix[i, j] != 0.0)
                         {
                             alglib.sparsematrix tempMat = new alglib.sparsematrix();
                             alglib.sparsecreate(matSize, matSize, matSize * (nModes + 1), out tempMat);

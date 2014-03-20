@@ -58,7 +58,7 @@ namespace ConsoleApplication1
             else
             {
                 jMax = input.maxJ;
-                if (input.minJBool == true)
+                if (input.MinJBool == true)
                 {
                     jMin = input.minJ;
                 }
@@ -105,7 +105,7 @@ namespace ConsoleApplication1
             int numQuadMatrix = 0;            
             List<int> a = new List<int>();
 
-            if (input.M > input.noIts)
+            if (input.M > input.NumberOfIts)
             {
                 throw new BasisSetTooSmallException(false);
             }
@@ -133,7 +133,7 @@ namespace ConsoleApplication1
                 numcolumnsA = new int[jBasisVecsByJ.Count];
 
                 ParallelOptions options = new ParallelOptions();
-                options.MaxDegreeOfParallelism = input.parJ;
+                options.MaxDegreeOfParallelism = input.ParJ;
                 try
                 {
                     Parallel.For((int)(jMin - 0.5M), (int)(jMax + 0.5M), options, i =>
@@ -152,12 +152,12 @@ namespace ConsoleApplication1
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
                                 //fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);                                
+                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false);                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
                                 //fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
-                                fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
+                                fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, true)[0];
                             }
                             numcolumnsA[i] = nColumns;
                             if (numcolumnsA[i] < input.M)
@@ -190,7 +190,7 @@ namespace ConsoleApplication1
                 }
                 measurer.Stop();
                 howMuchTime = measurer.ElapsedMilliseconds;
-                input.matGenTime = (double)howMuchTime / 1000D;
+                input.MatrixGenerationTime = (double)howMuchTime / 1000D;
                 for (int i = (int)(jMin - 0.5M); i < (int)(jMax + 0.5M); i++)
                 {
                     zMatrices.Add(new double[0, 0]);
@@ -229,7 +229,7 @@ namespace ConsoleApplication1
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
 
                 ParallelOptions options = new ParallelOptions();
-                options.MaxDegreeOfParallelism = input.parJ;
+                options.MaxDegreeOfParallelism = input.ParJ;
                 try
                 {
                     Parallel.For(jBasisVecsByJ.Count / 2, jBasisVecsByJ.Count - dynVar1, options, i =>//changed to dynVar1 from 6
@@ -254,12 +254,12 @@ namespace ConsoleApplication1
                         if (!matricesMade)
                         {
                             //fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);
-                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, false);       
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false);       
                         }                        
                         else//If they are made then just generate the diagonal elements.
 	                    {
                             //fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];
-                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true)[0];		 
 	                    }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
@@ -295,7 +295,7 @@ namespace ConsoleApplication1
                 matricesMade = true;
                 measurer.Stop();                    
                 howMuchTime = measurer.ElapsedMilliseconds;
-                input.matGenTime = (double)howMuchTime / 1000D;
+                input.MatrixGenerationTime = (double)howMuchTime / 1000D;
                 if (a.Count > 0)
                 {
                     throw new BasisSetTooSmallException(true);
@@ -314,7 +314,7 @@ namespace ConsoleApplication1
             bool bilinear = false;
             var biAVecPos = new List<int>();
             var biEVecPos = new List<int>();
-            GenHamMat.CrossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            GenHamMat.CrossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             //code here to convert the alglib matrices to matrices for each j block
             for (int i = 0; i < fitHamList.Count; i++)
             {
@@ -360,7 +360,7 @@ namespace ConsoleApplication1
                                     column = biEVecPos[e];
                                     row = biAVecPos[aa];
                                 }
-                                val = input.crossTermMatrix[row, column];
+                                val = input.CrossTermMatrix[row, column];
                             }//end loop over e elements
                         }//end loop over a elements
                     }//end else for counting if it's D / K or cross-Term
@@ -377,7 +377,7 @@ namespace ConsoleApplication1
             //move this to after genFitMatricss are treated so that SO code does not need to be changed
             #region Spin Orbit
             //add SO stuff here
-            if (input.inclSO == true)
+            if (input.IncludeSO == true)
             {
                 decimal minS = input.S * -1M;
                 List<alglib.sparsematrix> tempMatList = new List<alglib.sparsematrix>();
@@ -433,7 +433,7 @@ namespace ConsoleApplication1
             measurer.Reset();
             measurer.Start();
             //if the evecs of the lanczos matrices will need to be stored then save the lanczos matrices.
-            if (input.pVector && !input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit)
+            if (input.PrintVector && !input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit)
             {
                 lanczosEVectors = new List<double[,]>();
                 for (int i = 0; i < array1.Length; i++)
@@ -442,7 +442,7 @@ namespace ConsoleApplication1
                 }
             }
             ParallelOptions options2 = new ParallelOptions();
-            options2.MaxDegreeOfParallelism = input.parJ;
+            options2.MaxDegreeOfParallelism = input.ParJ;
             try
             {
                 Parallel.For(0, array1.Length, options2, i =>//changed to array1.count from sHamMatrix.count
@@ -453,19 +453,19 @@ namespace ConsoleApplication1
 
                     //add a parameter to count Lanczos iterations to set possible stopping criteria that way
                     //call MINVAL from here
-                    if (!input.blockLanczos)//means use naiveLanczos routine
+                    if (!input.BlockLanczos)//means use naiveLanczos routine
                     {
-                        ITER[i] = input.noIts;
+                        ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.noIts, input.tol, input.pVector, i, input.filePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
                         IECODE[i] = -1;
-                        ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.noIts, input.tol, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.parVec);
+                        ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.NumberOfIts, input.Tolerance, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.ParVectorMultiplication);
                     }
                  
                     //initialize eigenvalues to have a length.                    
@@ -475,7 +475,7 @@ namespace ConsoleApplication1
                         eigenvalues[i][j] = evs[j];                        
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.blockLanczos || (!input.blockLanczos && array1[i].innerobj.m < Lanczos.basisSetLimit))
+                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m < Lanczos.basisSetLimit))
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
@@ -487,7 +487,7 @@ namespace ConsoleApplication1
                         }
                     }
                     //here if evectors are needed and hamiltonian is too large assign the lanczosEVectors to the 
-                    if (!input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.pVector)
+                    if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
                     {
                         //assign the evecs of the lanczos matrices to the lanczosEVectors list.
                         lanczosEVectors[i] = new double[temp.GetLength(0), temp.GetLength(1)];
@@ -519,15 +519,15 @@ namespace ConsoleApplication1
                 }
 
             }//end catch
-            if (!input.blockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.pVector)
+            if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
-                input.pVector = false;
+                input.PrintVector = false;
             }
 
             measurer.Stop();
             howMuchTime = measurer.ElapsedMilliseconds;
-            input.diagTime = (double)howMuchTime / 1000D;
+            input.DiagonalizationTime = (double)howMuchTime / 1000D;
             #endregion
 
             if (isQuad == false)
@@ -544,7 +544,7 @@ namespace ConsoleApplication1
 
             //writes the eigenvectors to disk if that has been requested
             //if NTooBig == true then the separate eigenvector file will be made after the eigenvectors are calculated
-            if (input.vecFile && (input.blockLanczos || input.pVector))
+            if (input.EVectorFile && (input.BlockLanczos || input.PrintVector))
             {
                 writeVecFile(input, zMatrices, JvecsForOutuput);
             }//end if
@@ -553,13 +553,13 @@ namespace ConsoleApplication1
             //do this by writing function to use jbasisvecsbyj which has all basis functions and
             //go through that list, where a basis function is in it and JvecsForOutput, pull the appropriate coefficient
             //from the zmatrices, otherwise just put in a 0.
-            if (input.vecFileComplete)
+            if (input.VectorFileComplete)
             {
                 writeVecComplete(jBasisVecsByJ, JvecsForOutuput, zMatrices, input, eigenvalues, isQuad);
             }
 
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.inclSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
+            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
@@ -580,7 +580,7 @@ namespace ConsoleApplication1
         public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput)
         {
             StringBuilder vecFile = new StringBuilder();
-            vecFile.AppendLine("VecFile " + input.title);
+            vecFile.AppendLine("VecFile " + input.Title);
             vecFile.AppendLine(" ");
             for (int m = 0; m < zMatrices.Count; m++)
             {
@@ -601,7 +601,7 @@ namespace ConsoleApplication1
             }
             List<string> vecFileOut = new List<string>();
             vecFileOut.Add(vecFile.ToString());
-            File.WriteAllLines((input.filePath + input.title + "_vec.out"), vecFileOut);
+            File.WriteAllLines((input.FilePath + input.Title + "_vec.out"), vecFileOut);
         }
 
         /// <summary>
@@ -644,7 +644,7 @@ namespace ConsoleApplication1
             }
             StringBuilder file = new StringBuilder();
             file.AppendLine(" ");
-            file.AppendLine("Eigenvectors in complete basis set for " + input.title);
+            file.AppendLine("Eigenvectors in complete basis set for " + input.Title);
             file.AppendLine(" ");            
             //loop over jBlocks
             for (int i = 0; i < eigenvalues.Count; i++)
@@ -756,7 +756,7 @@ namespace ConsoleApplication1
 
             List<string> vecFileOut = new List<string>();
             vecFileOut.Add(file.ToString());
-            File.WriteAllLines((input.filePath + input.title + "_CompleteVector.out"), vecFileOut);
+            File.WriteAllLines((input.FilePath + input.Title + "_CompleteVector.out"), vecFileOut);
         }//end function writeCompleteVec
 
         /// <summary>
@@ -940,7 +940,7 @@ namespace ConsoleApplication1
             int[] tempVL = new int[input.nModes * 2 + 1];
             //this conditional is because if naive lanczos is used and eigenvectors are not calculated the tempMat actually contains the eigenvectors of the the lanczos matrix, not the Hamiltonian
             //boolean overRide lets me skip this when it's called to do separate eigenvector calculations
-            if (!input.blockLanczos && !input.pVector && !overRide)
+            if (!input.BlockLanczos && !input.PrintVector && !overRide)
             {
                 return false;
             }
@@ -1091,12 +1091,12 @@ namespace ConsoleApplication1
         {
             matricesMade = false;
             List<int> basisSizeList = new List<int>();
-            if (input.useMatFile && input.matMade)
+            if (input.UseMatrixFile && input.MatrixMade)
             {
                 string[] matFile = { };
                 try
                 {
-                    matFile = FileInfo.fileRead(input.matFilePath);
+                    matFile = FileInfo.FileRead(input.MatrixFilePath);
                 }
                 catch(FileNotFoundException)
                 {
@@ -1129,7 +1129,7 @@ namespace ConsoleApplication1
                         i += 2;
                         while (matFile[i] != "List" && matFile[i] != "Matrix")
                         {
-                            alglib.sparseadd(B, Convert.ToInt32(matFile[i]), Convert.ToInt32(matFile[i + 1]), FileInfo.parseDouble(matFile[i + 2]));
+                            alglib.sparseadd(B, Convert.ToInt32(matFile[i]), Convert.ToInt32(matFile[i + 1]), FileInfo.ParseDouble(matFile[i + 2]));
                             i += 3;
                             if (i >= matFile.Length)
                             {

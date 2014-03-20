@@ -25,7 +25,7 @@ namespace ConsoleApplication1
             string[] fitF = {};
             try
             {
-                fitF = FileInfo.fileRead(filepath);
+                fitF = FileInfo.FileRead(filepath);
             }
             catch(FileNotFoundException)
             {
@@ -59,7 +59,7 @@ namespace ConsoleApplication1
 
             //here I initialize the xList, upper and lower boundaries, and scales for each parameter being fit.
             //for Azeta
-            if (input.fitAzeta == true)
+            if (input.FitAzeta == true)
             {
                 xList.Add(input.Azeta);
                 bndL.Add(double.NegativeInfinity);
@@ -67,7 +67,7 @@ namespace ConsoleApplication1
                 lScale.Add(1.0);
             }
             //for the origin
-            if (input.fitOrigin == true)
+            if (input.FitOrigin == true)
             {
                 xList.Add(0.0);
                 bndL.Add(double.NegativeInfinity);
@@ -111,15 +111,15 @@ namespace ConsoleApplication1
                 }
             }
             //then for cross-terms
-            if (input.includeCrossTerms == true)
+            if (input.IncludeCrossTerms == true)
             {
                 for (int i = 0; i < input.nModes; i++)
                 {
                     for (int j = 0; j < input.nModes; j++)
                     {
-                        if (input.crossTermFit[i, j] == true)
+                        if (input.CrossTermFit[i, j] == true)
                         {
-                            xList.Add(input.crossTermMatrix[i, j]);
+                            xList.Add(input.CrossTermMatrix[i, j]);
                             bndL.Add(double.NegativeInfinity);
                             bndU.Add(double.PositiveInfinity);
                             if (j > i)
@@ -158,22 +158,22 @@ namespace ConsoleApplication1
 
             //here, if using simple lanczos and wanting evecs, set pVector to false so that they are not calculated each step of the fit
             bool evecs = false;
-            if (input.pVector && !input.blockLanczos)
+            if (input.PrintVector && !input.BlockLanczos)
             {
                 evecs = true;
-                input.pVector = false;
+                input.PrintVector = false;
             }
             Masterly.Initialize(run, input, Modes, inputFile, isQuad, userInput);
 
             //initialize and run MinLM algorithm
-            double epsg = input.gTol;
-            double epsf = input.fTol;
-            double epsx = input.xTol;
-            int maxits = input.maxFev;
+            double epsg = input.GTol;
+            double epsf = input.FTol;
+            double epsx = input.XTol;
+            int maxits = input.MaxOptimizerSteps;
             alglib.minlmstate state;
             alglib.minlmreport rep;
 
-            alglib.minlmcreatev(userInput.Length, xVec, input.factor, out state);
+            alglib.minlmcreatev(userInput.Length, xVec, input.Factor, out state);
             alglib.minlmsetbc(state, lowBound, upBound);
             alglib.minlmsetscale(state, scale);
             alglib.minlmsetcond(state, epsg, epsf, epsx, maxits);
@@ -213,10 +213,10 @@ namespace ConsoleApplication1
             }
 
             //if eigenvectors are needed when using naive lanczos, run SOCJT routine one more time to calculate them.
-            if (evecs && !input.blockLanczos)
+            if (evecs && !input.BlockLanczos)
             {
                 Console.WriteLine("Calculating eigenvectors.");
-                Masterly.nInput.pVector = true;
+                Masterly.nInput.PrintVector = true;
                 Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput);
                 //now assign the lanczosEVectors to those from the SOCJT routine
                 lanczosEVectors = Masterly.nSoc.lanczosEVectors;
@@ -226,7 +226,7 @@ namespace ConsoleApplication1
             soc = Masterly.nSoc;
             output = Masterly.nSoc.outp;
             //add something showing RMS error and parameters for each JT mode
-            double[] error = ComparerVec(userInput, Masterly.nSoc.finalList, Masterly.nInput.origin, true);
+            double[] error = ComparerVec(userInput, Masterly.nSoc.finalList, Masterly.nInput.Origin, true);
 
             StringBuilder file = new StringBuilder();
             file.AppendLine("Fit report below...");
@@ -280,26 +280,26 @@ namespace ConsoleApplication1
                 file.AppendLine(Convert.ToString(i + 1) + "\t" + String.Format("{0,4:0}", 0) + "\t" + String.Format("{0,4:0}", Masterly.nModes[i].modeVMax) + "\t" + String.Format("{0,7:0.00}", Masterly.nModes[i].modeOmega) + "\t" + "\t" + String.Format("{0,4:0.00}", Masterly.nModes[i].wExe) + "\t" + String.Format("{0,5:0.0000}", Masterly.nModes[i].D) + "\t" + String.Format("{0,5:0.0000}", Masterly.nModes[i].K) + "\t" + String.Format("{0,4:0.00}", JTSE) + "\t" + String.Format("{0,7:0.00}", Masterly.nModes[i].modeAOmega) + "\t" + "\t" + Convert.ToString(Masterly.nModes[i].IsAType));
             }
             file.AppendLine("  ");
-            if (input.fitOrigin == true)
+            if (input.FitOrigin == true)
             { 
-                file.AppendLine("Origin Shift = " + String.Format("{0,8:0.000}", -1.0 * Masterly.nInput.origin));
+                file.AppendLine("Origin Shift = " + String.Format("{0,8:0.000}", -1.0 * Masterly.nInput.Origin));
             }
             file.AppendLine("  ");
-            if (input.includeCrossTerms == true)
+            if (input.IncludeCrossTerms == true)
             {
                 for (int i = 0; i < input.nModes; i++)
                 {
                     for (int j = 0; j < input.nModes; j++)
                     {
-                        if (input.crossTermMatrix[i, j] != 0.0 || input.crossTermFit[i, j] == true)
+                        if (input.CrossTermMatrix[i, j] != 0.0 || input.CrossTermFit[i, j] == true)
                         {
                             if (i < j)
                             {
-                                file.AppendLine("Mode " + Convert.ToString(i + 1) + " Mode " + Convert.ToString(j + 1) + " JT cross-term = " + String.Format("{0,10:0.0000}", input.crossTermMatrix[i, j]));
+                                file.AppendLine("Mode " + Convert.ToString(i + 1) + " Mode " + Convert.ToString(j + 1) + " JT cross-term = " + String.Format("{0,10:0.0000}", input.CrossTermMatrix[i, j]));
                             }
                             else
                             {
-                                file.AppendLine("Mode " + Convert.ToString(j + 1) + " Mode " + Convert.ToString(i + 1) + " AT cross-term = " + String.Format("{0,10:0.00}", input.crossTermMatrix[i, j]));
+                                file.AppendLine("Mode " + Convert.ToString(j + 1) + " Mode " + Convert.ToString(i + 1) + " AT cross-term = " + String.Format("{0,10:0.00}", input.CrossTermMatrix[i, j]));
                             }
                         }
                     }
@@ -308,26 +308,26 @@ namespace ConsoleApplication1
             }            
 
             file.AppendLine("Fitting Results:");
-            if (input.fitOrigin == true)
+            if (input.FitOrigin == true)
             {
-                file.AppendLine("Experimental values are shifted by " + String.Format("{0,8:0.000}", Masterly.nInput.origin) + " wavenumbers.");
+                file.AppendLine("Experimental values are shifted by " + String.Format("{0,8:0.000}", Masterly.nInput.Origin) + " wavenumbers.");
             }
             file.AppendLine("FitFile Value" + "\t" + "Calculated Value" + "\t" + "Exp - Calc" + "\t" + "(Exp - Calc)^2");
             for (int i = 0; i < error.Length; i++)
             {
-                file.AppendLine(String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.origin) + "\t" + String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.origin - error[i]) + "\t" + "\t" + String.Format("{0,9:0.000}", error[i]) + "\t" + String.Format("{0,11:0.000}", Math.Pow(error[i], 2D)));
+                file.AppendLine(String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.Origin) + "\t" + String.Format("{0,13:0.000}", userInput[i].Evalue + Masterly.nInput.Origin - error[i]) + "\t" + "\t" + String.Format("{0,9:0.000}", error[i]) + "\t" + String.Format("{0,11:0.000}", Math.Pow(error[i], 2D)));
             }
             file.AppendLine("  ");
-            file.AppendLine("RMS Error = " + String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.origin) / userInput.Length))));
+            file.AppendLine("RMS Error = " + String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.Origin) / userInput.Length))));
             file.AppendLine("  ");
 
             int l = 0;
-            if (Masterly.nInput.fitAzeta == true)
+            if (Masterly.nInput.FitAzeta == true)
             {
                 file.AppendLine("Azeta StdDev = " + String.Format("{0,10:0.000000}", Math.Sqrt(resultM[l, l])));
                 l++;
             }
-            if (Masterly.nInput.fitOrigin == true)
+            if (Masterly.nInput.FitOrigin == true)
             {
                 file.AppendLine("Origin StdDev = " + String.Format("{0,10:0.00}", Math.Sqrt(resultM[l, l])));
                 l++;
@@ -355,13 +355,13 @@ namespace ConsoleApplication1
                     l++;
                 }
             }
-            if (Masterly.nInput.includeCrossTerms == true)
+            if (Masterly.nInput.IncludeCrossTerms == true)
             {
                 for (int i = 0; i < Masterly.nInput.nModes; i++)
                 {
                     for (int h = 0; h < Masterly.nInput.nModes; h++)
                     {
-                        if (Masterly.nInput.crossTermFit[i, h] == true)
+                        if (Masterly.nInput.CrossTermFit[i, h] == true)
                         {
                             if (i < h)
                             {
@@ -420,14 +420,14 @@ namespace ConsoleApplication1
             MasterObject Master = (MasterObject) obj;//(ConsoleApplication1.MasterObject)obj;
             int j = 0;
             double[] temp;
-            if (Master.nInput.fitAzeta == true)
+            if (Master.nInput.FitAzeta == true)
             {
                 Master.nInput.Azeta = x[j];
                 j++;
             }
-            if (Master.nInput.fitOrigin == true)
+            if (Master.nInput.FitOrigin == true)
             {
-                Master.nInput.origin = x[j];
+                Master.nInput.Origin = x[j];
                 j++;
             }
             for (int i = 0; i < Master.nInput.nModes; i++)
@@ -453,22 +453,22 @@ namespace ConsoleApplication1
                     j++;
                 }
             }
-            if (Master.nInput.includeCrossTerms == true)
+            if (Master.nInput.IncludeCrossTerms == true)
             {
                 for (int i = 0; i < Master.nInput.nModes; i++)
                 {
                     for (int h = 0; h < Master.nInput.nModes; h++)
                     {
-                        if (Master.nInput.crossTermFit[i, h] == true)
+                        if (Master.nInput.CrossTermFit[i, h] == true)
                         {
-                            Master.nInput.crossTermMatrix[i, h] = x[j];
+                            Master.nInput.CrossTermMatrix[i, h] = x[j];
                             j++;
                         }
                     }
                 }
             }
             Master.nSoc.SOCJTroutine(Master.nModes, Master.nIsQuad, Master.nInputFile, Master.nInput);
-            temp = FitSOCJT.ComparerVec(Master.nFitFile, Master.nSoc.finalList, Master.nInput.origin, true);
+            temp = FitSOCJT.ComparerVec(Master.nFitFile, Master.nSoc.finalList, Master.nInput.Origin, true);
             for (int i = 0; i < temp.Length; i++)
             {
                 fi[i] = temp[i];

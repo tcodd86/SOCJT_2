@@ -149,22 +149,22 @@ namespace ConsoleApplication1
                     {
                         if (inputF[u] == "MODEOMEGA")
                         {
-                            modeOmega = FileInfo.parseDouble(inputF[u + 1]);
+                            modeOmega = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODED")
                         {
-                            D = FileInfo.parseDouble(inputF[u + 1]);
+                            D = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEK")
                         {
-                            K = FileInfo.parseDouble(inputF[u + 1]);
+                            K = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEWEXE")
                         {
-                            wExe = FileInfo.parseDouble(inputF[u + 1]);
+                            wExe = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEVMAX")
@@ -174,12 +174,12 @@ namespace ConsoleApplication1
                         }
                         if (inputF[u] == "MODEA_OMEGA")
                         {
-                            nmodeAOmega = FileInfo.parseDouble(inputF[u + 1]);
+                            nmodeAOmega = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "MODEZETA")
                         {
-                            nmodeZeta = FileInfo.parseDouble(inputF[u + 1]);
+                            nmodeZeta = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u] == "FIT_OMEGA")
@@ -210,7 +210,7 @@ namespace ConsoleApplication1
                         if (inputF[u].ToUpper() == "KAPPA")
                         {
                             tReturn = true;
-                            kappa = FileInfo.parseDouble(inputF[u + 1]);
+                            kappa = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u].ToUpper() == "FIT_KAPPA")
@@ -221,7 +221,7 @@ namespace ConsoleApplication1
                         if (inputF[u].ToUpper() == "ETA")
                         {
                             tReturn = true;
-                            eta = FileInfo.parseDouble(inputF[u + 1]);
+                            eta = FileInfo.ParseDouble(inputF[u + 1]);
                             continue;
                         }
                         if (inputF[u].ToUpper() == "FIT_ETA")

@@ -13,15 +13,15 @@ namespace ConsoleApplication1
             List<string> linesToWrite = new List<string>();
             StringBuilder file = new StringBuilder();
             decimal J = 0.5M;
-            if (input.minJBool == true)
+            if (input.MinJBool == true)
             {
                 J = input.minJ;
             }                                                                                                                            
             decimal Sigma = input.S * -1M;
             file.AppendLine(" ");
             file.AppendLine("Time Report:");
-            file.AppendLine("Matrix generation took " + String.Format("{0,10:0.00}", input.matGenTime) + " seconds.");
-            file.AppendLine("The Lanczos routines took " + String.Format("{0,10:0.00}", input.diagTime) + " seconds.");
+            file.AppendLine("Matrix generation took " + String.Format("{0,10:0.00}", input.MatrixGenerationTime) + " seconds.");
+            file.AppendLine("The Lanczos routines took " + String.Format("{0,10:0.00}", input.DiagonalizationTime) + " seconds.");
             file.AppendLine(" ");
             for (int i = 0; i < eigenvalues.Count; i++)
             {
@@ -69,7 +69,7 @@ namespace ConsoleApplication1
                 file.AppendLine("Lanczos routine took " + Convert.ToString(ITER[i]) + " iterations to complete.");
                 file.AppendLine(" ");
 
-                if (input.pVector == true)
+                if (input.PrintVector == true)
                 {
                     #region PrintVector
                     for (int j = 0; j < tempEvs.Length; j++)
@@ -77,15 +77,15 @@ namespace ConsoleApplication1
                         file.AppendLine(" " + "\r");
                         file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(j + 1) + " = " + String.Format("{0,10:0.0000}", tempEvs[j]));
                         file.AppendLine(" " + "\r");
-                        file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.evMin) + " are shown)");
+                        file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.EigenvectorCoefficientMinimum) + " are shown)");
                         file.AppendLine(" ");
 
-                        vecBuilder(input, jBasisVecsByJ[i], file, tempMat, j, input.evMin);
+                        vecBuilder(input, jBasisVecsByJ[i], file, tempMat, j, input.EigenvectorCoefficientMinimum);
                     }
                     #endregion
                 }
 
-                if (input.printBasis == true)
+                if (input.PrintBasis == true)
                 {
                     #region PrintBasis
                     file.AppendLine("\t" + "\r");
@@ -108,7 +108,7 @@ namespace ConsoleApplication1
                     #endregion
                 }//end print Basis code
 
-                if (input.pMatrix == true)
+                if (input.PrintMatrix == true)
                 {
                     #region PrintMatrixSparse
                     int nonZeroCount = 0;
@@ -143,7 +143,7 @@ namespace ConsoleApplication1
 
                 linesToWrite.Add(file.ToString());
                 file.Clear();
-                if (input.inclSO == true)
+                if (input.IncludeSO == true)
                 {
                     if (Sigma < input.S)
                     {
@@ -162,11 +162,11 @@ namespace ConsoleApplication1
             }//writes all evs to the file object
             
             file.AppendLine("#" + "\t" + "Final results showing all eigenvalues found");
-            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + (input.blockLanczos ? "Symm" : input.pVector ? "Symm" : ""));
+            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + (input.BlockLanczos ? "Symm" : input.PrintVector ? "Symm" : ""));
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Evalue) + "\t" + Convert.ToString(finalList[i].JBlock) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sigma) + "\t" + Convert.ToString(finalList[i].Number) + "\t" + (input.blockLanczos ? (finalList[i].IsA1 ? "1" : "2") : input.pVector ? (finalList[i].IsA1 ? "1" : "2") : ""));
+                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Evalue) + "\t" + Convert.ToString(finalList[i].JBlock) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sigma) + "\t" + Convert.ToString(finalList[i].Number) + "\t" + (input.BlockLanczos ? (finalList[i].IsA1 ? "1" : "2") : input.PrintVector ? (finalList[i].IsA1 ? "1" : "2") : ""));
                 l++;
             }
             linesToWrite.Add(file.ToString());
@@ -238,19 +238,19 @@ namespace ConsoleApplication1
             List<string> linesToWrite = new List<string>();
             StringBuilder file = new StringBuilder();
             file.AppendLine("&GENERAL");
-            file.AppendLine("TITLE" + " = " + input.title);
+            file.AppendLine("TITLE" + " = " + input.Title);
             file.AppendLine("NMODES" + " = " + String.Format("{0,4}", input.nModes));
             file.AppendLine("S" + " = " + Convert.ToString(input.S));
             file.AppendLine("AZETA" + " = " + String.Format("{0,10:0.00000}", input.Azeta));
-            file.AppendLine("FIT_AZETA" + " = " + Convert.ToString(input.fitAzeta));
-            if (input.minJBool == true)
+            file.AppendLine("FIT_AZETA" + " = " + Convert.ToString(input.FitAzeta));
+            if (input.MinJBool == true)
             {
                 file.AppendLine("MINJ" + " = " + Convert.ToString(input.minJ));
             }
             file.AppendLine("MAXJ" + " = " + Convert.ToString(input.maxJ));
-            file.AppendLine("FIT_ORIGIN = " + Convert.ToString(input.fitOrigin));
-            file.AppendLine("ORIGIN = " + Convert.ToString(input.origin));
-            file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.useKappaEta));
+            file.AppendLine("FIT_ORIGIN = " + Convert.ToString(input.FitOrigin));
+            file.AppendLine("ORIGIN = " + Convert.ToString(input.Origin));
+            file.AppendLine("USE_KAPPA_ETA = " + Convert.ToString(input.UseKappaEta));
             file.AppendLine("S1" + " = " + Convert.ToString(input.S1));
             file.AppendLine("S2" + " = " + Convert.ToString(input.S2));
             file.AppendLine("/");
@@ -262,7 +262,7 @@ namespace ConsoleApplication1
                 file.AppendLine("MODEVMAX" + " = " + Convert.ToString(Modes[i].modeVMax));
                 file.AppendLine("MODEOMEGA" + " = " + String.Format("{0,10:0.00000}", Modes[i].modeOmega));
                 file.AppendLine("MODEWEXE" + " = " + String.Format("{0,10:0.00000}", Modes[i].wExe));
-                if (input.useKappaEta)
+                if (input.UseKappaEta)
                 {
                     file.AppendLine("MODED" + " = " + String.Format("{0,10:0.00000}", Modes[i].D));
                     file.AppendLine("MODEK" + " = " + String.Format("{0,10:0.00000}", Modes[i].K));
@@ -288,52 +288,52 @@ namespace ConsoleApplication1
             }
 
             file.AppendLine("&SOLVE_INFO");
-            file.AppendLine("BLOCK_LANCZOS = " + Convert.ToString(input.blockLanczos));
+            file.AppendLine("BLOCK_LANCZOS = " + Convert.ToString(input.BlockLanczos));
             file.AppendLine("M" + " = " + Convert.ToString(input.M));
             file.AppendLine("K_FACTOR" + " = " + Convert.ToString(input.kFactor));
-            file.AppendLine("NOITS" + " = " + Convert.ToString(input.noIts));
-            file.AppendLine("TOL" + " = " + Convert.ToString(input.tol));
-            file.AppendLine("PARVEC = " + Convert.ToString(input.parVec));
-            file.AppendLine("PARMAT = " + Convert.ToString(input.parMat));
-            file.AppendLine("PARJ = " + Convert.ToString(input.parJ));
+            file.AppendLine("NOITS" + " = " + Convert.ToString(input.NumberOfIts));
+            file.AppendLine("TOL" + " = " + Convert.ToString(input.Tolerance));
+            file.AppendLine("PARVEC = " + Convert.ToString(input.ParVectorMultiplication));
+            file.AppendLine("PARMAT = " + Convert.ToString(input.ParMatrix));
+            file.AppendLine("PARJ = " + Convert.ToString(input.ParJ));
             file.AppendLine("/");
             file.AppendLine("  ");
 
             file.AppendLine("&IO_INFO");
-            file.AppendLine("PRINT_BASIS" + " = " + Convert.ToString(input.printBasis));
-            file.AppendLine("PRINT_MATRIX" + " = " + Convert.ToString(input.pMatrix));
-            file.AppendLine("PRINT_VEC" + " = " + Convert.ToString(input.pVector));
-            file.AppendLine("VEC_FILE = " + Convert.ToString(input.vecFile));
-            file.AppendLine("VEC_FILE_COMPLETE = " + Convert.ToString(input.vecFileComplete));
-            file.AppendLine("USE_MATRIX_FILE = " + Convert.ToString(input.useMatFile));
-            file.AppendLine("MATRIX_FILE = " + input.matFile);
-            file.AppendLine("EV_MIN = " + Convert.ToString(input.evMin));
+            file.AppendLine("PRINT_BASIS" + " = " + Convert.ToString(input.PrintBasis));
+            file.AppendLine("PRINT_MATRIX" + " = " + Convert.ToString(input.PrintMatrix));
+            file.AppendLine("PRINT_VEC" + " = " + Convert.ToString(input.PrintVector));
+            file.AppendLine("VEC_FILE = " + Convert.ToString(input.EVectorFile));
+            file.AppendLine("VEC_FILE_COMPLETE = " + Convert.ToString(input.VectorFileComplete));
+            file.AppendLine("USE_MATRIX_FILE = " + Convert.ToString(input.UseMatrixFile));
+            file.AppendLine("MATRIX_FILE = " + input.MatrixFile);
+            file.AppendLine("EV_MIN = " + Convert.ToString(input.EigenvectorCoefficientMinimum));
             file.AppendLine("/");
             file.AppendLine("  ");
 
             file.AppendLine("&FIT_INFO");
-            file.AppendLine("FITFILE" + " = " + input.fitFile);
-            file.AppendLine("FTOL" + " = " + Convert.ToString(input.fTol));
-            file.AppendLine("XTOL" + " = " + Convert.ToString(input.xTol));
-            file.AppendLine("GTOL" + " = " + Convert.ToString(input.gTol));
-            file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.maxFev));
-            file.AppendLine("FACTOR" + " = " + Convert.ToString(input.factor));
+            file.AppendLine("FITFILE" + " = " + input.FitFile);
+            file.AppendLine("FTOL" + " = " + Convert.ToString(input.FTol));
+            file.AppendLine("XTOL" + " = " + Convert.ToString(input.XTol));
+            file.AppendLine("GTOL" + " = " + Convert.ToString(input.GTol));
+            file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.MaxOptimizerSteps));
+            file.AppendLine("FACTOR" + " = " + Convert.ToString(input.Factor));
             file.AppendLine("/");
             file.AppendLine("  ");
 
-            if (input.includeCrossTerms == true)
+            if (input.IncludeCrossTerms == true)
             {
                 file.AppendLine("&CROSS_TERMS");
                 for (int i = 0; i < input.nModes; i++)
                 {
                     for (int j = 0; j < input.nModes; j++)
                     {
-                        if (input.crossTermMatrix[i, j] != 0D || input.crossTermFit[i, j] == true)
+                        if (input.CrossTermMatrix[i, j] != 0D || input.CrossTermFit[i, j] == true)
                         {
                             if (i < j)
                             {
-                                file.AppendLine("JT MODE " + Convert.ToString(i + 1) + " MODE " + Convert.ToString(j + 1) + " = " + String.Format("{0,10:0.00000}", input.crossTermMatrix[i, j]));
-                                file.AppendLine("FIT" + " = " + Convert.ToString(input.crossTermFit[i, j]));
+                                file.AppendLine("JT MODE " + Convert.ToString(i + 1) + " MODE " + Convert.ToString(j + 1) + " = " + String.Format("{0,10:0.00000}", input.CrossTermMatrix[i, j]));
+                                file.AppendLine("FIT" + " = " + Convert.ToString(input.CrossTermFit[i, j]));
                             }
                         }
                     }
@@ -418,7 +418,7 @@ namespace ConsoleApplication1
             }//end loop i
             List<string> linesToWrite = new List<string>();
             linesToWrite.Add(file.ToString());
-            File.WriteAllLines(input.matFilePath, linesToWrite);
+            File.WriteAllLines(input.MatrixFilePath, linesToWrite);
         }//end method writeMatFile
     }//end class OutputFile    
 }

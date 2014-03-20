@@ -66,27 +66,27 @@ namespace ConsoleApplication1
                 }
 
                 //read and parse input file, then initialize FileInfo object
-                string[] inputFile = FileInfo.fileRead(filepathIN);
+                string[] inputFile = FileInfo.FileRead(filepathIN);
                 FileInfo input = new FileInfo();
-                input.setFileInfo(inputFile, filepath);
+                input.SetFileInfo(inputFile, filepath);
 
                 //make the fitfile point to something
-                filepathFIT = string.Concat(input.fitFile);
+                filepathFIT = string.Concat(input.FitFile);
 
                 //see if matFile is true, and if so if the matfile exists or not.
-                if (input.useMatFile)
+                if (input.UseMatrixFile)
                 {
-                    input.matFilePath = string.Copy(filepath);
-                    input.matFilePath += input.matFile;
+                    input.MatrixFilePath = string.Copy(filepath);
+                    input.MatrixFilePath += input.MatrixFile;
                     //check that the mat file has a valid path
-                    if (input.matFilePath == filepathIN || input.matFilePath == filepathOUT || input.matFilePath == filepathFIT)
+                    if (input.MatrixFilePath == filepathIN || input.MatrixFilePath == filepathOUT || input.MatrixFilePath == filepathFIT)
                     {
                         throw new FileNameError("matFile");
                     }
                     //if this file already exists, then use it for the matrix generation
-                    if (File.Exists(input.matFilePath))
+                    if (File.Exists(input.MatrixFilePath))
                     {
-                        input.matMade = true;
+                        input.MatrixMade = true;
                     }
                 }
 
@@ -108,7 +108,7 @@ namespace ConsoleApplication1
                 bool fit = IsFit(input, Modes);
                                 
                 //main subroutine execution when not running a scan
-                if (input.scan == false)
+                if (input.Scan == false)
                 {
                     List<string> linesToWrite = new List<string>();
                     linesToWrite = OutputFile.inputFileMaker(input, Modes);
@@ -146,33 +146,33 @@ namespace ConsoleApplication1
                     List<Eigenvalue[]> scanList = new List<Eigenvalue[]>();
                     List<string> finalOut = new List<string>();
 
-                    for (int h = 0; h < input.steps; h++)
+                    for (int h = 0; h < input.ScanSteps; h++)
                     {
                         List<string> linesToWrite = new List<string>();
 
                         //run loop over each variable to be scanned and increment by step size times loop iteration.
-                        for (int n = 0; n < input.scanList.Count; n++)
+                        for (int n = 0; n < input.ScanList.Count; n++)
                         {
-                            if (input.scanList[n].varToFit.ToUpper() == "OMEGA")
+                            if (input.ScanList[n].varToFit.ToUpper() == "OMEGA")
                             {
-                                Modes[input.scanList[n].Mode - 1].modeOmega = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                Modes[input.ScanList[n].Mode - 1].modeOmega = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "WEXE")
+                            if (input.ScanList[n].varToFit.ToUpper() == "WEXE")
                             {
-                                Modes[input.scanList[n].Mode - 1].wExe = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                Modes[input.ScanList[n].Mode - 1].wExe = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "D")
+                            if (input.ScanList[n].varToFit.ToUpper() == "D")
                             {
-                                Modes[input.scanList[n].Mode - 1].D = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                Modes[input.ScanList[n].Mode - 1].D = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "K")
+                            if (input.ScanList[n].varToFit.ToUpper() == "K")
                             {
-                                Modes[input.scanList[n].Mode - 1].K = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                Modes[input.ScanList[n].Mode - 1].K = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "B")
+                            if (input.ScanList[n].varToFit.ToUpper() == "B")
                             {
-                                int tRow = input.scanList[n].Mode;
-                                int tCol = input.scanList[n].Cross;
+                                int tRow = input.ScanList[n].Mode;
+                                int tCol = input.ScanList[n].Cross;
                                 int temp;
                                 if (tRow > tCol)
                                 {
@@ -180,16 +180,16 @@ namespace ConsoleApplication1
                                     tRow = tCol;
                                     tCol = temp;
                                 }
-                                input.crossTermMatrix[tRow - 1, tCol - 1] = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                input.CrossTermMatrix[tRow - 1, tCol - 1] = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "SPECIAL")
+                            if (input.ScanList[n].varToFit.ToUpper() == "SPECIAL")
                             {
-                                input.crossTermMatrix[0, 0] = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                input.CrossTermMatrix[0, 0] = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "AT")
+                            if (input.ScanList[n].varToFit.ToUpper() == "AT")
                             {
-                                int tRow = input.scanList[n].Mode;
-                                int tCol = input.scanList[n].Cross;
+                                int tRow = input.ScanList[n].Mode;
+                                int tCol = input.ScanList[n].Cross;
                                 int temp;
                                 if (tRow < tCol)
                                 {
@@ -197,12 +197,12 @@ namespace ConsoleApplication1
                                     tRow = tCol;
                                     tCol = temp;
                                 }
-                                input.crossTermMatrix[tRow - 1, tCol - 1] = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                input.CrossTermMatrix[tRow - 1, tCol - 1] = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.scanList[n].varToFit.ToUpper() == "JT")
+                            if (input.ScanList[n].varToFit.ToUpper() == "JT")
                             {
-                                int tRow = input.scanList[n].Mode;
-                                int tCol = input.scanList[n].Cross;
+                                int tRow = input.ScanList[n].Mode;
+                                int tCol = input.ScanList[n].Cross;
                                 int temp;
                                 if (tRow > tCol)
                                 {
@@ -210,7 +210,7 @@ namespace ConsoleApplication1
                                     tRow = tCol;
                                     tCol = temp;
                                 }
-                                input.crossTermMatrix[tRow - 1, tCol - 1] = input.scanList[n].Start + input.scanList[n].Step * (double)h;
+                                input.CrossTermMatrix[tRow - 1, tCol - 1] = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
                         }//end adjust each variable to fit
 
@@ -239,7 +239,7 @@ namespace ConsoleApplication1
                 }//end else for scan
 
                 //Writes the matrix to file if needed
-                if (input.useMatFile && !input.matMade)
+                if (input.UseMatrixFile && !input.MatrixMade)
                 {
                     OutputFile.writeMatFile(input);
                 }//end if to write matrix to file
@@ -395,12 +395,12 @@ namespace ConsoleApplication1
             bool fit = false;
             for (int i = 0; i < input.nModes; i++)
             {
-                if (input.fitAzeta == true)
+                if (input.FitAzeta == true)
                 {
                     fit = true;
                     break;
                 }
-                if (input.fitOrigin == true)
+                if (input.FitOrigin == true)
                 {
                     fit = true;
                     break;
@@ -428,9 +428,9 @@ namespace ConsoleApplication1
             }
 
             //this checks the cross term fit boolean values
-            if (input.includeCrossTerms == true)
+            if (input.IncludeCrossTerms == true)
             {
-                foreach (bool fitter in input.crossTermFit)
+                foreach (bool fitter in input.CrossTermFit)
                 {
                     if (fitter == true)
                     {
@@ -443,7 +443,7 @@ namespace ConsoleApplication1
             //turns off the scan function if any values are being fit
             if (fit == true)
             {
-                input.scan = false;
+                input.Scan = false;
             }
             return fit;
         }
@@ -482,13 +482,13 @@ namespace ConsoleApplication1
             {
                 for (int i = 0; i < input.nModes; i++)
                 {
-                    if (input.crossTermMatrix == null)
+                    if (input.CrossTermMatrix == null)
                     {
                         break;
                     }
                     for (int j = i + 1; j < input.nModes; j++)
                     {
-                        if (input.crossTermMatrix[j, i] != 0)
+                        if (input.CrossTermMatrix[j, i] != 0)
                         {
                             if (Modes[i].IsAType == true)
                             {
@@ -538,7 +538,7 @@ namespace ConsoleApplication1
                     Modes[i].fitD = Modes[i].fitKappa;
                     Modes[i].K = Modes[i].eta / Modes[i].modeOmega;
                     Modes[i].fitK = Modes[i].fitEta;
-                    input.useKappaEta = true;
+                    input.UseKappaEta = true;
                 }
             }//end for
             return Modes;
@@ -569,7 +569,7 @@ namespace ConsoleApplication1
             }
             while ((lineS = vecIn.ReadLine()) != "END_VEC")
             {
-                vector.Add(FileInfo.parseDouble(lineS));
+                vector.Add(FileInfo.ParseDouble(lineS));
             }//end while
             return vector.ToArray();
         }//end method vecRead
@@ -594,7 +594,7 @@ namespace ConsoleApplication1
         {
             List<double[,]> eVecs = new List<double[,]>();
             string file;
-            double evMin = input.evMin;
+            double evMin = input.EigenvectorCoefficientMinimum;
             double[] lanczosVector;
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
@@ -644,15 +644,15 @@ namespace ConsoleApplication1
                     output.AppendLine(" " + "\r");
                     output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
                     output.AppendLine(" ");                    
-                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.evMin, true);
+                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.EigenvectorCoefficientMinimum, true);
                 }//end j for loop
                 output.AppendLine("\r");
             }//end i loop
-            string fileName = filepath + input.title + "_EVecs.out";
+            string fileName = filepath + input.Title + "_EVecs.out";
             List<string> ou = new List<string>();
             ou.Add(output.ToString());
             File.WriteAllLines(fileName, ou);
-            if (input.vecFile)
+            if (input.EVectorFile)
             {
                 SOCJT.writeVecFile(input, eVecs, basisSet);
             }

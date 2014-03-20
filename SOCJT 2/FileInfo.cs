@@ -31,7 +31,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// Title of the calculations
         /// </summary>
-        public string title { get; private set;}
+        public string Title { get; private set;}
 
         /// <summary>
         /// Value of spin
@@ -59,7 +59,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if the SO coupling constant is being fit
         /// </summary>
-        public bool fitAzeta { get; private set; }
+        public bool FitAzeta { get; private set; }
 
         /// <summary>
         /// Maximum value of j to use in the basis set
@@ -100,7 +100,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if min J is user specified
         /// </summary>
-        public bool minJBool { get; private set; }
+        public bool MinJBool { get; private set; }
 
         /// <summary>
         /// Value of S1
@@ -139,37 +139,37 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if the basis set should be printed in the output file.
         /// </summary>
-        public bool printBasis { get; private set; }
+        public bool PrintBasis { get; private set; }
 
         /// <summary>
         /// True if the Hamiltonian should be printed in the output file.
         /// </summary>
-        public bool pMatrix { get; private set; }
+        public bool PrintMatrix { get; private set; }
 
         /// <summary>
         /// True if the eigenvectors should be printed in the output file.
         /// </summary>
-        public bool pVector { get; set; }  
+        public bool PrintVector { get; set; }  
 
         /// <summary>
         /// True if a file with the eigenvectors should be printed.
         /// </summary>
-        public bool vecFile { get; private set; }
+        public bool EVectorFile { get; private set; }
 
         /// <summary>
         /// Value of the origin to add to the eigenvalues
         /// </summary>
-        public double origin { get; set; }
+        public double Origin { get; set; }
 
         /// <summary>
         /// True if the origin should be fit.
         /// </summary>
-        public bool fitOrigin { get; private set; }
+        public bool FitOrigin { get; private set; }
 
         /// <summary>
         /// True if you want to save a file with the basis set in it.
         /// </summary>
-        public bool basisFile { get; private set; }
+        public bool BasisSetFile { get; private set; }
 
         /// <summary>
         /// Number of eigenvalues/eigenvectors to find
@@ -203,7 +203,7 @@ namespace ConsoleApplication1
         /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
         /// </summary>
         private int _noIts;
-        public int noIts 
+        public int NumberOfIts 
         {
             get { return _noIts; }
             private set 
@@ -217,7 +217,7 @@ namespace ConsoleApplication1
         /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
         /// </summary>
         private double _tol;
-        public double tol 
+        public double Tolerance 
         {
             get { return _tol; }
             private set
@@ -230,13 +230,13 @@ namespace ConsoleApplication1
         /// <summary>
         /// Name of the fit file to be used for a fit.
         /// </summary>
-        public string fitFile { get; private set; }
+        public string FitFile { get; private set; }
 
         /// <summary>
         /// F-Tolerance value for LM optimization
         /// </summary>
         private double _fTol;
-        public double fTol 
+        public double FTol 
         {
             get { return _fTol; }
             private set
@@ -250,7 +250,7 @@ namespace ConsoleApplication1
         /// X-Tolerance value for LM optimization
         /// </summary>
         private double _xTol;
-        public double xTol
+        public double XTol
         {
             get { return _xTol; }
             private set
@@ -264,7 +264,7 @@ namespace ConsoleApplication1
         /// G-Tolerance value for LM optimization
         /// </summary>
         private double _gTol;
-        public double gTol
+        public double GTol
         {
             get { return _gTol; }
             private set
@@ -278,7 +278,7 @@ namespace ConsoleApplication1
         /// Max number of iterations (steps) in the LM optimizer
         /// </summary>
         private int _maxFev;
-        public int maxFev
+        public int MaxOptimizerSteps
         {
             get { return _maxFev; }
             private set 
@@ -292,7 +292,7 @@ namespace ConsoleApplication1
         /// Factor used for step size in LM optimizer
         /// </summary>
         private double _factor;
-        public double factor
+        public double Factor
         {
             get { return _factor; }
             private set
@@ -305,18 +305,18 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if there are cross-terms in the Hamiltonian
         /// </summary>
-        public bool includeCrossTerms { get; private set; }
+        public bool IncludeCrossTerms { get; private set; }
 
         /// <summary>
         /// True if a scan is being run
         /// </summary>
-        public bool scan { get; set; }
+        public bool Scan { get; set; }
 
         /// <summary>
         /// Number of steps to run in a scan
         /// </summary>
         private int _steps;
-        public int steps
+        public int ScanSteps
         {
             get { return _steps; }
             set
@@ -329,18 +329,18 @@ namespace ConsoleApplication1
         /// <summary>
         /// How long (in seconds) the Hamiltonian generation took.
         /// </summary>
-        public double matGenTime { get; set; }
+        public double MatrixGenerationTime { get; set; }
 
         /// <summary>
         /// How long (in seconds) the diagonalization took.
         /// </summary>
-        public double diagTime { get; set; }
+        public double DiagonalizationTime { get; set; }
 
         /// <summary>
         /// How much to parallelize the Hamiltonian matrix generation
         /// </summary>
         private int _parMat;
-        public int parMat
+        public int ParMatrix
         {
             get { return _parMat; }
             private set
@@ -354,7 +354,7 @@ namespace ConsoleApplication1
         /// How much to parallelize the matrix vector multiplication
         /// </summary>
         private int _parVec;
-        public int parVec
+        public int ParVectorMultiplication
         {
             get { return _parVec; }
             private set
@@ -368,7 +368,7 @@ namespace ConsoleApplication1
         /// How many j-blocks should be run in parallel
         /// </summary>
         private int _parJ;
-        public int parJ
+        public int ParJ
         {
             get { return _parJ; }
             private set
@@ -382,7 +382,7 @@ namespace ConsoleApplication1
         /// Minimum value of coefficients to print in eigenvectors
         /// </summary>
         private double _evMin;
-        public double evMin
+        public double EigenvectorCoefficientMinimum
         {
             get { return _evMin; }
             private set
@@ -395,64 +395,64 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if SO coupling is nonzero
         /// </summary>
-        public bool inclSO { get; private set; }
+        public bool IncludeSO { get; private set; }
 
         public List<Tuple<decimal, int, int>> eVecs { get; private set; }
         
         /// <summary>
         /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
         /// </summary>
-        public bool useKappaEta { get; set; }//end useKappaEta
+        public bool UseKappaEta { get; set; }//end useKappaEta
 
         /// <summary>
         /// List of Scanner objects for scan. Contains, variable to scan, step size, and start value.
         /// </summary>
-        public List<Scanner> scanList;
+        public List<Scanner> ScanList;
 
         /// <summary>
         /// Array containing cross-terms
         /// </summary>
-        public double[,] crossTermMatrix;
+        public double[,] CrossTermMatrix;
 
         /// <summary>
         /// Array containing booleans for fitting various cross-terms
         /// </summary>
-        public bool[,] crossTermFit;
+        public bool[,] CrossTermFit;
 
         /// <summary>
         /// True if using block lanczos instead of naive Lanczos.
         /// </summary>
-        public bool blockLanczos { get; private set; }//end blockLanczos
+        public bool BlockLanczos { get; private set; }//end blockLanczos
 
         /// <summary>
         /// Filepath of matrix file to read.
         /// </summary>
-        public string matFilePath { get; set; }//end matFilePath
+        public string MatrixFilePath { get; set; }//end matFilePath
 
         /// <summary>
         /// String value. File name of file containing the previous matrix or the filename desired to write the matrix to.
         /// </summary>
-        public string matFile { get; private set; }//end matFile
+        public string MatrixFile { get; private set; }//end matFile
 
         /// <summary>
         /// Boolean indicating that a matrix file should be used or generated.
         /// </summary>
-        public bool useMatFile { get; private set; }//end useMatFile
+        public bool UseMatrixFile { get; private set; }//end useMatFile
 
         /// <summary>
         /// Boolean indicating whether the matrix file exists or not.
         /// </summary>
-        public bool matMade { get; set; }//end matMade
+        public bool MatrixMade { get; set; }//end matMade
 
         /// <summary>
         /// String to store the directory of the input and output files.
         /// </summary>
-        public string filePath { get; set; }
+        public string FilePath { get; set; }
 
         /// <summary>
         /// Boolean indicating whether or not an output file of the eigenvectors using the complete basis set should be printed.
         /// </summary>
-        public bool vecFileComplete { get; private set; }
+        public bool VectorFileComplete { get; private set; }
 
         #endregion properties
 
@@ -461,24 +461,24 @@ namespace ConsoleApplication1
         /// </summary>
         public FileInfo()
         {            
-            fitAzeta = false;
-            minJBool = false;
-            fitOrigin = false;
-            inclSO = false;
-            printBasis = false;
-            pMatrix = false;
-            pVector = false;
-            includeCrossTerms = false;
-            useKappaEta = false;
-            blockLanczos = false;
-            useMatFile = false;
-            matMade = false;
-            vecFile = false;
-            vecFileComplete = false;
+            FitAzeta = false;
+            MinJBool = false;
+            FitOrigin = false;
+            IncludeSO = false;
+            PrintBasis = false;
+            PrintMatrix = false;
+            PrintVector = false;
+            IncludeCrossTerms = false;
+            UseKappaEta = false;
+            BlockLanczos = false;
+            UseMatrixFile = false;
+            MatrixMade = false;
+            EVectorFile = false;
+            VectorFileComplete = false;
             
-            matFile = "matrix.txt";
-            title = "TITLE";
-            fitFile = "fit.fit";
+            MatrixFile = "matrix.txt";
+            Title = "TITLE";
+            FitFile = "fit.fit";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -488,24 +488,24 @@ namespace ConsoleApplication1
             S1 = 0;
             S2 = 1;
             
-            origin = 0.0;
-            parMat = 1;
+            Origin = 0.0;
+            ParMatrix = 1;
             nModes = 1;
             S = 0.5M;
             Azeta = 0.0;
-            evMin = 0.2;            
-            parVec = 1;
-            parMat = 1;
-            parJ = 2;
+            EigenvectorCoefficientMinimum = 0.2;            
+            ParVectorMultiplication = 1;
+            ParMatrix = 1;
+            ParJ = 2;
             M = 5;
             kFactor = 2;
-            noIts = 2000;
-            tol = 0.000001;
-            fTol = 0.0;
-            xTol = 0.0;
-            gTol = 0.0;
-            maxFev = 25;
-            factor = 0.001;        
+            NumberOfIts = 2000;
+            Tolerance = 0.000001;
+            FTol = 0.0;
+            XTol = 0.0;
+            GTol = 0.0;
+            MaxOptimizerSteps = 25;
+            Factor = 0.001;        
         }
         
         /// <summary>
@@ -517,7 +517,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Array containing all values from text file.
         /// </returns>
-        public static string[] fileRead(string filepath)
+        public static string[] FileRead(string filepath)
         {
             List<string> inputF = new List<string>();
             string[] inputFa = { };
@@ -539,9 +539,9 @@ namespace ConsoleApplication1
             return inputFa;
         }//end method fileRead
 
-        public void setFileInfo(string[] inputf, string filepath)
+        public void SetFileInfo(string[] inputf, string filepath)
         {
-            this.filePath = filePath;
+            this.FilePath = FilePath;
             for (int i = 0; i < inputf.Length; i++)
             {
                 if (inputf[i].ToUpper() == "&GENERAL")
@@ -551,7 +551,7 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "TITLE")
                         {
-                            title = inputf[u + 1];
+                            Title = inputf[u + 1];
                             continue;
                         }
                         if (inputf[u].ToUpper() == "NMODES")
@@ -561,7 +561,7 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "S")
                         {
-                            S = parseDecimal(inputf[u + 1]);
+                            S = ParseDecimal(inputf[u + 1]);
                             if (S < 0M)
                             {
                                 S = S * -1M;
@@ -570,37 +570,37 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "AZETA")
                         {
-                            Azeta = parseDouble(inputf[u + 1]);
+                            Azeta = ParseDouble(inputf[u + 1]);
                             if (Azeta != 0D)
                             {
-                                inclSO = true;
+                                IncludeSO = true;
                             }
                             continue;
                         }
                         if (inputf[u].ToUpper() == "FIT_AZETA")
                         {
-                            fitAzeta = TorF(inputf[u + 1]);
+                            FitAzeta = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MAXJ")
                         {
-                            maxJ = parseDecimal(inputf[u + 1]);
+                            maxJ = ParseDecimal(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MINJ")
                         {
-                            minJ = parseDecimal(inputf[u + 1]);
-                            minJBool = true;
+                            minJ = ParseDecimal(inputf[u + 1]);
+                            MinJBool = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "FIT_ORIGIN")
                         {
-                            fitOrigin = TorF(inputf[u + 1]);
+                            FitOrigin = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "ORIGIN")
                         {
-                            origin = parseDouble(inputf[u + 1]);
+                            Origin = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "S1")
@@ -615,7 +615,7 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "USE_KAPPA_ETA")
                         {
-                            useKappaEta = TorF(inputf[u + 1]);
+                            UseKappaEta = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -633,45 +633,45 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "PRINT_BASIS")
                         {
-                            printBasis = TorF(inputf[u + 1]);
+                            PrintBasis = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_MATRIX")
                         {
-                            pMatrix = TorF(inputf[u + 1]);
+                            PrintMatrix = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PRINT_VEC")
                         {
-                            pVector = TorF(inputf[u + 1]);
+                            PrintVector = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "USE_MATRIX_FILE")
                         {
-                            useMatFile = TorF(inputf[u + 1]);
+                            UseMatrixFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE")
                         {
-                            vecFile = TorF(inputf[u + 1]);
+                            EVectorFile = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "VEC_FILE_COMPLETE")
                         {
-                            vecFileComplete = TorF(inputf[u + 1]);
+                            VectorFileComplete = TorF(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MATRIX_FILE")
                         {
-                            matFile = inputf[u + 1];
+                            MatrixFile = inputf[u + 1];
                             continue;
                         }
                         if (inputf[u].ToUpper() == "EV_MIN")
                         {
-                            evMin = Convert.ToDouble(inputf[u + 1]);
-                            if (evMin < 0.0)
+                            EigenvectorCoefficientMinimum = Convert.ToDouble(inputf[u + 1]);
+                            if (EigenvectorCoefficientMinimum < 0.0)
                             {
-                                evMin = -1.0 * evMin;
+                                EigenvectorCoefficientMinimum = -1.0 * EigenvectorCoefficientMinimum;
                             }
                             continue;
                         }
@@ -701,43 +701,43 @@ namespace ConsoleApplication1
                         }
                         if (inputf[u].ToUpper() == "NOITS")
                         {
-                            noIts = Convert.ToInt32(inputf[u + 1]);
+                            NumberOfIts = Convert.ToInt32(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "TOL")
                         {
-                            tol = parseDouble(inputf[u + 1]);
+                            Tolerance = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PARVEC")
                         {
-                            parVec = Convert.ToInt16(inputf[u + 1]);
-                            if (parVec < 1)
+                            ParVectorMultiplication = Convert.ToInt16(inputf[u + 1]);
+                            if (ParVectorMultiplication < 1)
                             {
-                                parVec = 1;
+                                ParVectorMultiplication = 1;
                             }
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PARMAT")
                         {
-                            parMat = Convert.ToInt16(inputf[u + 1]);
-                            if (parMat < 1)
+                            ParMatrix = Convert.ToInt16(inputf[u + 1]);
+                            if (ParMatrix < 1)
                             {
-                                parMat = 1;
+                                ParMatrix = 1;
                             }
                             continue;
                         }
                         if (inputf[u].ToUpper() == "PARJ")
                         {
-                            parJ = Convert.ToInt16(inputf[u + 1]);
-                            if (parJ < 1)
+                            ParJ = Convert.ToInt16(inputf[u + 1]);
+                            if (ParJ < 1)
                             {
-                                parJ = 1;
+                                ParJ = 1;
                             }
                         }
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
-                            blockLanczos = TorF(inputf[u + 1]);
+                            BlockLanczos = TorF(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {
@@ -755,32 +755,32 @@ namespace ConsoleApplication1
                     {
                         if (inputf[u].ToUpper() == "FITFILE")
                         {
-                            fitFile = inputf[u + 1];
+                            FitFile = inputf[u + 1];
                             continue;
                         }
                         if (inputf[u].ToUpper() == "FTOL")
                         {
-                            fTol = parseDouble(inputf[u + 1]);
+                            FTol = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "XTOL")
                         {
-                            xTol = parseDouble(inputf[u + 1]);
+                            XTol = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "GTOL")
                         {
-                            gTol = parseDouble(inputf[u + 1]);
+                            GTol = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "MAXFEV")
                         {
-                            maxFev = Convert.ToInt32(inputf[u + 1]);
+                            MaxOptimizerSteps = Convert.ToInt32(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "FACTOR")
                         {
-                            factor = parseDouble(inputf[u + 1]);
+                            Factor = ParseDouble(inputf[u + 1]);
                             continue;
                         }
                         if (inputf[u].ToUpper() == "/")
@@ -798,15 +798,15 @@ namespace ConsoleApplication1
                     int column;
                     int temp;
                     bool tbool;
-                    includeCrossTerms = true;
-                    crossTermMatrix = new double[nModes, nModes];
-                    crossTermFit = new bool[nModes, nModes];
+                    IncludeCrossTerms = true;
+                    CrossTermMatrix = new double[nModes, nModes];
+                    CrossTermFit = new bool[nModes, nModes];
                     for (int l = 0; l < nModes; l++)
                     {
                         for (int m = 0; m < nModes; m++)
                         {
-                            crossTermMatrix[l, m] = 0D;
-                            crossTermFit[l, m] = false;
+                            CrossTermMatrix[l, m] = 0D;
+                            CrossTermFit[l, m] = false;
                         }
                     }//end loops to initalize crossTermMatrix to all 0's
 
@@ -823,9 +823,9 @@ namespace ConsoleApplication1
                                 row = column;
                                 column = temp;
                             }//end if
-                            crossTermMatrix[row, column] = parseDouble(inputf[j + 5]);
+                            CrossTermMatrix[row, column] = ParseDouble(inputf[j + 5]);
                             tbool = TorF(inputf[j + 7]);
-                            crossTermFit[row, column] = tbool;
+                            CrossTermFit[row, column] = tbool;
                             continue;
                         }
                         if (inputf[j] == "/")
@@ -839,23 +839,23 @@ namespace ConsoleApplication1
                 if (inputf[i].ToUpper() == "&SCAN")
                 {
                     #region &SCAN
-                    scanList = new List<Scanner>();
+                    ScanList = new List<Scanner>();
                     for (int u = i; ; u++)
                     {
                         if (inputf[u].ToUpper() == "STEPS")
                         {
-                            steps = Convert.ToInt32(inputf[u + 1]);
+                            ScanSteps = Convert.ToInt32(inputf[u + 1]);
                         }
                         if (inputf[u].ToUpper() == "MODE")
                         {
                             Scanner tempScan = new Scanner();
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.varToFit = inputf[u + 2];
-                            tempScan.Start = parseDouble(inputf[u + 3]);
-                            tempScan.Step = parseDouble(inputf[u + 4]);
-                            scanList.Add(tempScan);
+                            tempScan.Start = ParseDouble(inputf[u + 3]);
+                            tempScan.Step = ParseDouble(inputf[u + 4]);
+                            ScanList.Add(tempScan);
                             tempScan = null;
-                            scan = true;
+                            Scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "CROSS")
@@ -864,11 +864,11 @@ namespace ConsoleApplication1
                             tempScan.Mode = Convert.ToInt32(inputf[u + 1]);
                             tempScan.Cross = Convert.ToInt32(inputf[u + 2]);
                             tempScan.varToFit = inputf[u + 3];
-                            tempScan.Start = parseDouble(inputf[u + 4]);
-                            tempScan.Step = parseDouble(inputf[u + 5]);
-                            scanList.Add(tempScan);
+                            tempScan.Start = ParseDouble(inputf[u + 4]);
+                            tempScan.Step = ParseDouble(inputf[u + 5]);
+                            ScanList.Add(tempScan);
                             tempScan = null;
-                            scan = true;
+                            Scan = true;
                             continue;
                         }
                         if (inputf[u].ToUpper() == "/")
@@ -881,10 +881,10 @@ namespace ConsoleApplication1
             }//end for
 
             //this is to initialize the cross-term matrix no matter what
-            if (crossTermMatrix == null)
+            if (CrossTermMatrix == null)
             {
-                crossTermMatrix = new double[nModes, nModes];
-                crossTermFit = new bool[nModes, nModes];
+                CrossTermMatrix = new double[nModes, nModes];
+                CrossTermFit = new bool[nModes, nModes];
             }
         }//end method setFileInfo
 
@@ -916,7 +916,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Double value of parsed string
         /// </returns>
-        public static double parseDouble(string s)
+        public static double ParseDouble(string s)
         {
             try
             {
@@ -937,7 +937,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Decimal value of parsed string
         /// </returns>
-        public static decimal parseDecimal(string s)
+        public static decimal ParseDecimal(string s)
         {
             try
             {
