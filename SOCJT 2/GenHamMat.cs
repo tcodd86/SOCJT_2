@@ -610,14 +610,16 @@ namespace ConsoleApplication1
                     {
                         hashInt[a] = vlLambda[n, a];
                     }
+                    int[] tempInt;
+                    int m;
+                    double temp;
+                    string hashCode;                    
                     for (int eModes = 0; eModes < EVecPos.Count; eModes++)
                     {
+                        #region Linear
+                        //linear portion
                         //now check each EVecPos mode for a linear element by taking vlLambda[n, ] and changing the values appropriately to find a linear element. Store in tempint
-                        int[] tempInt = (int[])hashInt.Clone();
-                        //put in for loop over +/- 1 for lvalue in linear element -----DON'T NEED, l Only decreases                        
-                        int m;
-                        double temp;
-                        string hashCode;
+                        tempInt = (int[])hashInt.Clone();                         
                         for(int ll = -1; ll < 2; ll += 2)
                         {
                             tempInt = (int[])hashInt.Clone();
@@ -648,7 +650,10 @@ namespace ConsoleApplication1
                                 }
                             }
                         }//end loop over linear l values
-                        //check for either quadratic element
+                        #endregion
+
+                        #region Quadratic
+                        //check for all quadratic elements
                         //reset tempInt values for Quadratic elements
                         for (int ll = -2; ll < 3; ll += 4)
                         {
@@ -695,250 +700,75 @@ namespace ConsoleApplication1
                                 }
                             }
                         }//end quadratic loop over l values
+                        #endregion
                     }//end loop over E-modes
 
-                    //if Bilinear
-                    //check for bilinear element Possibly just call bilinear matrix element function from here.
-                    /*
-                    for (int m = n + 1; m < matSize; m++)
+                    #region Bilinear
+                    if (bilinear)
                     {
-                        double temp;
-                        if (vlLambda[n, nModes * 2] == vlLambda[m, nModes * 2])//Delta Lambda must be +/- 1
+                        //loop through A and E vecs with possible coupling
+                        for (int a = 0; a < biAVecPos.Count; a++)
                         {
-                            continue;
-                        }
+                            for (int e = 0; e < biEVecPos.Count; e++)
+                            {
+                                //value to keep track of which cross-term matrix we're on.
+                                int crossCount = a + e;
 
-                        //set the values for vdiff and ldiff
-                        for (int b = 0; b < nModes; b++)
-                        {
-                            vdiff[b] = vlLambda[n, b] - vlLambda[m, b];
-                            ldiff[b] = vlLambda[n, b + nModes] - vlLambda[m, b + nModes];
-                            //check to see if vdiff or ldiff have impossible values (Abs value > 2) if so, skip.
-                            if (Math.Abs(vdiff[b]) > 2 || Math.Abs(ldiff[b]) > 2)
-                            {
-                                exit = true;
-                                break;
-                            }
-                        }
-                        //if an impossible value for vdiff or ldiff is found then skip all conditionals and move to next
-                        if (exit)
-                        {
-                            //reset exit value for next iteration
-                            exit = false;
-                            continue;
-                        }
-
-                        //Linear JT elements
-                        if (vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1] == 0)//means Delta J = 0, possible linear or bilinear term
-                        {
-                            int[] vabs = new int[nModes];
-                            int[] labs = new int[nModes];
-                            for (int h = 0; h < nModes; h++)
-                            {
-                                vabs[h] = Math.Abs(vdiff[h]);
-                                labs[h] = Math.Abs(ldiff[h]);
-                            }
-                            int[] vlprod = new int[nModes];
-                            for (int h = 0; h < nModes; h++)
-                            {
-                                vlprod[h] = vabs[h] * labs[h];
-                            }
-                            if (vlprod.Sum() != 1)//this means |Delta V| = |Delta l| = 1 for only 1 mode, the same mode
-                            {
-                                continue;
-                            }
-                            #region Bilinear
-                            //checks for possible bilinear term by checking Delta v = +/- 1 for both A and E mode and Delta l = 1 for E mode and bilinear = true
-                            if (vabs.Sum() == 2 && labs.Sum() == 1 && bilinear)
-                            {
-                                //next check that the changes are in A and E vec positions
-                                int ASum = 0;
-                                int AVal = 0;
-                                for (int u = 0; u < biAVecPos.Count; u++)
+                                //this is because the cross-term couplings for JT terms are stored in the upper-diagonal of the cross-term matrix
+                                int row;
+                                int column;
+                                if (biAVecPos[a] > biEVecPos[e])
                                 {
-                                    ASum += vabs[biAVecPos[u]];
-                                    AVal += vdiff[biAVecPos[u]];
-                                }
-                                if (ASum != 1)//checks that one change is in an Avec and other must be in Evec, if not continue
-                                {
-                                    continue;
-                                }
-
-                                //loop through A and E vecs with possible coupling
-                                for (int a = 0; a < biAVecPos.Count; a++)
-                                {
-                                    for (int e = 0; e < biEVecPos.Count; e++)
-                                    {
-                                        //value to keep track of which cross-term matrix we're on.
-                                        int crossCount = a + e;
-
-                                        //this is because the cross-term couplings for JT terms are stored in the upper-diagonal of the cross-term matrix
-                                        int row;
-                                        int column;
-                                        if (biAVecPos[a] > biEVecPos[e])
-                                        {
-                                            column = biAVecPos[a];
-                                            row = biEVecPos[e];
-                                        }
-                                        else
-                                        {
-                                            column = biEVecPos[e];
-                                            row = biAVecPos[a];
-                                        }
-
-                                        //this sets up the values for the matrix element.  Doing this makes it so that only one matrix element formula needs to be included
-                                        int nl = vlLambda[n, nModes + biEVecPos[e]];
-                                        int ml = vlLambda[m, nModes + biEVecPos[e]];
-                                        int sl = (int)Math.Pow(-1D, (double)input.S1);
-                                        double oneORnone = 0.0;
-                                        if (vdiff[biAVecPos[a]] == -1)
-                                        {
-                                            oneORnone = 1.0;
-                                        }
-                                        double twoORnone = 0.0;
-                                        double slPre = 1.0;
-                                        if (vdiff[biEVecPos[e]] == -1)
-                                        {
-                                            twoORnone = 2.0;
-                                        }
-                                        if (nl - sl == ml)
-                                        {
-                                            slPre = -1.0 * vdiff[biEVecPos[e]];
-                                        }
-                                        else if (nl + sl == ml)
-                                        {
-                                            slPre = vdiff[biEVecPos[e]];
-                                        }
-                                        else
-                                        {
-                                            continue;
-                                        }
-                                        //formula for bilinear matrix element
-                                        temp = 0.5 * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] - slPre * (double)sl * (double)nl + twoORnone));
-                                        Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matrixPos[2 * nModes + crossCount].Add(tTemp);
-                                        continue;
-                                    }//end for loop over evec positions
-                                }//end for loop over a vec positions
-                            }//end bilinear if
-                            #endregion
-
-                            #region Linear Terms
-                            if (vabs.Sum() != 1)//Delta v = +/- 1 in only one mode for linear only
-                            {
-                                continue;
-                            }
-                            if (labs.Sum() != 1)//Delta l = +/- 1 in only one mode for linear only
-                            {
-                                continue;
-                            }
-
-                            int lval = ldiff.Sum() * -1;
-                            int mode = 0;
-                            //this loop finds which mode has the linear JT term
-                            for (int h = 0; h < nModes; h++)
-                            {
-                                if (vdiff[h] == 0)
-                                {
-                                    continue;
+                                    column = biAVecPos[a];
+                                    row = biEVecPos[e];
                                 }
                                 else
                                 {
-                                    mode = h;
-                                    break;
+                                    column = biEVecPos[e];
+                                    row = biAVecPos[a];
                                 }
-                            }
-                            //formula for the linear JT matrix element
-                            temp = Math.Sqrt(((double)vlLambda[n, mode] + lval * (double)vlLambda[n, mode + nModes] + 2D));
-                            Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                            matrixPos[2 * mode].Add(ttTemp);
-                            continue;
-                            #endregion
-                        }//end linear and bilinear terms
-
-                        #region Quadratic Terms
-                        if (Math.Abs(vlLambda[n, nModes * 2 + 1] - vlLambda[m, nModes * 2 + 1]) == 3)//means Delta J = 3, possible quadratic term
-                        {
-                            if (Math.Abs(ldiff.Sum()) != 2)//Delta l = 2 or -2
-                            {
-                                continue;
-                            }
-                            if (Math.Abs(vdiff.Sum()) != 2 && vdiff.Sum() != 0)//Delta v = 2, -2, or 0
-                            {
-                                continue;
-                            }
-                            int count = 0;
-                            int pos = 0;
-                            int count2 = 0;
-                            int pos2 = 0;
-                            int sign = 1;
-                            for (int h = 0; h < nModes; h++)
-                            {
-                                if (vdiff[h] != 0)
+                                for (int ll = -1; ll < 2; ll += 2)
                                 {
-                                    count++;
-                                    pos = h;
-                                }
-                                if (ldiff[h] != 0)
-                                {
-                                    count2++;
-                                    pos2 = h;
-                                }
-                            }
-                            if (count > 1 || count2 > 1)//says only one mode changes for each
-                            {
-                                continue;
-                            }
-                            //it might be possible to simplify these formulas down to only two (one for delta v = +/- 2 and one for delta v = 0) but it would be very confusing
-                            if (count == 1)//means Delta v = +/- 2
-                            {
-                                if (pos != pos2)//same mode has changes in v and l
-                                {
-                                    continue;
-                                }
-                                else
-                                {
-                                    if (vdiff.Sum() == 2)//top matrix elements on Ham page
+                                    for (int dve = -1; dve < 2; dve += 2)
                                     {
-                                        if (ldiff.Sum() == 2)
+                                        for (int dva = -1; dva < 2; dva += 2)
                                         {
-                                            sign = -1;
-                                        }
-                                        temp = (1 / 4D * Math.Sqrt((vlLambda[n, pos] - sign * vlLambda[n, nModes + pos]) * (vlLambda[n, pos] - sign * vlLambda[n, nModes + pos] - 2)));
-                                        Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matrixPos[pos * 2 + 1].Add(tTemp);
-                                        //matPos.Add(tTemp);
-                                        continue;
-                                    }
-                                    else if (vdiff.Sum() == -2)//bottom matrix elements on Ham page
-                                    {
-                                        if (ldiff.Sum() == 2)
-                                        {
-                                            sign = -1;
-                                        }
-                                        temp = (1 / 4D * Math.Sqrt((vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 4D) * (vlLambda[n, pos] + sign * vlLambda[n, nModes + pos] + 2)));
-                                        Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                        matrixPos[pos * 2 + 1].Add(tTemp);
-                                        //matPos.Add(tTemp);
-                                        continue;
-                                    }
-                                }
-                            }
-                            else//means Delta v = 0
-                            {
-                                if (ldiff.Sum() > 0)
-                                {
-                                    sign = -1;
-                                }
-                                temp = (1D / 2D * Math.Sqrt((vlLambda[n, pos2] + sign * vlLambda[n, nModes + pos2] + 2) * (vlLambda[n, pos2] - sign * vlLambda[n, pos2 + nModes])));
-                                Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                matrixPos[pos2 * 2 + 1].Add(tTemp);
-                                //matPos.Add(tTemp);
-                                continue;
-                            }
-                        }//end quadratic elements if    
-                        #endregion
-                    }//column for loop//*/
+                                            double oneORnone = 0.0;
+                                            if (dva == 1)
+                                            {
+                                                oneORnone = 1.0;
+                                            }
+                                            double twoORnone = 0.0;
+                                            int pre = -1;
+                                            if (dve == 1)
+                                            {
+                                                twoORnone = 2.0;
+                                                pre = 1;
+                                            }
+                                            tempInt = (int[])hashInt.Clone();
+                                            //delta vl for e mode
+                                            DeltaVL(ref tempInt, biEVecPos[e], dve, ll, nModes);
+                                            //delta vl for a mode
+                                            DeltaVL(ref tempInt, biAVecPos[a], dva, 0, nModes, false);
+                                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                                            //formula for bilinear matrix element
+                                            if (BasisPositions.TryGetValue(hashCode, out m))
+                                            {
+                                                if (m > n)
+                                                {
+                                                    temp = 0.5 * Math.Sqrt(((double)vlLambda[n, biAVecPos[a]] + oneORnone) * ((double)vlLambda[n, biEVecPos[e]] + ll * pre * vlLambda[n, nModes + biEVecPos[e]] + twoORnone));//ll * (double)vlLambda[n, EVecPos[eModes] + nModes] + 2D))
+                                                    Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
+                                                    matrixPos[2 * nModes + crossCount].Add(tTemp);
+                                                }
+                                            }
+                                        }//end loop over delta v values for a mode
+                                    }//end loop over delta v values for e mode
+                                }//end loop over l values for e mode
+                            }//end for loop over evec positions
+                        }//end for loop over a vec positions
+                    }//end bilinear if
+                    #endregion
+                    
                 }//row for loop
             }//end anonymous function in parallel for loop
             );//end parallel for
@@ -950,21 +780,41 @@ namespace ConsoleApplication1
                 //add all calculated matrix elements to the appropriate sparsematrices
                 foreach (Tuple<int, int, double> spot in matrixPos[i])
                 {
-                    //add to both upper and lower triangle because I've found that the matrix multiplication for a symmetric matrix where all elements are actually stored
-                    //as opposed to storing only the upper or lower triangle is roughly %30 faster and the extra memory required has not been a concern yet
-                    //moved this to the aggregator function in SOCJT.cs so that the persistent lists take less memory
                     alglib.sparseadd(matList[i + 1], spot.Item1, spot.Item2, spot.Item3);
-                    //alglib.sparseadd(matList[i + 1], spot.Item2, spot.Item1, spot.Item3);
                 }
             }
             return matList;
         }//end method genMatrix
 
-        private static void DeltaVL(ref int[] vlArray, int Mode, int deltaV, int deltaL, int nModes)
+        /// <summary>
+        /// Changes appropriate values for finding a given matrix element
+        /// </summary>
+        /// <param name="vlArray">
+        /// Integer array of basis function values
+        /// </param>
+        /// <param name="Mode">
+        /// Which mode is being changed
+        /// </param>
+        /// <param name="deltaV">
+        /// Delta v
+        /// </param>
+        /// <param name="deltaL">
+        /// Delta l
+        /// </param>
+        /// <param name="nModes">
+        /// Number of Modes.
+        /// </param>
+        /// <param name="switchLambda">
+        /// Boolean to say whether the sign of lambda should be changed or not.
+        /// </param>
+        private static void DeltaVL(ref int[] vlArray, int Mode, int deltaV, int deltaL, int nModes, bool switchLambda = true)
         {
             vlArray[Mode] += deltaV;
             vlArray[Mode + nModes] += deltaL;
-            vlArray[2 * nModes] *= -1;
+            if (switchLambda)
+            {
+                vlArray[2 * nModes] *= -1;
+            }
         }
 
         /// <summary>
@@ -1114,7 +964,6 @@ namespace ConsoleApplication1
                 if (vector.J == J)
                 {
                     outList.Add(vector);
-                    //count++;
                 }//end if
             }//end foreach
             return outList;
