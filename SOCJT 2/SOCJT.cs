@@ -84,7 +84,7 @@ namespace ConsoleApplication1
             List<List<BasisFunction>> jBasisVecsByJ = new List<List<BasisFunction>>();            
             for (decimal i = jMin; i <= jMax; i++)
             {
-                jBasisVecsByJ.Add(GenHamMat.sortByJ(hamiltonianVecs, i));
+                jBasisVecsByJ.Add(GenHamMat.SortByJ(hamiltonianVecs, i));
             }//end for loop
 
             //Initializes Lists to hold the Hamiltonian matrices, eigenvectors, eigenvalues, basis vectors for the output file and number of columns for each j matrix respectively.
@@ -152,12 +152,12 @@ namespace ConsoleApplication1
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
                                 //fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                                fitHamList[i] = GenHamMat.genMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);                                
+                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
                                 //fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
-                                fitHamList[i][0] = GenHamMat.genMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
+                                fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
                             }
                             numcolumnsA[i] = nColumns;
                             if (numcolumnsA[i] < input.M)
@@ -254,12 +254,12 @@ namespace ConsoleApplication1
                         if (!matricesMade)
                         {
                             //fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);
-                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, false);       
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, false);       
                         }                        
                         else//If they are made then just generate the diagonal elements.
 	                    {
                             //fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];
-                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];		 
 	                    }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
@@ -314,7 +314,7 @@ namespace ConsoleApplication1
             bool bilinear = false;
             var biAVecPos = new List<int>();
             var biEVecPos = new List<int>();
-            GenHamMat.crossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            GenHamMat.CrossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
             //code here to convert the alglib matrices to matrices for each j block
             for (int i = 0; i < fitHamList.Count; i++)
             {

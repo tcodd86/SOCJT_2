@@ -135,7 +135,7 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
             
             //add any matrices needed for cross-terms
             if (input.crossTermMatrix != null)
@@ -459,7 +459,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of sparsematrix objects corresponding to different parameters.
         /// </returns>
-        public static List<alglib.sparsematrix> genMatrixHash(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly)
+        public static List<alglib.sparsematrix> GenMatrixHash(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -469,7 +469,7 @@ namespace ConsoleApplication1
             //Lists to store the positions of the A and E vecs with cross-terms coupling
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
-            List<int> EVecPos = new List<int>();
+            List<int> eVecPos = new List<int>();
             //List to store the alglib sparse matrices for each variable
             var matList = new List<alglib.sparsematrix>();
             //The Tuple stores the row and column of the matrix element in the two int values and the value at that matrix element as the double
@@ -483,7 +483,7 @@ namespace ConsoleApplication1
             //This is ugly but makes the matrix generation much faster than accessing the objects in the matrix generation and saves me a ton of re-coding
             int[,] vlLambda = new int[matSize, nModes * 2 + 2];
             int[] hashStorage = new int[nModes * 2 + 1];
-            Dictionary<string, int> BasisPositions = new Dictionary<string, int>();
+            Dictionary<string, int> basisPositions = new Dictionary<string, int>();
             for (int i = 0; i < matSize; i++)
             {
                 for (int j = 0; j < nModes; j++)
@@ -493,7 +493,7 @@ namespace ConsoleApplication1
                 }
                 vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
-                BasisPositions.Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
+                basisPositions.Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
             }//end loop to make vlLambda
 
             //generate an array to store omega, omegaExe, D, K and degeneracy of each mode
@@ -513,7 +513,7 @@ namespace ConsoleApplication1
                 else
                 {
                     modeVals[i, 4] = 2.0;
-                    EVecPos.Add(i);
+                    eVecPos.Add(i);
                 }
             }//end loop to make modeVals[,] array
 
@@ -570,7 +570,7 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            crossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
+            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.crossTermMatrix);
 
             //add any matrices needed for cross-terms
             if (input.crossTermMatrix != null)
@@ -614,7 +614,7 @@ namespace ConsoleApplication1
                     int m;
                     double temp;
                     string hashCode;                    
-                    for (int eModes = 0; eModes < EVecPos.Count; eModes++)
+                    for (int eModes = 0; eModes < eVecPos.Count; eModes++)
                     {
                         #region Linear
                         //linear portion
@@ -623,30 +623,30 @@ namespace ConsoleApplication1
                         for(int ll = -1; ll < 2; ll += 2)
                         {
                             tempInt = (int[])hashInt.Clone();
-                            DeltaVL(ref tempInt, EVecPos[eModes], 1, ll, nModes);
+                            DeltaVL(ref tempInt, eVecPos[eModes], 1, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                             //if it exists, then assign it to the linear value                            
-                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions.TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
-                                    temp = Math.Sqrt(((double)vlLambda[n, EVecPos[eModes]] + ll * (double)vlLambda[n, EVecPos[eModes] + nModes] + 2D));//changed from - to + ll
+                                    temp = Math.Sqrt(((double)vlLambda[n, eVecPos[eModes]] + ll * (double)vlLambda[n, eVecPos[eModes] + nModes] + 2D));//changed from - to + ll
                                     Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                                    matrixPos[2 * EVecPos[eModes]].Add(ttTemp);
+                                    matrixPos[2 * eVecPos[eModes]].Add(ttTemp);
                                 }
                             }
 
                             tempInt = (int[])hashInt.Clone();
-                            DeltaVL(ref tempInt, EVecPos[eModes], -1, ll, nModes);
+                            DeltaVL(ref tempInt, eVecPos[eModes], -1, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                             //if it exists, then assign it to the linear value                            
-                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions.TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
-                                    temp = Math.Sqrt(((double)vlLambda[n, EVecPos[eModes]] - ll * (double)vlLambda[n, EVecPos[eModes] + nModes]));//changed from - to + ll
+                                    temp = Math.Sqrt(((double)vlLambda[n, eVecPos[eModes]] - ll * (double)vlLambda[n, eVecPos[eModes] + nModes]));//changed from - to + ll
                                     Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                                    matrixPos[2 * EVecPos[eModes]].Add(ttTemp);
+                                    matrixPos[2 * eVecPos[eModes]].Add(ttTemp);
                                 }
                             }
                         }//end loop over linear l values
@@ -659,44 +659,44 @@ namespace ConsoleApplication1
                         {
                             tempInt = (int[])hashInt.Clone();
                             //for bottom matrix element on page
-                            DeltaVL(ref tempInt, EVecPos[eModes], 2, ll, nModes);
+                            DeltaVL(ref tempInt, eVecPos[eModes], 2, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions.TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
-                                    temp = (1 / 4D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + EVecPos[eModes]] + 4D) * (vlLambda[n, EVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + EVecPos[eModes]] + 2)));
+                                    temp = (1 / 4D * Math.Sqrt((vlLambda[n, eVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + eVecPos[eModes]] + 4D) * (vlLambda[n, eVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + eVecPos[eModes]] + 2)));
                                     Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                    matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                                    matrixPos[eVecPos[eModes] * 2 + 1].Add(tTemp);
                                 }
                             }
 
                             //reset tempInt values for Quadratic elements
                             tempInt = (int[])hashInt.Clone();
                             //for middle matrix element on page
-                            DeltaVL(ref tempInt, EVecPos[eModes], 0, ll, nModes);
+                            DeltaVL(ref tempInt, eVecPos[eModes], 0, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions.TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
-                                    temp = (1D / 2D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + EVecPos[eModes]] + 2) * (vlLambda[n, EVecPos[eModes]] - (ll / 2) * vlLambda[n, EVecPos[eModes] + nModes])));
+                                    temp = (1D / 2D * Math.Sqrt((vlLambda[n, eVecPos[eModes]] + (ll / 2) * vlLambda[n, nModes + eVecPos[eModes]] + 2) * (vlLambda[n, eVecPos[eModes]] - (ll / 2) * vlLambda[n, eVecPos[eModes] + nModes])));
                                     Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                    matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                                    matrixPos[eVecPos[eModes] * 2 + 1].Add(tTemp);
                                 }
                             }
 
                             tempInt = (int[])hashInt.Clone();
                             //for top matrix element on page
-                            DeltaVL(ref tempInt, EVecPos[eModes], -2, ll, nModes);
+                            DeltaVL(ref tempInt, eVecPos[eModes], -2, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (BasisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions.TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
-                                    temp = (1 / 4D * Math.Sqrt((vlLambda[n, EVecPos[eModes]] - (ll / 2) * vlLambda[n, nModes + EVecPos[eModes]]) * (vlLambda[n, EVecPos[eModes]] - (ll / 2) * vlLambda[n, nModes + EVecPos[eModes]] - 2)));
+                                    temp = (1 / 4D * Math.Sqrt((vlLambda[n, eVecPos[eModes]] - (ll / 2) * vlLambda[n, nModes + eVecPos[eModes]]) * (vlLambda[n, eVecPos[eModes]] - (ll / 2) * vlLambda[n, nModes + eVecPos[eModes]] - 2)));
                                     Tuple<int, int, double> tTemp = new Tuple<int, int, double>(n, m, temp);
-                                    matrixPos[EVecPos[eModes] * 2 + 1].Add(tTemp);
+                                    matrixPos[eVecPos[eModes] * 2 + 1].Add(tTemp);
                                 }
                             }
                         }//end quadratic loop over l values
@@ -752,7 +752,7 @@ namespace ConsoleApplication1
                                             DeltaVL(ref tempInt, biAVecPos[a], dva, 0, nModes, false);
                                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                                             //formula for bilinear matrix element
-                                            if (BasisPositions.TryGetValue(hashCode, out m))
+                                            if (basisPositions.TryGetValue(hashCode, out m))
                                             {
                                                 if (m > n)
                                                 {
@@ -838,7 +838,7 @@ namespace ConsoleApplication1
         /// <param name="crossTermMatrix">
         /// Cross term matrix containing coupling the actual coupling terms.
         /// </param>
-        public static void crossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
+        public static void CrossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
         {
             bool containsAVecs = false;
             bilinear = false;
@@ -955,7 +955,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of JBasisVectors with the specified value of j.
         /// </returns>
-        public static List<BasisFunction> sortByJ(List<BasisFunction> jVecs, decimal J)
+        public static List<BasisFunction> SortByJ(List<BasisFunction> jVecs, decimal J)
         {
             List<BasisFunction> outList = new List<BasisFunction>();
             //count = 0;
