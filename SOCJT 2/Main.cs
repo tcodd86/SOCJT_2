@@ -278,7 +278,7 @@ namespace ConsoleApplication1
             }
             catch (InvalidInput a)
             {
-                Console.WriteLine(a.eMessage);
+                Console.WriteLine(a.EMessage);
                 Console.WriteLine("Press enter to terminate the program.");
                 Console.ReadLine();
             }

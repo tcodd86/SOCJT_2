@@ -7,7 +7,7 @@ namespace ConsoleApplication1
 {
     class BasisSetTooSmallException : ApplicationException
     {
-        public string eMessage { get; private set; }
+        public string EMessage { get; private set; }
 
         /// <summary>
         /// Constructs BasisSetTooSmallException
@@ -19,14 +19,14 @@ namespace ConsoleApplication1
         {
             if (blockLanczos)
             {
-                eMessage = "At least one of the j-blocks has a dimension smaller than M.";
-                eMessage += "\r" + "Increase the basis set or decrease M.";
+                EMessage = "At least one of the j-blocks has a dimension smaller than M.";
+                EMessage += "\r" + "Increase the basis set or decrease M.";
             }
             else
             {
-                eMessage = "M is larger than noits.  Either increase noits or decrease M.";
+                EMessage = "M is larger than noits.  Either increase noits or decrease M.";
             }
-            eMessage += "\r" + "Press enter to terminate the program.";
+            EMessage += "\r" + "Press enter to terminate the program.";
         }
     }
 
@@ -40,10 +40,10 @@ namespace ConsoleApplication1
 
     class InvalidInput : ApplicationException
     {
-        public string eMessage { get; private set; }
-        public InvalidInput(string Mess)
+        public string EMessage { get; private set; }
+        public InvalidInput(string mess)
         {
-            eMessage = Mess + " has an invalid value. Please check your input file.";
+            EMessage = mess + " has an invalid value. Please check your input file.";
         }
     }
 
@@ -57,22 +57,22 @@ namespace ConsoleApplication1
 
     class FileNameError : ApplicationException
     {
-        public string eMessage { get; private set; }
+        public string EMessage { get; private set; }
         public FileNameError(string error)
         {
             if (error == "matFile")
             {
-                eMessage = "The matrix file may not have the same name as the input, \n output, or fit files. Please change the file name.";
+                EMessage = "The matrix file may not have the same name as the input, \n output, or fit files. Please change the file name.";
             }
             else if (error == "outFile")
             {
-                eMessage = "The output file may not have the same name as the input file. \n Please change the output file name.";
+                EMessage = "The output file may not have the same name as the input file. \n Please change the output file name.";
             }
             else
             {
-                eMessage = "There is a file name error. Please check your input file name.";
+                EMessage = "There is a file name error. Please check your input file name.";
             }
-            eMessage += "\r" + "Press enter to terminate the program.";
+            EMessage += "\r" + "Press enter to terminate the program.";
         }
     }
 
