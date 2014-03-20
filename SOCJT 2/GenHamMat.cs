@@ -60,7 +60,7 @@ namespace ConsoleApplication1
                 for (int j = 0; j < nModes; j++)
                 {
                     vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].v;
-                    vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].l;
+                    vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
                 vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
@@ -489,7 +489,7 @@ namespace ConsoleApplication1
                 for (int j = 0; j < nModes; j++)
                 {
                     vlLambda[i, j] = hashStorage[j] = basisVectorsByJ[i].modesInVec[j].v;
-                    vlLambda[i, j + nModes] = hashStorage[j + nModes] = basisVectorsByJ[i].modesInVec[j].l;
+                    vlLambda[i, j + nModes] = hashStorage[j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
                 vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);

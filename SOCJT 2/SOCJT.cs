@@ -777,7 +777,7 @@ namespace ConsoleApplication1
             file.Append(String.Format("{0,10:0.000000}", coefficient));
             for (int m = 0; m < func.modesInVec.Count; m++)//goes through each mode
             {
-                file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].v) + "\t" + String.Format("{0,3}", func.modesInVec[m].l));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
+                file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].v) + "\t" + String.Format("{0,3}", func.modesInVec[m].L));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
             }
             file.Append("\t" + String.Format("{0,4}", func.Lambda));
         }//end of function writeVec
@@ -810,7 +810,7 @@ namespace ConsoleApplication1
                     for(int j = 0; j < jBasisVec.modesInVec.Count; j++)
                     {
                     
-                        if (jBasisVec.modesInVec[j].v == eigenvector[i].modesInVec[j].v && jBasisVec.modesInVec[j].l == eigenvector[i].modesInVec[j].l)
+                        if (jBasisVec.modesInVec[j].v == eigenvector[i].modesInVec[j].v && jBasisVec.modesInVec[j].L == eigenvector[i].modesInVec[j].L)
                         {
                             if (j == jBasisVec.modesInVec.Count - 1)
                             {
@@ -951,7 +951,7 @@ namespace ConsoleApplication1
                     for (int n = 0; n < input.nModes; n++)
                     {
                         tempVL[n * 2] = jBasisVecsByJ[m].modesInVec[n].v;
-                        tempVL[n * 2 + 1] = jBasisVecsByJ[m].modesInVec[n].l;
+                        tempVL[n * 2 + 1] = jBasisVecsByJ[m].modesInVec[n].L;
                     }
                     tempVL[input.nModes * 2] = jBasisVecsByJ[m].Lambda;
                     temp = tempMat[m, j];
@@ -967,7 +967,7 @@ namespace ConsoleApplication1
                     {
                         if (jBasisVecsByJ[m].modesInVec[v].v == tempVL[v * 2])
                         {
-                            if (jBasisVecsByJ[m].modesInVec[v].l == -1 * tempVL[v * 2 + 1])
+                            if (jBasisVecsByJ[m].modesInVec[v].L == -1 * tempVL[v * 2 + 1])
                             {
                                 tempInt++;
                             }

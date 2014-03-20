@@ -54,7 +54,7 @@ namespace ConsoleApplication1
             modesInVec.AddRange(basis);
             for (int i = 0; i < basis.Count; i++)
             {
-                l += basis[i].l;
+                l += basis[i].L;
             }
             nJ = (decimal)l + ((decimal)lam) / 2M;
             Lambda = lam;
@@ -83,12 +83,12 @@ namespace ConsoleApplication1
                         break;
                     }
                     //if neither of those is true then the two v values are equal, then check l values
-                    if (a.modesInVec[place].l > b.modesInVec[place].l)
+                    if (a.modesInVec[place].L > b.modesInVec[place].L)
                     {
                         val = 1;
                         break;
                     }
-                    if (a.modesInVec[place].l < b.modesInVec[place].l)
+                    if (a.modesInVec[place].L < b.modesInVec[place].L)
                     {
                         val = -1;
                         break;
@@ -228,7 +228,7 @@ namespace ConsoleApplication1
             for (int i = 0; i < Modes.Count; i++)
             {
                 s += Modes[i].v;
-                s += Modes[i].l;
+                s += Modes[i].L;
             }
             s += Lambda;
             return s;

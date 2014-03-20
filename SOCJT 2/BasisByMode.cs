@@ -11,60 +11,50 @@ namespace ConsoleApplication1
         /// <summary>
         /// Number mode this is
         /// </summary>
-        private int nModeN;
-        public int modeN
-        {
-            get { return nModeN; }
-            //set { nModeN = value; }
-        }//end property nModeN
+        public int ModeN { get; private set; }
 
         /// <summary>
         /// Value of l, the vibrational angular momentum
         /// </summary>
-        private int nl;
-        public int l
-        {
-            get { return nl; }
-            //set { nl = value; }
-        }//end property l
+        public int L { get; private set; }
 
         /// <summary>
         /// Value of v, the principal vibrational quantum number
         /// </summary>
-        private int nv;
+        private int V;
         public int v
         {
-            get { return nv; }
+            get { return V; }
             //set { nv = value; }
         }//end property nv
 
         /// <summary>
         /// Value of omega
         /// </summary>
-        private double nModeOmega;
+        private double ModeOmega;
         public double modeOmega
         {
-            get { return nModeOmega; }
+            get { return ModeOmega; }
             //set { nModeOmega = value; }
         }//end property nModeOmega
 
         /// <summary>
         /// Boolean indicating whether this is a nondegenerate mode (true) or degenerate mode (false)
         /// </summary>
-        private bool nsymmetryIsA;
+        private bool SymmetryIsA;
         public bool symmetryIsA
         {
-            get { return nsymmetryIsA; }
+            get { return SymmetryIsA; }
             //set { nsymmetryIsA = value; }
         }//end property symmetry
 
         /// <summary>
         /// Value of the anharmonicity
         /// </summary>
-        private double nAnharmonicity;
+        private double Anharmonicity;
         public double anharmonicity
         {
-            get { return nAnharmonicity; }
+            get { return Anharmonicity; }
             //set { nAnharmonicity = value; }
         }//end property anharmonicity
 
@@ -110,22 +100,22 @@ namespace ConsoleApplication1
         /// <param name="anharmonicity">
         /// Value of the anharmonicity constant
         /// </param>
-        /// <param name="DBasis">
+        /// <param name="D">
         /// Value of D
         /// </param>
-        /// <param name="KBasis">
+        /// <param name="K">
         /// Value of K
         /// </param>
-        public BasisByMode(bool symmetryIsA, int modeN, int l, int v, double modeOmega, double anharmonicity, double DBasis, double KBasis)
+        public BasisByMode(bool symmetryIsA, int modeN, int l, int v, double modeOmega, double anharmonicity, double D, double K)
         {
-            nsymmetryIsA = symmetryIsA;
-            nModeN = modeN;
-            nl = l;
-            nv = v;
-            nModeOmega = modeOmega;
-            nAnharmonicity = anharmonicity;
-            nDBasis = DBasis;
-            nKBasis = KBasis;
+            SymmetryIsA = symmetryIsA;
+            ModeN = modeN;
+            L = l;
+            V = v;
+            ModeOmega = modeOmega;
+            Anharmonicity = anharmonicity;
+            nDBasis = D;
+            nKBasis = K;
         }
 
         /// <summary>

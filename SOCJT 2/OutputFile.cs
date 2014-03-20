@@ -101,7 +101,7 @@ namespace ConsoleApplication1
                         file.Append("\t" + Convert.ToString(j + 1));
                         for(int m = 0; m < input.nModes; m++)//goes through each mode
                         {
-                            file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][j].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][j].modesInVec[m].l));
+                            file.Append("\t" + "  " + Convert.ToString(jBasisVecsByJ[i][j].modesInVec[m].v) + "\t" + String.Format("{0,3}", jBasisVecsByJ[i][j].modesInVec[m].L));
                         }
                         file.Append("\t" + String.Format("{0,4}", jBasisVecsByJ[i][j].Lambda) + "\t" + String.Format("{0,3:0.0}", Sigma));
                     }
