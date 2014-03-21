@@ -205,7 +205,7 @@ namespace ConsoleApplication1
             }
             file.AppendLine(" ");
 
-            file.Append("Coefficient" + "\t");
+            file.Append(" Coefficient  " + "\t");
             for (int h = 0; h < input.nModes; h++)
             {
                 file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");

@@ -681,7 +681,7 @@ namespace ConsoleApplication1
                         file.AppendLine("Vector is Type 2");
                     }
                     file.AppendLine(" " + "\r");
-                    file.Append("Coefficient" + "\t");
+                    file.Append(" Coefficient  " + "\t");
                     for (int h = 0; h < input.nModes; h++)
                     {
                         file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
@@ -774,7 +774,7 @@ namespace ConsoleApplication1
         public static void writeVec(double coefficient, BasisFunction func, StringBuilder file)
         {
             file.AppendLine("\t");
-            file.Append(String.Format("{0,10:0.000000}", coefficient));
+            file.Append(String.Format("{0,14:0.0000000000}", coefficient));
             for (int m = 0; m < func.modesInVec.Count; m++)//goes through each mode
             {
                 file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].V) + "\t" + String.Format("{0,3}", func.modesInVec[m].L));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
