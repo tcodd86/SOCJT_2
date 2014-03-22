@@ -293,7 +293,7 @@ namespace ConsoleApplication1
             }
             catch (BasisSetTooSmallException a)
             {
-                Console.Write(a.eMessage);
+                Console.Write(a.EMessage);
                 Console.ReadLine();
             }
             catch (AEAnharmonicTermException)
@@ -312,7 +312,7 @@ namespace ConsoleApplication1
             }
             catch (FileNameError err)
             {
-                Console.WriteLine(err.eMessage);
+                Console.WriteLine(err.EMessage);
                 Console.ReadLine();
             }
             catch (MatrixFileError)
