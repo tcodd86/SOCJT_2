@@ -519,6 +519,9 @@ namespace ConsoleApplication1
                 }
 
             }//end catch
+
+            //EvalChecker(array1[1], zMatrices, eigenvalues[1][0]);
+
             if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
@@ -564,6 +567,26 @@ namespace ConsoleApplication1
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
+
+
+        private static void EvalChecker(alglib.sparsematrix A, List<double[,]> zmatrices, double eVal)
+        {
+            var temp = new double[zmatrices[1].GetLength(0)];
+            for (int row = 0; row < temp.Length; row++)
+            {
+                temp[row] = zmatrices[1][row, 0];
+            }
+            var V = new double[temp.Length];
+            alglib.sparsemv(A, temp, ref V);
+            double sum = 0.0;
+            for (int row = 0; row < temp.Length; row++)
+            {
+                sum += V[row] / temp[row];
+            }
+            sum /= V.Length;
+            Console.WriteLine(Convert.ToString(sum) + " " + Convert.ToString(eVal));
+            Console.ReadLine();
+        }
 
         /// <summary>
         /// Writes the eigenvectors to a separate file including basis functions with a 0.0 coefficient.
