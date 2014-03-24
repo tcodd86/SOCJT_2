@@ -635,11 +635,15 @@ namespace ConsoleApplication1
             {
                 ZPE *= -1.0;
             }
+            var tempEvalue = new List<double[]>(eigenvalues.Count);
+
             for (int i = 0; i < eigenvalues.Count; i++)
             {
+                tempEvalue.Add(new double[eigenvalues[i].Length]);
+                //tempEvalue[i] = new double[eigenvalues[i].Length];
                 for (int j = 0; j < eigenvalues[i].Length; j++)
                 {
-                    eigenvalues[i][j] += ZPE;
+                    tempEvalue[i][j] = eigenvalues[i][j] + ZPE;
                 }
             }
             StringBuilder file = new StringBuilder();
@@ -670,7 +674,7 @@ namespace ConsoleApplication1
                 for (int l = 0; l < eigenvalues[i].Length; l++)
                 {                    
                     file.AppendLine(" " + "\r");
-                    file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", eigenvalues[i][l]));
+                    file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", tempEvalue[i][l]));
                     bool a1 = SOCJT.isA(JvecsForOutput[i], tempMat[i], l, input, false);
                     if (a1)
                     {
