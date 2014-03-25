@@ -454,6 +454,26 @@ namespace ConsoleApplication1
         /// </summary>
         public bool VectorFileComplete { get; private set; }
 
+        /// <summary>
+        /// Boolean indicating whether or not an eigenvector will be checked for accuracy
+        /// </summary>
+        public bool CheckEigenvector { get; private set; }
+        
+        /// <summary>
+        /// File name of the eigenvector being checked
+        /// </summary>
+        public string EigenvectorFileName { get; private set; }
+
+        /// <summary>
+        /// Which j block the eigenvector belongs to and which eigenvector in that block is being checked.
+        /// </summary>
+        public Tuple<decimal, int> JBlockEigenvector { get; private set; }
+
+        /// <summary>
+        /// The tolerance that will define if a vector is considered to be an eigenvector or not
+        /// </summary>
+        public double EigenvectorTolerance { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -475,6 +495,7 @@ namespace ConsoleApplication1
             MatrixMade = false;
             EVectorFile = false;
             VectorFileComplete = false;
+            CheckEigenvector = false;
             
             MatrixFile = "matrix.txt";
             Title = "TITLE";
@@ -505,7 +526,8 @@ namespace ConsoleApplication1
             XTol = 0.0;
             GTol = 0.0;
             MaxOptimizerSteps = 25;
-            Factor = 0.001;        
+            Factor = 0.001;
+            EigenvectorTolerance = 0.0001;
         }
         
         /// <summary>
@@ -876,6 +898,39 @@ namespace ConsoleApplication1
                             break;
                         }
                     }
+                    #endregion
+                }
+
+                if (inputf[i].ToUpper() == "&SPECIAL")
+                {
+                    #region &SPECIAL
+                    for (int u = i; ; u++)
+                    {
+                        if (inputf[u].ToUpper() == "CHECK_EIGENVECTOR")
+                        {
+                            CheckEigenvector = TorF(inputf[u + 1]);
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "EIGENVECTOR_FILE")
+                        {
+                            EigenvectorFileName = inputf[u + 1];
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "INDICES")
+                        {
+                            JBlockEigenvector = new Tuple<decimal, int>(ParseDecimal(inputf[u + 1]), Convert.ToInt32(inputf[u + 2]));
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "EIGENVECTOR_TOLERANCE")
+                        {
+                            EigenvectorTolerance = ParseDouble(inputf[u + 1]);
+                            continue;
+                        }
+                        if (inputf[u] == "/")
+                        {
+                            break;
+                        }
+                    }//end for
                     #endregion
                 }
             }//end for
