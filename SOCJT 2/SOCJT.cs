@@ -248,11 +248,18 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-                        //for (int v = tempDynVar2; v <= dynVar2; v++)
-                        for (int v = -dynVar2; v <= dynVar2; v++)                        
+
+                        /*****************************************************************************************/
+                        //added the -1 to make the basis set correct
+                        for (int v = -dynVar2 - 1; v <= dynVar2; v++)                        
                         {
-                            quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            if (i + v * 3 >= 0)
+                            {
+                                quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
+                            }
                         }
+                        /*****************************************************************************************/
+
                         //this checks if the matrix was read from file, and if so if the basis set is the correct size
                         if (basisSize.Count != 0)                        
                         { 
@@ -582,7 +589,21 @@ namespace ConsoleApplication1
             return linesToWrite;   
         }//end SOCJT Routine
 
-
+        /// <summary>
+        /// Functiont to see if a vector is an eigenvector of the Hamiltonian.
+        /// </summary>
+        /// <param name="input">
+        /// Fileinfo object
+        /// </param>
+        /// <param name="hamiltonianArray">
+        /// Array witht the Hamiltonian matrices in them
+        /// </param>
+        /// <param name="zmatrices">
+        /// Eigenvectors of the hamiltonians
+        /// </param>
+        /// <param name="eigenvalues">
+        /// Eigenvalues of the Hamiltonians
+        /// </param>
         private static void EvalChecker(FileInfo input, alglib.sparsematrix[] hamiltonianArray, List<double[,]> zmatrices, List<double[]> eigenvalues)
         {
             int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
@@ -714,10 +735,10 @@ namespace ConsoleApplication1
                 for (int n = i; n < input.maxJ; n += 3)
                 {
                     possibleJVals.Add((decimal)n + 0.5M);
-                    if (n == i)
-                    {
-                        continue;
-                    }
+                    //if (n == i)
+                    //{
+                    //    continue;
+                    //}
                     possibleJVals.Add((decimal)n * -1M + (decimal)i * 2M + 0.5M);
                 }//end loop over possible j values
                 possibleJVals.Sort();
