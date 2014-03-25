@@ -724,31 +724,17 @@ namespace ConsoleApplication1
             file.AppendLine("Eigenvectors in complete basis set for " + input.Title);
             file.AppendLine(" ");            
             //loop over jBlocks
-            for (int i = 0; i < eigenvalues.Count; i++)
+            for (int jBlockIndex = 0; jBlockIndex < eigenvalues.Count; jBlockIndex++)
             {
                 file.AppendLine(" ");
-                file.AppendLine("J-Block " + ((decimal)i + 0.5M));
-                file.AppendLine(" ");                
-
-                //here make a list of possible j values in this eigenvector to save time
-                List<decimal> possibleJVals = new List<decimal>();
-                for (int n = i; n < input.maxJ; n += 3)
-                {
-                    possibleJVals.Add((decimal)n + 0.5M);
-                    //if (n == i)
-                    //{
-                    //    continue;
-                    //}
-                    possibleJVals.Add((decimal)n * -1M + (decimal)i * 2M + 0.5M);
-                }//end loop over possible j values
-                possibleJVals.Sort();
-
+                file.AppendLine("J-Block " + ((decimal)jBlockIndex + 0.5M));
+                file.AppendLine(" ");
                 //loop over all of the eigenvalues found
-                for (int l = 0; l < eigenvalues[i].Length; l++)
+                for (int eigenvectorIndex = 0; eigenvectorIndex < eigenvalues[jBlockIndex].Length; eigenvectorIndex++)
                 {                    
                     file.AppendLine(" " + "\r");
-                    file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(l + 1) + " = " + String.Format("{0,10:0.0000}", tempEvalue[i][l]));
-                    bool a1 = SOCJT.isA(JvecsForOutput[i], tempMat[i], l, input, false);
+                    file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(eigenvectorIndex + 1) + " = " + String.Format("{0,10:0.0000}", tempEvalue[jBlockIndex][eigenvectorIndex]));
+                    bool a1 = SOCJT.isA(JvecsForOutput[jBlockIndex], tempMat[jBlockIndex], eigenvectorIndex, input, false);
                     if (a1)
                     {
                         file.AppendLine("Vector is Type 1");
@@ -767,54 +753,31 @@ namespace ConsoleApplication1
                     
                     for (int j = 0; j < jBasisVecsByJ.Count; j++)//goes through basis vectors
                     {
-                        int place = 0;
-                        
                         //first split into quadratic and linear
                         if (isQuad)
                         {
-                            //first check to see if this J value will have nonzero coefficients
-                            bool rightJ = false;
-                            for (int b = 0; b < possibleJVals.Count; b++)
+                            for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                             {
-                                if (jBasisVecsByJ[j][0].J == possibleJVals[b])
+                                string hashCode = BasisFunction.GenerateHashCode(jBasisVecsByJ[j][k]);
+                                int m = 0;                          
+                                if (GenHamMat.basisPositions[jBlockIndex].TryGetValue(hashCode, out m))
                                 {
-                                    rightJ = true;
-                                    break;
+                                    writeVec(tempMat[jBlockIndex][m, eigenvectorIndex], jBasisVecsByJ[j][k], file);
                                 }
-                            }//end loop over possible j values
-
-                            //if this j value is not a j value with a nonzero coefficient just put 0 in
-                            if (!rightJ)
-                            { 
-                                for(int k = 0; k < jBasisVecsByJ[j].Count; k++)
+                                else
                                 {
                                     writeVec(0.0, jBasisVecsByJ[j][k], file);
                                 }
-                            }//end if
-                            else//means this j has possible nonzero matrix elements
-                            {
-                                for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
-                                {
-                                    bool temp = isInBasis(jBasisVecsByJ[j][k], JvecsForOutput[i], ref place, 0);
-                                    if (!temp)
-                                    {
-                                        writeVec(0.0, jBasisVecsByJ[j][k], file);
-                                    }
-                                    else
-                                    {
-                                        writeVec(tempMat[i][place, l], jBasisVecsByJ[j][k], file);
-                                    }
-                                }//end for loop over J
-                            }//end else
+                            }//end for loop over J
                         }//end if isQuad
                         else
                         {
-                            if (jBasisVecsByJ[j][0].J == (decimal)i + 0.5M)
+                            if (jBasisVecsByJ[j][0].J == (decimal)jBlockIndex + 0.5M)
                             {
                                 //write actual values to the eigenvector
                                 for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                                 {
-                                    writeVec(tempMat[i][k, l], jBasisVecsByJ[j][k], file);
+                                    writeVec(tempMat[jBlockIndex][k, eigenvectorIndex], jBasisVecsByJ[j][k], file);
                                 }//end loop over BasisFunctions in j value for jBasisVecsByJ
                             }
                             else
