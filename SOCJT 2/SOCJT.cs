@@ -88,13 +88,13 @@ namespace ConsoleApplication1
             }//end for loop
 
             //Initializes Lists to hold the Hamiltonian matrices, eigenvectors, eigenvalues, basis vectors for the output file and number of columns for each j matrix respectively.
-            //List<double[,]> hamMatrices = new List<double[,]>(); ---moved into if statement so it's only made if it's needed.
+            //Also initializes the Dictionary list for storing the positions of the basis functions
             List<double[,]> zMatrices = new List<double[,]>();
             List<double[]> eigenvalues = new List<double[]>();
             List<List<BasisFunction>> JvecsForOutuput = new List<List<BasisFunction>>();
             List<BasisFunction>[] jbasisoutA = new List<BasisFunction>[0];
             List<int> numColumns = new List<int>();
-
+            GenHamMat.basisPositions = new List<Dictionary<string, int>>();
 
             #region Hamiltonian
             List<alglib.sparsematrix> sHamMatrix = new List<alglib.sparsematrix>();            
@@ -132,6 +132,13 @@ namespace ConsoleApplication1
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
 
+                
+                //put items up to length in here
+                for (int i = (int)(jMin - 0.5M); i < (int)(jMax + 0.5M); i++)
+                {
+                    GenHamMat.basisPositions.Add(new Dictionary<string, int>());
+                }
+
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.ParJ;
                 try
@@ -152,12 +159,12 @@ namespace ConsoleApplication1
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
                                 //fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
-                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false);                                
+                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false, i);                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
                                 //fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
-                                fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, true)[0];
+                                fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, true, i)[0];
                             }
                             numcolumnsA[i] = nColumns;
                             if (numcolumnsA[i] < input.M)
@@ -228,6 +235,11 @@ namespace ConsoleApplication1
                 numcolumnsA = new int[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
                 jbasisoutA = new List<BasisFunction>[jBasisVecsByJ.Count - dynVar1 - jBasisVecsByJ.Count / 2];//changed to dynVar1 from 6
 
+                for (int i = jBasisVecsByJ.Count / 2; i < jBasisVecsByJ.Count - dynVar1; i++)
+                {
+                    GenHamMat.basisPositions.Add(new Dictionary<string, int>());
+                }
+
                 ParallelOptions options = new ParallelOptions();
                 options.MaxDegreeOfParallelism = input.ParJ;
                 try
@@ -236,7 +248,6 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-
                         //for (int v = tempDynVar2; v <= dynVar2; v++)
                         for (int v = -dynVar2; v <= dynVar2; v++)                        
                         {
@@ -254,12 +265,12 @@ namespace ConsoleApplication1
                         if (!matricesMade)
                         {
                             //fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, false);
-                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false);       
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false, i - jBasisVecsByJ.Count / 2);       
                         }                        
                         else//If they are made then just generate the diagonal elements.
 	                    {
                             //fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];
-                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true)[0];		 
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true, i - jBasisVecsByJ.Count / 2)[0];		 
 	                    }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
@@ -520,7 +531,10 @@ namespace ConsoleApplication1
 
             }//end catch
 
-            //EvalChecker(array1[1], zMatrices, eigenvalues[1][0]);
+            if (input.CheckEigenvector)
+            {
+                EvalChecker(input, array1, zMatrices, eigenvalues);
+            }
 
             if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
             {
@@ -569,22 +583,37 @@ namespace ConsoleApplication1
         }//end SOCJT Routine
 
 
-        private static void EvalChecker(alglib.sparsematrix A, List<double[,]> zmatrices, double eVal)
+        private static void EvalChecker(FileInfo input, alglib.sparsematrix[] hamiltonianArray, List<double[,]> zmatrices, List<double[]> eigenvalues)
         {
-            var temp = new double[zmatrices[1].GetLength(0)];
+            int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
+            int whichEigenvalue = input.JBlockEigenvector.Item2 - 1;
+
+            var temp = new double[zmatrices[jBlock].GetLength(0)];
             for (int row = 0; row < temp.Length; row++)
             {
-                temp[row] = zmatrices[1][row, 0];
+                temp[row] = zmatrices[jBlock][row, whichEigenvalue];
             }
             var V = new double[temp.Length];
-            alglib.sparsemv(A, temp, ref V);
+            alglib.sparsemv(hamiltonianArray[jBlock], temp, ref V);
             double sum = 0.0;
+            int count = 0;
             for (int row = 0; row < temp.Length; row++)
             {
-                sum += V[row] / temp[row];
+                if (Math.Abs(temp[row]) > 0.00000001)
+                {
+                    sum += V[row] / temp[row];
+                    count++;
+                }
             }
-            sum /= V.Length;
-            Console.WriteLine(Convert.ToString(sum) + " " + Convert.ToString(eVal));
+            sum /= count;
+            Console.WriteLine("Calculated Eigenvalue = " + Convert.ToString(sum));
+            Console.WriteLine("Eigenvalue from Lanczos = " + Convert.ToString(eigenvalues[jBlock][whichEigenvalue]));
+            double ratio = eigenvalues[jBlock][whichEigenvalue] / sum;
+            if (Math.Abs(1.0 - ratio) < input.EigenvectorTolerance)
+            { 
+                //set some parameter to be true
+            }
+            Console.WriteLine("Ratio of Lanczos/Calculated = " + Convert.ToString(ratio));
             Console.ReadLine();
         }
 

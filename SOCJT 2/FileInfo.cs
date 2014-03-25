@@ -472,7 +472,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// The tolerance that will define if a vector is considered to be an eigenvector or not
         /// </summary>
-        public double EigenvectorTolerance { get; private set; }
+        public double EigenvectorTolerance { get; set; }
 
         #endregion properties
 
