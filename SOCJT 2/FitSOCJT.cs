@@ -493,6 +493,9 @@ namespace ConsoleApplication1
         /// <param name="socjtOut">
         /// Calculated eigenvalues.
         /// </param>
+        /// <param name="origin">
+        /// Value of the transition origin to be used.
+        /// </param>
         /// <param name="raw">
         /// If true, returns raw (exp - calc) eigenvalues.  If false, returns (exp - calc)^2.
         /// </param>

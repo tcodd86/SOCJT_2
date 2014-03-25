@@ -67,6 +67,8 @@ namespace ConsoleApplication1
         /// <param name="E"></param>
         /// <param name="U"></param>
         /// <param name="V"></param>
+        /// <param name="A"></param>
+        /// <param name="par"></param>
         private static void BKLANC(int N, int Q, int M, int P, int S, double[] D, ref double[,] C, ref double[,] X, ref double[] E, ref double[] U, ref double[] V, alglib.sparsematrix A, int par)
         {
             int LL;

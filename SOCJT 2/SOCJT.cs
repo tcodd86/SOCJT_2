@@ -1085,8 +1085,8 @@ namespace ConsoleApplication1
         /// <param name="input">
         /// initialized FileInfo object.
         /// </param>
-        /// <param name="fitHamList">
-        /// List of matrices. If matFile is to be used and exists this list will contain initialized off-diagonal matrices after function call.
+        /// <param name="matricesMade">
+        /// Set to true if the matrices are generated after this function call.
         /// </param>
         /// <returns>
         /// Boolean indicating whether or not the fitHamList matrices have been initialized from matFile.

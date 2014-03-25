@@ -192,6 +192,12 @@ namespace ConsoleApplication1
         /// <param name="j">
         /// Which eigenvector is being looked at
         /// </param>
+        /// <param name="evMin">
+        /// Minumum value of the eigenvector to print.
+        /// </param>
+        /// <param name="overRide">
+        /// True if the isA function shouldn't actually run.
+        /// </param>
         public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin, bool overRide = false)
         {
             bool a1 = SOCJT.isA(jBasisVecsByJ, tempMat, j, input, overRide);

@@ -7,7 +7,7 @@ using System.Globalization;
 namespace ConsoleApplication1
 {
     /// <summary>
-    /// Stores the information for a mode in the input file.  All info in &MODE_INFO section stored here.
+    /// Stores the information for a mode in the input file.  All info in &amp;MODE_INFO section stored here.
     /// </summary>
     class ModeInfo
     {
@@ -130,6 +130,9 @@ namespace ConsoleApplication1
         /// </param>
         /// <param name="inputF">
         /// The string array containing the parsed input file
+        /// </param>
+        /// <param name="tReturn">
+        /// Boolean to indicate if Kappa and Eta are being used.
         /// </param>
         public ModeInfo(int modeN, string[] inputF, out bool tReturn)
         {

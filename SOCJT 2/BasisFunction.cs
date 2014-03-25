@@ -178,6 +178,12 @@ namespace ConsoleApplication1
         /// <param name="n">
         /// Gives index of array to be incremented (corrsponds to which mode).
         /// </param>
+        /// <param name="ints">
+        /// Array of max values for the CountKeeper
+        /// </param>
+        /// <param name="keepGoing">
+        /// Boolean that's true while the count needs to keep going and false when it's done.
+        /// </param>
         static private void CountKeeper(ref int[] count, int n, int[] ints, ref bool keepGoing)
         {
             count[n] += 1;
@@ -202,9 +208,6 @@ namespace ConsoleApplication1
         /// </summary>
         /// <param name="Modes">
         /// List of BasisByMode objects representing modes in the BasisFunction
-        /// </param>
-        /// <param name="J">
-        /// value of J
         /// </param>
         /// <param name="Lambda">
         /// Value of Lambda
