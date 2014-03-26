@@ -636,6 +636,49 @@ namespace ConsoleApplication1
             }
             Console.WriteLine("Ratio of Lanczos/Calculated = " + Convert.ToString(ratio));
             Console.ReadLine();
+        }//end function EvalChecker
+
+        /// <summary>
+        /// Reads in and parses an eigenvector from John
+        /// </summary>
+        /// <param name="filepath">
+        /// What the filename is of the eigenvector including filepath.
+        /// </param>
+        /// <param name="jIndex">
+        /// Which j block this vector corresponds to.
+        /// </param>
+        /// <returns>
+        /// The eigevnector with the coefficients from John's file in the appropriate spot.
+        /// </returns>
+        private static double[] EigenvectorReader(string filepath, int jIndex)
+        {
+            double[] eigenvector = new double[GenHamMat.basisPositions[jIndex].Count()];
+            string[] vecFile = FileInfo.FileRead(filepath);
+            for (int position = 0; position < vecFile.Length; position += 8)
+            {
+                int[] vlLambda = new int[7];
+                vlLambda[0] = Convert.ToInt32(vecFile[position]);//v for v1
+                vlLambda[3] = 0;//l for v1
+                vlLambda[1] = Convert.ToInt32(vecFile[position + 4]);//v for v3
+                vlLambda[4] = Convert.ToInt32(vecFile[position + 2]);//l for v3
+                vlLambda[2] = Convert.ToInt32(vecFile[position + 5]);//v for v4
+                vlLambda[5] = Convert.ToInt32(vecFile[position + 3]);//l for v4
+                if (vecFile[position + 7][vecFile[position + 7].Length - 1] == '+')
+                {
+                    vlLambda[6] = 1;
+                }
+                else
+                {
+                    vlLambda[6] = -1;
+                }
+                string hashCode = BasisFunction.GenerateHashCode(vlLambda, 3);
+                int index = 0;
+                if (GenHamMat.basisPositions[jIndex].TryGetValue(hashCode, out index))
+                {
+                    eigenvector[index] = Convert.ToDouble(vecFile[position + 6]);
+                }
+            }
+            return eigenvector;
         }
 
         /// <summary>
