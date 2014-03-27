@@ -1354,7 +1354,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Magnitude of vec.
         /// </returns>
-        private static double Magnitude(double[] vec)
+        public static double Magnitude(double[] vec)
         {
             double sum = 0.0;
             for (int i = 0; i < vec.Length; i++)
