@@ -542,7 +542,7 @@ namespace ConsoleApplication1
             {
                 LanczosChecker(input, array1, zMatrices, eigenvalues);
                 int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
-                CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2]);
+                CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2 - 1]);
             }
 
             if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
@@ -643,6 +643,7 @@ namespace ConsoleApplication1
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
             int count = 0;
+            Console.WriteLine(Lanczos.Magnitude(V));
             for (int row = 0; row < temp.Length; row++)
             {
                 if (Math.Abs(temp[row]) > 0.00000001)
