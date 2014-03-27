@@ -540,7 +540,9 @@ namespace ConsoleApplication1
 
             if (input.CheckEigenvector)
             {
-                EvalChecker(input, array1, zMatrices, eigenvalues);
+                LanczosChecker(input, array1, zMatrices, eigenvalues);
+                int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
+                CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2]);
             }
 
             if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
@@ -590,7 +592,7 @@ namespace ConsoleApplication1
         }//end SOCJT Routine
 
         /// <summary>
-        /// Functiont to see if a vector is an eigenvector of the Hamiltonian.
+        /// Functiont to see if a vector from the Lanczos diagonalization is an eigenvector of the Hamiltonian.
         /// </summary>
         /// <param name="input">
         /// Fileinfo object
@@ -604,7 +606,7 @@ namespace ConsoleApplication1
         /// <param name="eigenvalues">
         /// Eigenvalues of the Hamiltonians
         /// </param>
-        private static void EvalChecker(FileInfo input, alglib.sparsematrix[] hamiltonianArray, List<double[,]> zmatrices, List<double[]> eigenvalues)
+        private static void LanczosChecker(FileInfo input, alglib.sparsematrix[] hamiltonianArray, List<double[,]> zmatrices, List<double[]> eigenvalues)
         {
             int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
             int whichEigenvalue = input.JBlockEigenvector.Item2 - 1;
@@ -614,8 +616,31 @@ namespace ConsoleApplication1
             {
                 temp[row] = zmatrices[jBlock][row, whichEigenvalue];
             }
+            EigenvectorCheck(hamiltonianArray[jBlock], eigenvalues[jBlock][whichEigenvalue], temp);
+        }//end function EvalChecker
+
+        private static void CheckJohnEigenvector(FileInfo input, alglib.sparsematrix hamiltonian, double eigenvalue)
+        {
+            var johnsVector = EigenvectorReader(input.FilePath + input.EigenvectorFileName, (int)(input.JBlockEigenvector.Item1 - 0.5M));
+            EigenvectorCheck(hamiltonian, eigenvalue, johnsVector);
+        }
+
+        /// <summary>
+        /// Checks if a vector is an eigenvector
+        /// </summary>
+        /// <param name="hamiltonianArray">
+        /// Hamiltonian to be checked
+        /// </param>
+        /// <param name="eigenvalue">
+        /// Eigenvalue to be compared against
+        /// </param>
+        /// <param name="temp">
+        /// Vector being tested as an eigenvector of hamiltonianArray
+        /// </param>
+        private static void EigenvectorCheck(alglib.sparsematrix hamiltonianArray, double eigenvalue, double[] temp)
+        {
             var V = new double[temp.Length];
-            alglib.sparsemv(hamiltonianArray[jBlock], temp, ref V);
+            alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
             int count = 0;
             for (int row = 0; row < temp.Length; row++)
@@ -628,15 +653,15 @@ namespace ConsoleApplication1
             }
             sum /= count;
             Console.WriteLine("Calculated Eigenvalue = " + Convert.ToString(sum));
-            Console.WriteLine("Eigenvalue from Lanczos = " + Convert.ToString(eigenvalues[jBlock][whichEigenvalue]));
-            double ratio = eigenvalues[jBlock][whichEigenvalue] / sum;
-            if (Math.Abs(1.0 - ratio) < input.EigenvectorTolerance)
-            { 
+            Console.WriteLine("Eigenvalue from Lanczos = " + Convert.ToString(eigenvalue));
+            double ratio = eigenvalue / sum;
+            //if (Math.Abs(1.0 - ratio) < input.EigenvectorTolerance)
+            //{
                 //set some parameter to be true
-            }
+            //}
             Console.WriteLine("Ratio of Lanczos/Calculated = " + Convert.ToString(ratio));
             Console.ReadLine();
-        }//end function EvalChecker
+        }//end EigenvectorCheck
 
         /// <summary>
         /// Reads in and parses an eigenvector from John
