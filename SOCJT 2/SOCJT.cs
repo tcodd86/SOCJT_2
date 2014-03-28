@@ -540,7 +540,7 @@ namespace ConsoleApplication1
 
             if (input.CheckEigenvector)
             {
-                LanczosChecker(input, array1, zMatrices, eigenvalues);
+                //LanczosChecker(input, array1, zMatrices, eigenvalues);
                 int jBlock = (int)(input.JBlockEigenvector.Item1 - 0.5M);
                 CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2 - 1]);
             }
@@ -642,20 +642,23 @@ namespace ConsoleApplication1
             var V = new double[temp.Length];
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
-            int count = 0;
-            Console.WriteLine(Lanczos.Magnitude(V));
+            //int count = 0;
+            //Console.WriteLine(Lanczos.Magnitude(V));
+            double magnitude = Lanczos.Magnitude(V);
             for (int row = 0; row < temp.Length; row++)
             {
-                if (Math.Abs(temp[row]) > 0.00000001)
-                {
-                    sum += V[row] / temp[row];
-                    count++;
-                }
+                //if (Math.Abs(temp[row]) > 0.0000000001)
+                //{
+                    //sum += V[row] / temp[row];
+                    //count++;
+                //}
+                sum += Math.Pow(V[row] / magnitude - temp[row], 2.0);
             }
-            sum /= count;
-            Console.WriteLine("Calculated Eigenvalue = " + Convert.ToString(sum));
+            //sum /= count;
+            sum /= V.Length;
+            Console.WriteLine("Calculated Eigenvalue = " + Convert.ToString(magnitude));
             Console.WriteLine("Eigenvalue from Lanczos = " + Convert.ToString(eigenvalue));
-            double ratio = eigenvalue / sum;
+            double ratio = eigenvalue / magnitude;
             //if (Math.Abs(1.0 - ratio) < input.EigenvectorTolerance)
             //{
                 //set some parameter to be true
