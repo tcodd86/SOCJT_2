@@ -35,7 +35,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of sparsematrix objects corresponding to different parameters.
         /// </returns>
-        public static List<alglib.sparsematrix> genFitMatrix(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly)
+        public static List<alglib.sparsematrix> genFitMatrix(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly, int position)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -57,15 +57,20 @@ namespace ConsoleApplication1
             //the nested loops initialize the vlLambda arrays for each basis function
             //This is ugly but makes the matrix generation much faster than accessing the objects in the matrix generation and saves me a ton of re-coding
             int[,] vlLambda = new int[matSize, nModes * 2 + 2];
+            int[] hashStorage = new int[nModes * 2 + 1];
+            //Dictionary<string, int> basisPositions = new Dictionary<string, int>();
+
+            //basisPositions[position] = new Dictionary<string, int>();
             for (int i = 0; i < matSize; i++)
             {
                 for (int j = 0; j < nModes; j++)
                 {
-                    vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].V;
-                    vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
+                    vlLambda[i, j] = hashStorage[j] = basisVectorsByJ[i].modesInVec[j].V;
+                    vlLambda[i, j + nModes] = hashStorage[j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
-                vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
+                vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
+                basisPositions[position].Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
             }//end loop to make vlLambda
 
             //generate an array to store omega, omegaExe, D, K and degeneracy of each mode
