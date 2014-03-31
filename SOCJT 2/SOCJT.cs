@@ -640,6 +640,7 @@ namespace ConsoleApplication1
         private static void EigenvectorCheck(alglib.sparsematrix hamiltonianArray, double eigenvalue, double[] temp)
         {
             var V = new double[temp.Length];
+            Lanczos.normalize(ref temp);
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
             double magnitude = Lanczos.Magnitude(V);
@@ -664,6 +665,8 @@ namespace ConsoleApplication1
             {
                 sum += Math.Pow(V[row] - magnitude * temp[row], 2.0);
             }
+            sum /= V.Length;
+            sum = Math.Sqrt(sum);
             Console.WriteLine("RMS error between vectors = " + sum);
             Console.ReadLine();
         }//end EigenvectorCheck
@@ -684,6 +687,7 @@ namespace ConsoleApplication1
         {
             double[] eigenvector = new double[GenHamMat.basisPositions[jIndex].Count()];
             string[] vecFile = FileInfo.FileRead(filepath);
+            double temp = 0.0;
             for (int position = 0; position < vecFile.Length; position += 8)
             {
                 int[] vlLambda = new int[7];
@@ -693,7 +697,7 @@ namespace ConsoleApplication1
                 vlLambda[4] = Convert.ToInt32(vecFile[position + 2]);//l for v3
                 vlLambda[2] = Convert.ToInt32(vecFile[position + 5]);//v for v4
                 vlLambda[5] = Convert.ToInt32(vecFile[position + 3]);//l for v4
-                if (vecFile[position + 7][vecFile[position + 7].Length - 1] == '+')
+                if (vecFile[position + 7][vecFile[position + 7].Length - 1] == '+')//for Lambda
                 {
                     vlLambda[6] = 1;
                 }
@@ -705,7 +709,16 @@ namespace ConsoleApplication1
                 int index = 0;
                 if (GenHamMat.basisPositions[jIndex].TryGetValue(hashCode, out index))
                 {
-                    eigenvector[index] = Convert.ToDouble(vecFile[position + 6]);
+                    temp = Convert.ToDouble(vecFile[position + 6]);
+                    if (temp != 0.0)
+                    {
+                        eigenvector[index] = Convert.ToDouble(vecFile[position + 6]);
+                    }
+                    else
+                    {
+                        string s = vecFile[position + 7].Substring(0, vecFile[position + 7].Length - 1);
+                        eigenvector[index] = Convert.ToDouble(s);
+                    }
                 }
             }
             return eigenvector;
