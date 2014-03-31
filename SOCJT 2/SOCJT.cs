@@ -642,28 +642,29 @@ namespace ConsoleApplication1
             var V = new double[temp.Length];
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
-            //int count = 0;
-            //Console.WriteLine(Lanczos.Magnitude(V));
             double magnitude = Lanczos.Magnitude(V);
             for (int row = 0; row < temp.Length; row++)
             {
-                //if (Math.Abs(temp[row]) > 0.0000000001)
-                //{
-                    //sum += V[row] / temp[row];
-                    //count++;
-                //}
                 sum += Math.Pow(V[row] / magnitude - temp[row], 2.0);
             }
-            //sum /= count;
             sum /= V.Length;
+            if (eigenvalue < 0.0)
+            {
+                magnitude *= -1.0;
+            }
             Console.WriteLine("Calculated Eigenvalue = " + Convert.ToString(magnitude));
             Console.WriteLine("Eigenvalue from Lanczos = " + Convert.ToString(eigenvalue));
             double ratio = eigenvalue / magnitude;
-            //if (Math.Abs(1.0 - ratio) < input.EigenvectorTolerance)
-            //{
-                //set some parameter to be true
-            //}
             Console.WriteLine("Ratio of Lanczos/Calculated = " + Convert.ToString(ratio));
+
+            //then find the residuals of A*x - c*x where c is the magnitude from above and x is temp
+            //means keep a running sum of V[i] - magnitude*temp[i]
+            sum = 0.0;
+            for (int row = 0; row < temp.Length; row++)
+            {
+                sum += Math.Pow(V[row] - magnitude * temp[row], 2.0);
+            }
+            Console.WriteLine("RMS error between vectors = " + sum);
             Console.ReadLine();
         }//end EigenvectorCheck
 
