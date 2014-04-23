@@ -580,6 +580,8 @@ namespace ConsoleApplication1
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
             BilinearInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
+            bool crossQuad = false;
+            var crossQuadPos = CrossQuadraticInitialization(eVecPos, out crossQuad, input.CrossTermMatrix);
 
             //add any matrices needed for cross-terms
             if (input.CrossTermMatrix != null)
@@ -628,36 +630,25 @@ namespace ConsoleApplication1
                         #region Linear
                         //linear portion
                         //now check each EVecPos mode for a linear element by taking vlLambda[n, ] and changing the values appropriately to find a linear element. Store in tempint
-                        tempInt = (int[])hashInt.Clone();                         
-                        for(int ll = -1; ll < 2; ll += 2)
+                        //tempInt = (int[])hashInt.Clone();                         
+                        for(int deltal = -1; deltal < 2; deltal += 2)
                         {
-                            tempInt = (int[])hashInt.Clone();
-                            DeltaVL(ref tempInt, eVecPos[eModes], 1, ll, nModes);
-                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            //if it exists, then assign it to the linear value                            
-                            if (basisPositions[position].TryGetValue(hashCode, out m))
+                            for (int deltaV = -1; deltaV < 2; deltaV += 2)
                             {
-                                if (m > n)
+                                tempInt = (int[])hashInt.Clone();
+                                DeltaVL(ref tempInt, eVecPos[eModes], deltaV, deltal, nModes);
+                                hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                                //if it exists, then assign it to the linear value                            
+                                if (basisPositions[position].TryGetValue(hashCode, out m))
                                 {
-                                    temp = Math.Sqrt(((double)vlLambda[n, eVecPos[eModes]] + ll * (double)vlLambda[n, eVecPos[eModes] + nModes] + 2D));//changed from - to + ll
-                                    Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                                    matrixPos[2 * eVecPos[eModes]].Add(ttTemp);
+                                    if (m > n)
+                                    {
+                                        temp = LinearMatrixElement(vlLambda, n, eVecPos[eModes], nModes, deltal, deltaV);
+                                        Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
+                                        matrixPos[2 * eVecPos[eModes]].Add(ttTemp);
+                                    }
                                 }
-                            }
-
-                            tempInt = (int[])hashInt.Clone();
-                            DeltaVL(ref tempInt, eVecPos[eModes], -1, ll, nModes);
-                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            //if it exists, then assign it to the linear value                            
-                            if (basisPositions[position].TryGetValue(hashCode, out m))
-                            {
-                                if (m > n)
-                                {
-                                    temp = Math.Sqrt(((double)vlLambda[n, eVecPos[eModes]] - ll * (double)vlLambda[n, eVecPos[eModes] + nModes]));//changed from - to + ll
-                                    Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
-                                    matrixPos[2 * eVecPos[eModes]].Add(ttTemp);
-                                }
-                            }
+                            }//end loop over deltaV
                         }//end loop over linear l values
                         #endregion
 
@@ -712,6 +703,7 @@ namespace ConsoleApplication1
                         #endregion
                     }//end loop over E-modes
 
+                    int crossCount = 0;
                     #region Bilinear
                     if (bilinear)
                     {
@@ -721,7 +713,7 @@ namespace ConsoleApplication1
                             for (int e = 0; e < biEVecPos.Count; e++)
                             {
                                 //value to keep track of which cross-term matrix we're on.
-                                int crossCount = a + e;
+                                crossCount = a + e;
 
                                 //this is because the cross-term couplings for JT terms are stored in the upper-diagonal of the cross-term matrix
                                 int row;
@@ -777,7 +769,46 @@ namespace ConsoleApplication1
                         }//end for loop over a vec positions
                     }//end bilinear if
                     #endregion
-                    
+
+                    #region Cross-Quadratic
+                    if (crossQuad)
+                    {
+                        for (int crossTerm = 0; crossTerm < crossQuadPos.Count; crossTerm += 2)
+                        {
+                            for (int deltal = -1; deltal < 2; deltal += 2)
+                            {
+                                for (int deltaV = -1; deltaV < 2; deltaV += 2)
+                                {                                    
+                                    for (int deltal2 = -1; deltal2 < 2; deltal2 += 2)
+                                    {
+                                        for (int deltaV2 = -1; deltaV2 < 2; deltaV2 += 2)
+                                        {
+                                            tempInt = (int[])hashInt.Clone();
+                                            //get DeltaVL for the first mode
+                                            DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm]], deltaV, deltal, nModes);
+                                            //get DeltaVL for the second mode
+                                            DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm + 1]], deltaV, deltal, nModes);
+                                            //generate the hashcode
+                                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                                            //if it exists, then assign it to the linear value                            
+                                            if (basisPositions[position].TryGetValue(hashCode, out m))
+                                            {
+                                                if (m > n)
+                                                {
+                                                    temp = LinearMatrixElement(vlLambda, n, eVecPos[crossQuadPos[crossTerm]], nModes, deltal, deltaV);
+                                                    temp *= LinearMatrixElement(vlLambda, n, eVecPos[crossQuadPos[crossTerm + 1]], nModes, deltal, deltaV);
+                                                    Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
+                                                    matrixPos[2 * nModes + crossCount].Add(ttTemp);
+                                                }
+                                            }
+                                        }//end loop over deltaV
+                                    }//end loop over linear l values
+                                }//end loop over deltaV
+                            }//end loop over linear l values
+                            crossCount++;
+                        }//end loop over cross quadratic terms
+                    }
+                    #endregion
                 }//row for loop
             }//end anonymous function in parallel for loop
             );//end parallel for
@@ -794,6 +825,17 @@ namespace ConsoleApplication1
             }
             return matList;
         }//end method genMatrix
+
+
+        private static double LinearMatrixElement(int[,] vlLambda, int n, int index, int nModes, int deltal, int deltaV)
+        {
+            int plus = 0;
+            if (deltaV == 1)
+            {
+                plus = 2;
+            }
+            return Math.Sqrt((double)vlLambda[n, index] + deltaV * deltal * (double)vlLambda[n, index + nModes] + plus);
+        }
 
         /// <summary>
         /// Changes appropriate values for finding a given matrix element
@@ -845,6 +887,7 @@ namespace ConsoleApplication1
         {
             crossQuadratic = false;
             var crossQuadModes = new List<int>();
+            //check the upper diagonal of the crossterm matrix to see if any emodes are coupled to one another
             for (int i = 0; i < evecPosition.Count; i++)
             {
                 for (int j = i + 1; j < evecPosition.Count; j++)
