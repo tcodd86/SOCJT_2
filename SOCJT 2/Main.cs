@@ -477,6 +477,7 @@ namespace ConsoleApplication1
                 }
             }//end for
 
+            /*
             //this sets isQuad = true if there is a cross quadratic term between an A and E mode
             if (isQuad == false)
             {
@@ -509,6 +510,7 @@ namespace ConsoleApplication1
                     }//end inner for
                 }//end outer for
             }//end if isQuad == false
+            */
             return isQuad;
         }
 
