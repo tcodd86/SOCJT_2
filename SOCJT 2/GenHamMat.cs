@@ -826,6 +826,26 @@ namespace ConsoleApplication1
             }
         }
 
+
+        public static List<int> CrossQuadraticInitialization(List<int> evecPosition, out bool crossQuadratic, double[,] crossTermMatrix)
+        {
+            crossQuadratic = false;
+            var crossQuadModes = new List<int>();
+            for (int i = 0; i < evecPosition.Count; i++)
+            {
+                for (int j = i + 1; j < evecPosition.Count; j++)
+                { 
+                    //check here to see if the cross term matrix element between evecPosition[i] and evecPosition[j] is 0
+                    if (crossTermMatrix[evecPosition[i], evecPosition[j]] != 0.0)
+                    {
+                        crossQuadModes.Add(evecPosition[i]);
+                        crossQuadModes.Add(evecPosition[j]);
+                    }
+                }
+            }
+            return crossQuadModes;
+        }//end method CrossQuadraticInitialization
+
         /// <summary>
         /// This function initializes the biAVecPos and biEVecPos lists which tell which A and E vecs have cross-term coupling.  Also finds if there is any bilinear coupling.
         /// </summary>
