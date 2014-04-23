@@ -142,7 +142,7 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
+            BilinearInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             
             //add any matrices needed for cross-terms
             if (input.CrossTermMatrix != null)
@@ -579,7 +579,7 @@ namespace ConsoleApplication1
             }
 
             //initialize cross-terms and generate biAVecPos and biEVecPos lists
-            CrossTermInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
+            BilinearInitialization(basisVectorsByJ[0].modesInVec, nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
 
             //add any matrices needed for cross-terms
             if (input.CrossTermMatrix != null)
@@ -826,7 +826,21 @@ namespace ConsoleApplication1
             }
         }
 
-
+        /// <summary>
+        /// Generates a list containing the positions of modes with cross-quadratic coupling.
+        /// </summary>
+        /// <param name="evecPosition">
+        /// List containing the positions of degenerate (e type) modes
+        /// </param>
+        /// <param name="crossQuadratic">
+        /// Boolean to be set if there are cross-quadratic terms
+        /// </param>
+        /// <param name="crossTermMatrix">
+        /// Cross-term matrix
+        /// </param>
+        /// <returns>
+        /// List whose elements are the modes with cross-quadratic coupling.
+        /// </returns>
         public static List<int> CrossQuadraticInitialization(List<int> evecPosition, out bool crossQuadratic, double[,] crossTermMatrix)
         {
             crossQuadratic = false;
@@ -840,6 +854,7 @@ namespace ConsoleApplication1
                     {
                         crossQuadModes.Add(evecPosition[i]);
                         crossQuadModes.Add(evecPosition[j]);
+                        crossQuadratic = true;
                     }
                 }
             }
@@ -867,7 +882,7 @@ namespace ConsoleApplication1
         /// <param name="crossTermMatrix">
         /// Cross term matrix containing coupling the actual coupling terms.
         /// </param>
-        public static void CrossTermInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
+        public static void BilinearInitialization(List<BasisByMode> modesInVec, int nModes, out bool bilinear, out List<int> biAVecPos, out List<int> biEVecPos, double[,] crossTermMatrix)
         {
             bool containsAVecs = false;
             bilinear = false;

@@ -332,7 +332,7 @@ namespace ConsoleApplication1
             bool bilinear = false;
             var biAVecPos = new List<int>();
             var biEVecPos = new List<int>();
-            GenHamMat.CrossTermInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
+            GenHamMat.BilinearInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             //code here to convert the alglib matrices to matrices for each j block
             for (int i = 0; i < fitHamList.Count; i++)
             {
