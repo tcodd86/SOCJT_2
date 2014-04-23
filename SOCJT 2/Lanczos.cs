@@ -1310,7 +1310,7 @@ namespace ConsoleApplication1
         /// <param name="X">
         /// Vector to be normalized.
         /// </param>
-        private static void normalize(ref double[] X)
+        public static void normalize(ref double[] X)
         {
             double sum = 0.0;
             for (int i = 0; i < X.Length; i++)
@@ -1356,7 +1356,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Magnitude of vec.
         /// </returns>
-        private static double Magnitude(double[] vec)
+        public static double Magnitude(double[] vec)
         {
             double sum = 0.0;
             for (int i = 0; i < vec.Length; i++)

@@ -9,6 +9,8 @@ namespace ConsoleApplication1
 {
     static class GenHamMat
     {
+        public static List<Dictionary<string, int>> basisPositions;
+
         /// <summary>
         /// Generates a list of alglib sparsematrix objects where the first is the diagonal elements and the remaining ones are for D and K for each mode and then the matrices for the cross terms.
         /// </summary>
@@ -33,7 +35,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of sparsematrix objects corresponding to different parameters.
         /// </returns>
-        public static List<alglib.sparsematrix> genFitMatrix(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly)
+        public static List<alglib.sparsematrix> genFitMatrix(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly, int position)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -55,15 +57,20 @@ namespace ConsoleApplication1
             //the nested loops initialize the vlLambda arrays for each basis function
             //This is ugly but makes the matrix generation much faster than accessing the objects in the matrix generation and saves me a ton of re-coding
             int[,] vlLambda = new int[matSize, nModes * 2 + 2];
+            int[] hashStorage = new int[nModes * 2 + 1];
+            //Dictionary<string, int> basisPositions = new Dictionary<string, int>();
+
+            //basisPositions[position] = new Dictionary<string, int>();
             for (int i = 0; i < matSize; i++)
             {
                 for (int j = 0; j < nModes; j++)
                 {
-                    vlLambda[i, j] = basisVectorsByJ[i].modesInVec[j].V;
-                    vlLambda[i, j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
+                    vlLambda[i, j] = hashStorage[j] = basisVectorsByJ[i].modesInVec[j].V;
+                    vlLambda[i, j + nModes] = hashStorage[j + nModes] = basisVectorsByJ[i].modesInVec[j].L;
                 }
-                vlLambda[i, nModes * 2] = basisVectorsByJ[i].Lambda;
+                vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
+                basisPositions[position].Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
             }//end loop to make vlLambda
 
             //generate an array to store omega, omegaExe, D, K and degeneracy of each mode
@@ -459,7 +466,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of sparsematrix objects corresponding to different parameters.
         /// </returns>
-        public static List<alglib.sparsematrix> GenMatrixHash(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly)
+        public static List<alglib.sparsematrix> GenMatrixHash(List<BasisFunction> basisVectorsByJ, bool isQuad, FileInfo input, out int nColumns, int par, bool diagOnly, int position)
         {
             int matSize = basisVectorsByJ.Count;
             nColumns = matSize;
@@ -483,7 +490,9 @@ namespace ConsoleApplication1
             //This is ugly but makes the matrix generation much faster than accessing the objects in the matrix generation and saves me a ton of re-coding
             int[,] vlLambda = new int[matSize, nModes * 2 + 2];
             int[] hashStorage = new int[nModes * 2 + 1];
-            Dictionary<string, int> basisPositions = new Dictionary<string, int>();
+            //Dictionary<string, int> basisPositions = new Dictionary<string, int>();
+
+            //basisPositions[position] = new Dictionary<string, int>();
             for (int i = 0; i < matSize; i++)
             {
                 for (int j = 0; j < nModes; j++)
@@ -493,7 +502,7 @@ namespace ConsoleApplication1
                 }
                 vlLambda[i, nModes * 2] = hashStorage[nModes * 2] = basisVectorsByJ[i].Lambda;
                 vlLambda[i, nModes * 2 + 1] = (int)(basisVectorsByJ[i].J - 0.5M);
-                basisPositions.Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
+                basisPositions[position].Add(BasisFunction.GenerateHashCode(hashStorage, nModes), i);
             }//end loop to make vlLambda
 
             //generate an array to store omega, omegaExe, D, K and degeneracy of each mode
@@ -626,7 +635,7 @@ namespace ConsoleApplication1
                             DeltaVL(ref tempInt, eVecPos[eModes], 1, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                             //if it exists, then assign it to the linear value                            
-                            if (basisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
@@ -640,7 +649,7 @@ namespace ConsoleApplication1
                             DeltaVL(ref tempInt, eVecPos[eModes], -1, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                             //if it exists, then assign it to the linear value                            
-                            if (basisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
@@ -661,7 +670,7 @@ namespace ConsoleApplication1
                             //for bottom matrix element on page
                             DeltaVL(ref tempInt, eVecPos[eModes], 2, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (basisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
@@ -676,7 +685,7 @@ namespace ConsoleApplication1
                             //for middle matrix element on page
                             DeltaVL(ref tempInt, eVecPos[eModes], 0, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (basisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
@@ -690,7 +699,7 @@ namespace ConsoleApplication1
                             //for top matrix element on page
                             DeltaVL(ref tempInt, eVecPos[eModes], -2, ll, nModes);
                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
-                            if (basisPositions.TryGetValue(hashCode, out m))
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
                             {
                                 if (m > n)
                                 {
@@ -752,7 +761,7 @@ namespace ConsoleApplication1
                                             DeltaVL(ref tempInt, biAVecPos[a], dva, 0, nModes, false);
                                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                                             //formula for bilinear matrix element
-                                            if (basisPositions.TryGetValue(hashCode, out m))
+                                            if (basisPositions[position].TryGetValue(hashCode, out m))
                                             {
                                                 if (m > n)
                                                 {
@@ -816,6 +825,26 @@ namespace ConsoleApplication1
                 vlArray[2 * nModes] *= -1;
             }
         }
+
+
+        public static List<int> CrossQuadraticInitialization(List<int> evecPosition, out bool crossQuadratic, double[,] crossTermMatrix)
+        {
+            crossQuadratic = false;
+            var crossQuadModes = new List<int>();
+            for (int i = 0; i < evecPosition.Count; i++)
+            {
+                for (int j = i + 1; j < evecPosition.Count; j++)
+                { 
+                    //check here to see if the cross term matrix element between evecPosition[i] and evecPosition[j] is 0
+                    if (crossTermMatrix[evecPosition[i], evecPosition[j]] != 0.0)
+                    {
+                        crossQuadModes.Add(evecPosition[i]);
+                        crossQuadModes.Add(evecPosition[j]);
+                    }
+                }
+            }
+            return crossQuadModes;
+        }//end method CrossQuadraticInitialization
 
         /// <summary>
         /// This function initializes the biAVecPos and biEVecPos lists which tell which A and E vecs have cross-term coupling.  Also finds if there is any bilinear coupling.

@@ -215,13 +215,13 @@ namespace ConsoleApplication1
         /// <returns>
         /// String to be used as key for position lookup in dictionary
         /// </returns>
-        private string GenerateHashCode(List<BasisByMode> Modes, int Lambda)
+        private static string GenerateHashCode(List<BasisByMode> Modes, int Lambda)
         {
             string s = "";
             for (int i = 0; i < Modes.Count; i++)
             {
-                s += Modes[i].V;
-                s += Modes[i].L;
+                s += Modes[i].V + " ";
+                s += Modes[i].L + " ";
             }
             s += Lambda;
             return s;
@@ -236,7 +236,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Key of basisfunction as a string
         /// </returns>
-        public string GenerateHashCode(BasisFunction a)
+        public static string GenerateHashCode(BasisFunction a)
         {
             return GenerateHashCode(a.modesInVec, a.Lambda);
         }
