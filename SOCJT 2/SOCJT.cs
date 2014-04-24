@@ -35,6 +35,8 @@ namespace ConsoleApplication1
         //this list stores the untransformed eigenvectors
         public List<double[,]> lanczosEVectors { get; private set; }
 
+        public List<double[]> OverlapCoefficients { get; private set; }
+
         public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input)
         {
             //Sets minimum and maximum j values.
@@ -459,6 +461,11 @@ namespace ConsoleApplication1
                     lanczosEVectors.Add(new double[0,0]);
                 }
             }
+            OverlapCoefficients = new List<double[]>();
+            for (int i = 0; i < array1.Length; i++)
+            {
+                OverlapCoefficients.Add(new double[0]);
+            }
             ParallelOptions options2 = new ParallelOptions();
             options2.MaxDegreeOfParallelism = input.ParJ;
             try
@@ -467,16 +474,27 @@ namespace ConsoleApplication1
                 {
                     double[] evs;
                     double[,] temp;
+                    double[] overlap = new double[input.M + 1];
                     IECODE[i] = -1;
 
-                    //add a parameter to count Lanczos iterations to set possible stopping criteria that way
-                    //call MINVAL from here
                     if (!input.BlockLanczos)//means use naiveLanczos routine
                     {
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, i, input.FilePath);
+                        bool evsNeeded = input.PrintVector;
+                        double[] seed;
+                        if (input.UseSeedVector)// && i == 0)
+                        { 
+                            seed = EigenvectorReader(input.FilePath + input.SeedVector, i);
+                            evsNeeded = true;
+                        }
+                        else
+                        {
+                            seed = Lanczos.RANDOM(numcolumnsA[i]);
+                        }
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, evsNeeded, i, input.FilePath, seed, ref overlap);
+                        OverlapCoefficients[i] = overlap;
                     }
                     else//means use block Lanczos from SOCJT
                     {
@@ -585,7 +603,7 @@ namespace ConsoleApplication1
             }
 
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
+            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, OverlapCoefficients);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
@@ -629,7 +647,7 @@ namespace ConsoleApplication1
         /// Hamiltonian being checked
         /// </param>
         /// <param name="eigenvalue">
-        /// Eigenvalue to compare against
+        /// Eigenvalue to check.
         /// </param>
         private static void CheckJohnEigenvector(FileInfo input, alglib.sparsematrix hamiltonian, double eigenvalue)
         {
@@ -991,7 +1009,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
         /// </returns>
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlapCoeffs)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
@@ -1009,7 +1027,7 @@ namespace ConsoleApplication1
                 {
                     //add call to symmetry checker function here.
                     bool tbool = isA(jvecs[i], zMatrices[i], j, input, false);
-                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
+                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool, overlapCoeffs[i][j]));
                 }
                 if (tempS < maxS)
                 {

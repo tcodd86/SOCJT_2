@@ -528,7 +528,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Normalized, random vector of length N.
         /// </returns>
-        private static double[] RANDOM(int N)
+        public static double[] RANDOM(int N)
         {
             var X = new double[N];            
             Random randy = new Random(6821);
@@ -816,7 +816,7 @@ namespace ConsoleApplication1
         /// <param name="file">
         /// FileInfo object
         /// </param>
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, int n, string file, double[] seed, ref double[] overlap)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -838,7 +838,7 @@ namespace ConsoleApplication1
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, writer);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, seed, writer);
                 writer.Close();
             }
             else     //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
@@ -848,7 +848,7 @@ namespace ConsoleApplication1
                 {
                     lanczosVecs = new double[N, its];
                 }
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, NTooBig, seed);
             }
                         
             double[] nBetas = new double[its - 1];
@@ -868,6 +868,12 @@ namespace ConsoleApplication1
 
             //Diagonalize Lanczos Matrix to find M correct eigenvalues
             LanczosMatrixDiagonalization(ref evs, ref z, tol, M, alphas, nBetas, tAlphas, tBetas, evsNeeded);
+
+            //pull overlap coefficients from z
+            for (int co = 0; co < overlap.Length; co++)
+            {
+                overlap[co] = Math.Pow(z[0, co], 2.0);
+            }
 
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
@@ -1096,11 +1102,12 @@ namespace ConsoleApplication1
         /// <param name="writer">
         /// StreamWriter for writing LanczosVectors to disc if necessary, null by default
         /// </param>
-        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, StreamWriter writer = null)
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool NTooBig, double[] seed, StreamWriter writer = null)
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
-            var vi = RANDOM(N);
+            //var vi = RANDOM(N);
+            var vi = seed;
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];

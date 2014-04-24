@@ -41,7 +41,7 @@ namespace ConsoleApplication1
             //initialize the Eigenvalue array for the fit values from the fit file
             for (int i = 0; i < nToFit; i++)
             {
-                userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false);
+                userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false, 0.0);
             }
             
             //initializes the X vector, boundary conditions and variable scales
