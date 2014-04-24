@@ -335,9 +335,10 @@ namespace ConsoleApplication1
             GenHamMat.BilinearInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             //code here to convert the alglib matrices to matrices for each j block
 
-            int whichCrossMatrix = 0;
+            
             for (int i = 0; i < fitHamList.Count; i++)
             {
+                int whichCrossMatrix = 0;
                 mat.Add(new List<alglib.sparsematrix>());
                 int count;
                 int DorK;
@@ -363,6 +364,7 @@ namespace ConsoleApplication1
                     }
                     else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
                     {
+                        //*
                         int crossMatrixCounter = 0;
                         for (int blOrNot = 0; blOrNot < 2; blOrNot++)
                         {
@@ -379,30 +381,30 @@ namespace ConsoleApplication1
                                         //crossMatrixCounter will keep going 
                                         if ((biAVecPos.Exists(x => x == row) || biAVecPos.Exists(x => x == column)) && blOrNot == 0)
                                         { 
-                                            //means this is a bilinear term
-                                            crossMatrixCounter++;
+                                            //means this is a bilinear term                                            
                                             if (crossMatrixCounter == whichCrossMatrix)
                                             {
                                                 val = input.CrossTermMatrix[row, column];
-                                            }//end conditional to see if this is the cross-term element we want                                            
+                                            }//end conditional to see if this is the cross-term element we want    
+                                            crossMatrixCounter++;
                                         }
                                         if (!(biAVecPos.Exists(x => x == row) || biAVecPos.Exists(x => x == column)) && blOrNot == 1)
                                         {
                                             //means this is a cross-quadratic term
-                                            crossMatrixCounter++;
                                             if (crossMatrixCounter == whichCrossMatrix)
                                             {
                                                 val = input.CrossTermMatrix[row, column];
-                                            }//end conditional to see if this is the cross-term element we want   
+                                            }//end conditional to see if this is the cross-term element we want  
+                                            crossMatrixCounter++; 
                                         }
                                     }//end conditional to see if this matrix element is 0
                                 }//end loop over columns of cross-term matrix
                             }//end loop over rows of cross-term matrix
                         }//end loop to go through the cross-term matrix twice
-
+                        //*/
 
                         /*
-                        This code is wrong, it will only ever return the first cross-term
+                        //This code is wrong, it will only ever return the first cross-term
                         for (int aa = 0; aa < biAVecPos.Count; aa++)
                         {
                             for (int e = 0; e < biEVecPos.Count; e++)
@@ -423,10 +425,10 @@ namespace ConsoleApplication1
                                 val = input.CrossTermMatrix[row, column];
                             }//end loop over e elements
                         }//end loop over a elements
-                    }//end else for counting if it's D / K or cross-Term
-                    */
+                        //*/
+                        whichCrossMatrix++;
+                    }//end else for counting if it's D / K or cross-Term                    
                     mat[i].Add(cTimesSparse(fitHamList[i][j], val));
-                    whichCrossMatrix++;
                 }//end loop over fitHamList
             }
             //now need to convert the lists of matrices in each mat element into a single object
