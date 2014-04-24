@@ -619,6 +619,18 @@ namespace ConsoleApplication1
             EigenvectorCheck(hamiltonianArray[jBlock], eigenvalues[jBlock][whichEigenvalue], temp);
         }//end function EvalChecker
 
+        /// <summary>
+        /// Function to see if a vector from John is an eigenvector of the Hamiltonian
+        /// </summary>
+        /// <param name="input">
+        /// FileInfo Object
+        /// </param>
+        /// <param name="hamiltonian">
+        /// Hamiltonian being checked
+        /// </param>
+        /// <param name="eigenvalue">
+        /// Eigenvalue to compare against
+        /// </param>
         private static void CheckJohnEigenvector(FileInfo input, alglib.sparsematrix hamiltonian, double eigenvalue)
         {
             var johnsVector = EigenvectorReader(input.FilePath + input.EigenvectorFileName, (int)(input.JBlockEigenvector.Item1 - 0.5M));
