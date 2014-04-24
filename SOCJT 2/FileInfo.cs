@@ -474,6 +474,16 @@ namespace ConsoleApplication1
         /// </summary>
         public double EigenvectorTolerance { get; set; }
 
+        /// <summary>
+        /// String storing the filename for the seed vector for the Lanczos routine.
+        /// </summary>
+        public string SeedVector { get; private set; }
+
+        /// <summary>
+        /// Flag to indicate whether a seed vector should be used or not.
+        /// </summary>
+        public bool UseSeedVector { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -496,10 +506,12 @@ namespace ConsoleApplication1
             EVectorFile = false;
             VectorFileComplete = false;
             CheckEigenvector = false;
+            UseSeedVector = false;
             
             MatrixFile = "matrix.txt";
             Title = "TITLE";
             FitFile = "fit.fit";
+            SeedVector = "seed.txt";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -898,6 +910,25 @@ namespace ConsoleApplication1
                             break;
                         }
                     }
+                    #endregion
+                }
+
+                if (inputf[i].ToUpper() == "&INTENSITY")
+                {
+                    #region &INTENSITY
+                    for (int u = i; ; u++)
+                    {
+                        if (inputf[u].ToUpper() == "SEED_VECTOR")
+                        {
+                            SeedVector = inputf[u + 1];
+                            UseSeedVector = true;
+                            continue;
+                        }
+                        if (inputf[u] == "/")
+                        {
+                            break;
+                        }
+                    }//end for
                     #endregion
                 }
 
