@@ -484,9 +484,10 @@ namespace ConsoleApplication1
                         temp = new double[numcolumnsA[i], input.M + 1];
                         bool evsNeeded = input.PrintVector;
                         double[] seed;
-                        if (input.UseSeedVector)// && i == 0)
+                        if (input.UseSeedVector && i == 0)
                         { 
                             seed = EigenvectorReader(input.FilePath + input.SeedVector, i);
+                            Lanczos.normalize(ref seed);
                             evsNeeded = true;
                         }
                         else
