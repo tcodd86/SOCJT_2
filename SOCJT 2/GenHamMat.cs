@@ -787,7 +787,7 @@ namespace ConsoleApplication1
                                             //get DeltaVL for the first mode
                                             DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm]], deltaV, deltal, nModes);
                                             //get DeltaVL for the second mode
-                                            DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm + 1]], deltaV, deltal, nModes);
+                                            DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm + 1]], deltaV2, deltal2, nModes);
                                             //generate the hashcode
                                             hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                                             //if it exists, then assign it to the linear value                            
