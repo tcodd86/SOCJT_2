@@ -474,6 +474,21 @@ namespace ConsoleApplication1
         /// </summary>
         public double EigenvectorTolerance { get; set; }
 
+        /// <summary>
+        /// Boolean to indicate that a vector from John Stanton is being checked.
+        /// </summary>
+        public bool JSInten { get; private set; }
+
+        /// <summary>
+        /// Name of the vector file to be read.
+        /// </summary>
+        public string VectorName { get; private set; }
+
+        /// <summary>
+        /// Boolean indicating whether intensity is being checked or not.
+        /// </summary>
+        public bool Intensity { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -496,10 +511,13 @@ namespace ConsoleApplication1
             EVectorFile = false;
             VectorFileComplete = false;
             CheckEigenvector = false;
+            JSInten = false;
+            Intensity = false;
             
             MatrixFile = "matrix.txt";
             Title = "TITLE";
             FitFile = "fit.fit";
+            VectorName = "vector.txt";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -898,6 +916,30 @@ namespace ConsoleApplication1
                             break;
                         }
                     }
+                    #endregion
+                }
+
+                if (inputf[i].ToUpper() == "&INTENSITY")
+                {
+                    #region &INTENSITY
+                    Intensity = true;
+                    for (int u = i; ; u++)
+                    {
+                        if (inputf[u].ToUpper() == "JS")
+                        {
+                            JSInten = true;
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "VECTOR_FILE")
+                        {
+                            VectorName = inputf[u + 1];
+                            continue;
+                        }
+                        if (inputf[u] == "/")
+                        {
+                            break;
+                        }
+                    }//end for
                     #endregion
                 }
 
