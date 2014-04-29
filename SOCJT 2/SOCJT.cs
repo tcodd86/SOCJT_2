@@ -493,7 +493,7 @@ namespace ConsoleApplication1
                         eigenvalues[i][j] = evs[j];                        
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m < Lanczos.basisSetLimit))
+                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit))
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
@@ -545,7 +545,7 @@ namespace ConsoleApplication1
                 CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2 - 1]);
             }
 
-            if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
+            if (!input.BlockLanczos && array1[0].innerobj.m * input.NumberOfIts >= Lanczos.basisSetLimit && input.PrintVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
                 input.PrintVector = false;
@@ -584,12 +584,55 @@ namespace ConsoleApplication1
                 writeVecComplete(jBasisVecsByJ, JvecsForOutuput, zMatrices, input, eigenvalues, isQuad);
             }
 
+            //this is where the intensity or overlap will be checked if necessary
+            var overlaps = new List<double[]>(eigenvalues.Count);
+            for (int count = 0; count < overlaps.Count; count++)
+            {
+                overlaps[count] = new double[eigenvalues[count].Length];
+            }
+            if (input.Intensity && input.PrintVector)
+            { 
+                //code here to read vector and take dot product
+                for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                {
+                    var vector = EigenvectorReader(input.VectorName, jIndex);
+                    Lanczos.normalize(ref vector);
+                    overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                }
+            }
+
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
+            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, overlaps);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
+
+        /// <summary>
+        /// Calculates the overlap integral (dot product) of a provided vector and the eigenvectors
+        /// </summary>
+        /// <param name="eigenvectors">
+        /// Eigenvectors of the Hamiltonian
+        /// </param>
+        /// <param name="overlapVector">
+        /// Vector from John or from file reading.
+        /// </param>
+        /// <returns>
+        /// Array of doubles which correspond to the dot products of the overlapVector with each of the eigenvectors.
+        /// </returns>
+        private static double[] Overlap(double[,] eigenvectors, double[] overlapVector)
+        { 
+            //vector to store the overlaps
+            var overlaps = new double[eigenvectors.GetLength(1)];
+            for (int i = 0; i < overlaps.Length; i++)
+            {
+                for (int j = 0; j < overlapVector.Length; j++)
+                {
+                    overlaps[i] += overlapVector[j] * eigenvectors[j, i];
+                }
+            }
+            return overlaps;
+        }
 
         /// <summary>
         /// Functiont to see if a vector from the Lanczos diagonalization is an eigenvector of the Hamiltonian.
@@ -979,7 +1022,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
         /// </returns>
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlap)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
@@ -997,7 +1040,14 @@ namespace ConsoleApplication1
                 {
                     //add call to symmetry checker function here.
                     bool tbool = isA(jvecs[i], zMatrices[i], j, input, false);
-                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
+                    if (input.Intensity)
+                    {
+                        eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool, overlap[i][j]));
+                    }
+                    else
+                    {
+                        eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
+                    }
                 }
                 if (tempS < maxS)
                 {
