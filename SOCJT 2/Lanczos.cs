@@ -28,7 +28,7 @@ namespace ConsoleApplication1
     /// </summary>
     static class Lanczos
     {
-        public static int basisSetLimit = 40000;
+        public static int basisSetLimit = 40000 * 2000;
 
         /// <summary>
         /// This subroutine implements the block lanczos method with reorthogonalization.
@@ -827,7 +827,7 @@ namespace ConsoleApplication1
 
             var lanczosVecs = new double[0,0];
             bool NTooBig = false;
-            if (N > basisSetLimit)
+            if (N * its > basisSetLimit)
             {
                 NTooBig = true;
             }
