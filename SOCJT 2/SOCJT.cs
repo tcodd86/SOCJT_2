@@ -586,16 +586,17 @@ namespace ConsoleApplication1
 
             //this is where the intensity or overlap will be checked if necessary
             var overlaps = new List<double[]>(eigenvalues.Count);
-            for (int count = 0; count < overlaps.Count; count++)
+            for (int count = 0; count < eigenvalues.Count; count++)
             {
-                overlaps[count] = new double[eigenvalues[count].Length];
+                overlaps.Add(new double[eigenvalues[count].Length]);
+                //overlaps[count] = new double[eigenvalues[count].Length];
             }
             if (input.Intensity && input.PrintVector)
             { 
                 //code here to read vector and take dot product
                 for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                 {
-                    var vector = EigenvectorReader(input.VectorName, jIndex);
+                    var vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
                     Lanczos.normalize(ref vector);
                     overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
                 }
@@ -1040,7 +1041,7 @@ namespace ConsoleApplication1
                 {
                     //add call to symmetry checker function here.
                     bool tbool = isA(jvecs[i], zMatrices[i], j, input, false);
-                    if (input.Intensity)
+                    if (input.Intensity && input.PrintVector)
                     {
                         eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool, overlap[i][j]));
                     }

@@ -69,6 +69,7 @@ namespace ConsoleApplication1
                 string[] inputFile = FileInfo.FileRead(filepathIN);
                 FileInfo input = new FileInfo();
                 input.SetFileInfo(inputFile, filepath);
+                input.FilePath = filepath;
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.FitFile);

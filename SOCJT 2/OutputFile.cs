@@ -162,11 +162,11 @@ namespace ConsoleApplication1
             }//writes all evs to the file object
             
             file.AppendLine("#" + "\t" + "Final results showing all eigenvalues found");
-            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + "\t" + (input.BlockLanczos ? "Symm" : input.PrintVector ? "Symm" : ""));
+            file.AppendLine("\t" + "Eigenvalue" + "\t" + " j" + "\t" + "Sigma" + "\t" + "n_j" + (input.BlockLanczos ? "\tSymm" : input.PrintVector ? "\tSymm" : "") + (input.Intensity ? "\tIntensity" : ""));
             int l = 0;
             for (int i = 0; i < finalList.Length; i++)
             {
-                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Evalue) + "\t" + Convert.ToString(finalList[i].JBlock) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sigma) + "\t" + Convert.ToString(finalList[i].Number) + "\t" + (input.BlockLanczos ? (finalList[i].IsA1 ? "1" : "2") : input.PrintVector ? (finalList[i].IsA1 ? "1" : "2") : ""));
+                file.AppendLine(Convert.ToString(l + 1) + "\t" + String.Format("{0,9:0.0000}", finalList[i].Evalue) + "\t" + Convert.ToString(finalList[i].JBlock) + "\t" + String.Format("{0,3:0.0}", finalList[i].Sigma) + "\t" + Convert.ToString(finalList[i].Number) + (input.BlockLanczos ? (finalList[i].IsA1 ? "\t1" : "\t2") : input.PrintVector ? (finalList[i].IsA1 ? "\t1" : "\t2") : "") + (input.Intensity ? "\t" + Convert.ToString(finalList[i].Overlap) : ""));
                 l++;
             }
             linesToWrite.Add(file.ToString());
