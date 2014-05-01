@@ -479,6 +479,7 @@ namespace ConsoleApplication1
                 rmsError += Math.Pow(temp[w], 2D);
             }
             rmsError /= temp.Length;
+            rmsError = Math.Sqrt(rmsError);
 
             Console.WriteLine("Eigenvalues have been calculated {0} times.", ++count);
             Console.WriteLine("RMS Error is {0}.", rmsError);
