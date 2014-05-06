@@ -489,6 +489,16 @@ namespace ConsoleApplication1
         /// </summary>
         public bool Intensity { get; private set; }
 
+        /// <summary>
+        /// Int indicating which vector from an eigenvector file should be read.
+        /// </summary>
+        public int VectorIndex { get; private set; }
+
+        /// <summary>
+        /// Decimal indicating which jblock the vector to be read is in.
+        /// </summary>
+        public decimal VectorJBlock { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -934,6 +944,14 @@ namespace ConsoleApplication1
                         {
                             VectorName = inputf[u + 1];
                             continue;
+                        }
+                        if (inputf[u].ToUpper() == "INDEX")
+                        {
+                            VectorIndex = Convert.ToInt32(inputf[u + 1]);
+                        }
+                        if (inputf[u].ToUpper() == "JBLOCK")
+                        {
+                            VectorJBlock = ParseDecimal(inputf[u + 1]);
                         }
                         if (inputf[u] == "/")
                         {

@@ -591,14 +591,28 @@ namespace ConsoleApplication1
                 overlaps.Add(new double[eigenvalues[count].Length]);
                 //overlaps[count] = new double[eigenvalues[count].Length];
             }
+
             if (input.Intensity && input.PrintVector)
             { 
                 //code here to read vector and take dot product
-                for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                double[] vector;
+                if (input.JSInten)
                 {
-                    var vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
+                    for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                    {
+                        vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
+                        Lanczos.normalize(ref vector);
+                        overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                    }
+                }
+                else
+                {
+                    vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock);
                     Lanczos.normalize(ref vector);
-                    overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                    for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                    {
+                        overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                    }
                 }
             }
 
@@ -608,6 +622,20 @@ namespace ConsoleApplication1
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
+
+        /// <summary>
+        /// Parses a SOCJT 2 vector file and returns the specified vector
+        /// </summary>
+        /// <param name="fileName">The name of vector file</param>
+        /// <param name="index">Which eigenvector</param>
+        /// <param name="jBlock">Which j-block</param>
+        /// <returns></returns>
+        private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock)
+        {
+            List<double> evec = new List<double>();
+
+            return evec.ToArray();
+        }
 
         /// <summary>
         /// Calculates the overlap integral (dot product) of a provided vector and the eigenvectors
@@ -813,7 +841,7 @@ namespace ConsoleApplication1
             {
                 title = file;
             }
-            File.WriteAllLines(file, vecFileOut);
+            File.WriteAllLines(title, vecFileOut);
         }
 
         /// <summary>
