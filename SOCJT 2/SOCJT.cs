@@ -572,7 +572,7 @@ namespace ConsoleApplication1
             //if NTooBig == true then the separate eigenvector file will be made after the eigenvectors are calculated
             if (input.EVectorFile && (input.BlockLanczos || input.PrintVector))
             {
-                writeVecFile(input, zMatrices, JvecsForOutuput);
+                writeVecFile(input, zMatrices, JvecsForOutuput, 0.0);
             }//end if
 
             //put code here to write eigenvectors to file with entire basis set.
@@ -780,7 +780,7 @@ namespace ConsoleApplication1
         /// <param name="JvecsForOutuput">
         /// Basis Set.
         /// </param>
-        public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput)
+        public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput, double evMin, string file = "")
         {
             StringBuilder vecFile = new StringBuilder();
             vecFile.AppendLine("VecFile " + input.Title);
@@ -797,14 +797,23 @@ namespace ConsoleApplication1
                 {
                     vecFile.AppendLine("Eigenvector: " + (o + 1));
                     vecFile.AppendLine(" ");
-                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, 0.0);
+                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, evMin);
                     vecFile.AppendLine(" ");
                 }
                 vecFile.AppendLine(" ");
             }
             List<string> vecFileOut = new List<string>();
             vecFileOut.Add(vecFile.ToString());
-            File.WriteAllLines((input.FilePath + input.Title + "_vec.out"), vecFileOut);
+            string title;
+            if (file == "")
+            {
+                title = input.FilePath + input.Title + "_vec.out";
+            }
+            else
+            {
+                title = file;
+            }
+            File.WriteAllLines(file, vecFileOut);
         }
 
         /// <summary>

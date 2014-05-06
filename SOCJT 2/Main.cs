@@ -628,6 +628,8 @@ namespace ConsoleApplication1
                 eVecs.Add(temp);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
+            SOCJT.writeVecFile(input, eVecs, basisSet, evMin, filepath + input.Title + "_EVecs.out");
+            /*
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
@@ -653,9 +655,10 @@ namespace ConsoleApplication1
             List<string> ou = new List<string>();
             ou.Add(output.ToString());
             File.WriteAllLines(fileName, ou);
+            */
             if (input.EVectorFile)
             {
-                SOCJT.writeVecFile(input, eVecs, basisSet);
+                SOCJT.writeVecFile(input, eVecs, basisSet, 0.0);
             }
         }//end eVecGenerator
     }//end class Program
