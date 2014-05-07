@@ -253,13 +253,24 @@ namespace ConsoleApplication1
         /// <returns>
         /// String representing the needed key.
         /// </returns>
-        public static string GenerateHashCode(int[] vlLambda, int nModes)
+        public static string GenerateHashCode(int[] vlLambda, int nModes, bool order = true)
         {
             string s = "";
-            for (int i = 0; i < nModes; i ++)
+            if (order)
             {
-                s += vlLambda[i] + " ";
-                s += vlLambda[i + nModes] + " ";
+                for (int i = 0; i < nModes; i++)
+                {
+                    s += vlLambda[i] + " ";
+                    s += vlLambda[i + nModes] + " ";
+                }                
+            }
+            else
+            {
+                for (int i = 0; i < 2 * nModes; i += 2)
+                {
+                    s += vlLambda[i] + " ";
+                    s += vlLambda[i + 1] + " ";
+                }
             }
             s += vlLambda[nModes * 2];
             return s;

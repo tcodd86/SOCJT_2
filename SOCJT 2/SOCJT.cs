@@ -632,9 +632,46 @@ namespace ConsoleApplication1
         /// <returns></returns>
         private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock)
         {
-            List<double> evec = new List<double>();
-
-            return evec.ToArray();
+            var evec = new List<string>();
+            StreamReader vec = new StreamReader(fileName);
+            string line;
+            
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + index))
+            {
+                continue;
+            }
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + (index + 1)) && vec.Peek() != -1)
+            {
+                evec.Add(line);
+            }
+            string[] parsedLine;
+            int jPos = (int)(jBlock - 0.5M);
+            var vecToReturn = new double[GenHamMat.basisPositions[jPos].Count()];
+            char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
+            string hash;
+            int[] vlLambda;
+            int pos;
+            for (int i = 0; i < evec.Count(); i++)
+            {
+                parsedLine = evec[i].Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                //have this to ignore entries where there is only a space or nothing
+                if (parsedLine.Length == 0 || parsedLine.Length == 1)
+                {
+                    continue;
+                }
+                int nmodes = parsedLine.Length / 2 - 1;
+                vlLambda = new int[nmodes * 2 + 1];
+                for (int j = 1; j < parsedLine.Length; j++)
+                {
+                    vlLambda[j - 1] = Convert.ToInt32(parsedLine[j]);
+                }
+                hash = BasisFunction.GenerateHashCode(vlLambda, nmodes, false);
+                if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                { 
+                    vecToReturn[pos] = FileInfo.ParseDouble(parsedLine[0]);
+                }
+            }
+            return vecToReturn;
         }
 
         /// <summary>
