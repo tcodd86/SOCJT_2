@@ -611,7 +611,14 @@ namespace ConsoleApplication1
                     Lanczos.normalize(ref vector);
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
-                        overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                        if (jIndex == (int)(input.VectorJBlock - 0.5M))
+                        {
+                            overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                        }
+                        else
+                        {
+                            overlaps[jIndex] = new double[zMatrices[jIndex].GetLength(0)];
+                        }
                     }
                 }
             }
@@ -635,12 +642,16 @@ namespace ConsoleApplication1
             var evec = new List<string>();
             StreamReader vec = new StreamReader(fileName);
             string line;
-            
-            while ((line = vec.ReadLine()) != ("Eigenvector: " + index))
+
+            while ((line = vec.ReadLine()) != ("j-block " + Convert.ToString(jBlock)))
             {
                 continue;
             }
-            while ((line = vec.ReadLine()) != ("Eigenvector: " + (index + 1)) && vec.Peek() != -1)
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + Convert.ToString(index)))
+            {
+                continue;
+            }
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + Convert.ToString(index + 1)) && vec.Peek() != -1)
             {
                 evec.Add(line);
             }
@@ -651,11 +662,13 @@ namespace ConsoleApplication1
             string hash;
             int[] vlLambda;
             int pos;
+            double dummy;
             for (int i = 0; i < evec.Count(); i++)
             {
                 parsedLine = evec[i].Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
                 //have this to ignore entries where there is only a space or nothing
-                if (parsedLine.Length == 0 || parsedLine.Length == 1)
+                //if (parsedLine.Length == 0 || parsedLine.Length == 1)                
+                if(parsedLine.Length == 0 || !double.TryParse(parsedLine[0], out dummy))
                 {
                     continue;
                 }
