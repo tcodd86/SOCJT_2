@@ -709,6 +709,7 @@ namespace ConsoleApplication1
                 {
                     overlaps[i] += overlapVector[j] * eigenvectors[j, i];
                 }
+                overlaps[i] = Math.Pow(overlaps[i], 2.0);
             }
             return overlaps;
         }
