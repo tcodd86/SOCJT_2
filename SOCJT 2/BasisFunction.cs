@@ -253,6 +253,9 @@ namespace ConsoleApplication1
         /// <returns>
         /// String representing the needed key.
         /// </returns>
+        /// <order>
+        /// Boolean. True (or blank) if vlLambda is in v1, v2, ....., l1, l2, ....., Lambda order. False if in v1, l1, v2, l2, ....., Lambda order.
+        /// </order>
         public static string GenerateHashCode(int[] vlLambda, int nModes, bool order = true)
         {
             string s = "";

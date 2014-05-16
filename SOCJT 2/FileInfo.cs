@@ -499,6 +499,11 @@ namespace ConsoleApplication1
         /// </summary>
         public decimal VectorJBlock { get; private set; }
 
+        /// <summary>
+        /// Bool used for special one off's like checking intensity from special B State vector.
+        /// </summary>
+        public bool Special { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -966,6 +971,12 @@ namespace ConsoleApplication1
                     #region &SPECIAL
                     for (int u = i; ; u++)
                     {
+
+                        if (inputf[u].ToUpper() == "SPECIAL")
+                        {
+                            Special = TorF(inputf[u + 1]);
+                            continue;
+                        }
                         if (inputf[u].ToUpper() == "CHECK_EIGENVECTOR")
                         {
                             CheckEigenvector = TorF(inputf[u + 1]);

@@ -607,7 +607,7 @@ namespace ConsoleApplication1
                 }
                 else
                 {
-                    vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock);
+                    vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock, input.Special);
                     Lanczos.normalize(ref vector);
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
@@ -637,7 +637,7 @@ namespace ConsoleApplication1
         /// <param name="index">Which eigenvector</param>
         /// <param name="jBlock">Which j-block</param>
         /// <returns></returns>
-        private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock)
+        private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock, bool special = false)
         {
             var evec = new List<string>();
             StreamReader vec = new StreamReader(fileName);
@@ -667,7 +667,6 @@ namespace ConsoleApplication1
             {
                 parsedLine = evec[i].Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
                 //have this to ignore entries where there is only a space or nothing
-                //if (parsedLine.Length == 0 || parsedLine.Length == 1)                
                 if(parsedLine.Length == 0 || !double.TryParse(parsedLine[0], out dummy))
                 {
                     continue;
@@ -682,6 +681,30 @@ namespace ConsoleApplication1
                 if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
                 { 
                     vecToReturn[pos] = FileInfo.ParseDouble(parsedLine[0]);
+                }
+            }
+            //This is a special function used only in calculating intensities using special wavefunctions from the B state.
+            if (special)
+            {
+                var zeroer = new double[vecToReturn.Length];
+                for (int Lambda = -1; Lambda < 2; Lambda += 2)
+                {
+                    for (int v3l = -1; v3l < 2; v3l += 2)
+                    {
+                        for (int v4l = -1; v4l < 2; v4l += 2)
+                        {
+                            vlLambda = new int[] { 0, 0, 1, v3l, 1, v4l, Lambda };
+                            hash = BasisFunction.GenerateHashCode(vlLambda, 3, false);
+                            if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                            {
+                                zeroer[pos] = 1.0;
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < zeroer.Length; i++)
+                {
+                    vecToReturn[i] = vecToReturn[i] * zeroer[i];
                 }
             }
             return vecToReturn;
