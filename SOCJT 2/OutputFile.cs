@@ -348,6 +348,19 @@ namespace ConsoleApplication1
                 file.AppendLine("  ");
             }
 
+            if (input.Intensity)
+            {
+                file.AppendLine("&INTENSITY");
+                if (input.JSInten)
+                {
+                    file.AppendLine("JS");
+                }
+                file.AppendLine("VECTOR_FILE = " + input.VectorName);
+                file.AppendLine("INDEX = " + input.VectorIndex);
+                file.AppendLine("JBLOCK = " + input.VectorJBlock);
+                file.AppendLine("/");
+            }
+
             linesToWrite.Add(file.ToString());
             return linesToWrite;
         }
