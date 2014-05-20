@@ -33,6 +33,11 @@ namespace ConsoleApplication1
         /// </summary>
         public bool IsA1 { get; private set; }
 
+        /// <summary>
+        /// Double for overlap integral value.
+        /// </summary>
+        public double Overlap { get; private set; }
+
         #endregion
 
         /// <summary>
@@ -53,13 +58,14 @@ namespace ConsoleApplication1
         /// <param name="isa1">
         /// True if symmetric, false if not
         /// </param>
-        public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva, bool isa1)
+        public Eigenvalue(decimal pJa, int nJa, decimal Siga, double Eva, bool isa1, double Overlap = 0.0)
         {
             JBlock = pJa;
             Number = nJa;
             Sigma = Siga;
             Evalue = Eva;
             IsA1 = isa1;
+            this.Overlap = Overlap;
         }//end constructor
     }//end class Eigenvalue
 }

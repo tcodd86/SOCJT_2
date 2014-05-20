@@ -253,13 +253,27 @@ namespace ConsoleApplication1
         /// <returns>
         /// String representing the needed key.
         /// </returns>
-        public static string GenerateHashCode(int[] vlLambda, int nModes)
+        /// <order>
+        /// Boolean. True (or blank) if vlLambda is in v1, v2, ....., l1, l2, ....., Lambda order. False if in v1, l1, v2, l2, ....., Lambda order.
+        /// </order>
+        public static string GenerateHashCode(int[] vlLambda, int nModes, bool order = true)
         {
             string s = "";
-            for (int i = 0; i < nModes; i ++)
+            if (order)
             {
-                s += vlLambda[i] + " ";
-                s += vlLambda[i + nModes] + " ";
+                for (int i = 0; i < nModes; i++)
+                {
+                    s += vlLambda[i] + " ";
+                    s += vlLambda[i + nModes] + " ";
+                }                
+            }
+            else
+            {
+                for (int i = 0; i < 2 * nModes; i += 2)
+                {
+                    s += vlLambda[i] + " ";
+                    s += vlLambda[i + 1] + " ";
+                }
             }
             s += vlLambda[nModes * 2];
             return s;

@@ -72,7 +72,7 @@ namespace ConsoleApplication1
                 xList.Add(0.0);
                 bndL.Add(double.NegativeInfinity);
                 bndU.Add(double.PositiveInfinity);
-                lScale.Add(200.0);//changed from 75
+                lScale.Add(50.0);//changed from 200
             }
             //for each mode
             for (int i = 0; i < input.nModes; i++)
@@ -83,7 +83,7 @@ namespace ConsoleApplication1
                     xList.Add(Modes[i].modeOmega);
                     bndL.Add(0.0);
                     bndU.Add(double.PositiveInfinity);
-                    lScale.Add(200.0);//changed from 200
+                    lScale.Add(50.0);//changed from 100
                 }
                 //for D
                 if (Modes[i].fitD == true)
@@ -91,7 +91,7 @@ namespace ConsoleApplication1
                     xList.Add(Modes[i].D);
                     bndL.Add(0.0);
                     bndU.Add(double.PositiveInfinity);
-                    lScale.Add(10.0);//changed from 1000
+                    lScale.Add(3.0);//changed from 10
                 }
                 //for K
                 if (Modes[i].fitK == true)
@@ -99,7 +99,7 @@ namespace ConsoleApplication1
                     xList.Add(Modes[i].K);
                     bndL.Add(double.NegativeInfinity);
                     bndU.Add(double.PositiveInfinity);
-                    lScale.Add(1.0);//changed from 100
+                    lScale.Add(0.5);//changed from 1
                 }
                 //for wexe
                 if (Modes[i].fitWEXE == true)
@@ -107,7 +107,7 @@ namespace ConsoleApplication1
                     xList.Add(Modes[i].wExe);
                     bndL.Add(double.NegativeInfinity);
                     bndU.Add(double.PositiveInfinity);
-                    lScale.Add(50.0);//change from 250
+                    lScale.Add(10.0);//change from 50
                 }
             }
             //then for cross-terms
@@ -124,7 +124,7 @@ namespace ConsoleApplication1
                             bndU.Add(double.PositiveInfinity);
                             if (j > i)
                             {
-                                lScale.Add(100.0);//scale for bilinear coupling + cross quadratic, changed from 1
+                                lScale.Add(500.0);//scale for bilinear coupling + cross quadratic, changed from 100
                             }
                             if (j == i)
                             {
@@ -479,6 +479,7 @@ namespace ConsoleApplication1
                 rmsError += Math.Pow(temp[w], 2D);
             }
             rmsError /= temp.Length;
+            rmsError = Math.Sqrt(rmsError);
 
             Console.WriteLine("Eigenvalues have been calculated {0} times.", ++count);
             Console.WriteLine("RMS Error is {0}.", rmsError);

@@ -539,7 +539,7 @@ namespace ConsoleApplication1
                         eigenvalues[i][j] = evs[j];                        
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m < Lanczos.basisSetLimit))
+                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit))
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
@@ -591,7 +591,7 @@ namespace ConsoleApplication1
                 CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2 - 1]);
             }
 
-            if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
+            if (!input.BlockLanczos && array1[0].innerobj.m * input.NumberOfIts >= Lanczos.basisSetLimit && input.PrintVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
                 input.PrintVector = false;
@@ -618,7 +618,7 @@ namespace ConsoleApplication1
             //if NTooBig == true then the separate eigenvector file will be made after the eigenvectors are calculated
             if (input.EVectorFile && (input.BlockLanczos || input.PrintVector))
             {
-                writeVecFile(input, zMatrices, JvecsForOutuput);
+                writeVecFile(input, zMatrices, JvecsForOutuput, 0.0);
             }//end if
 
             //put code here to write eigenvectors to file with entire basis set.
@@ -630,12 +630,176 @@ namespace ConsoleApplication1
                 writeVecComplete(jBasisVecsByJ, JvecsForOutuput, zMatrices, input, eigenvalues, isQuad);
             }
 
+            //this is where the intensity or overlap will be checked if necessary
+            var overlaps = new List<double[]>(eigenvalues.Count);
+            for (int count = 0; count < eigenvalues.Count; count++)
+            {
+                overlaps.Add(new double[eigenvalues[count].Length]);
+                //overlaps[count] = new double[eigenvalues[count].Length];
+            }
+
+            if (input.Intensity && input.PrintVector)
+            { 
+                //code here to read vector and take dot product
+                double[] vector;
+                if (input.JSInten)
+                {
+                    for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                    {
+                        vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
+                        Lanczos.normalize(ref vector);
+                        overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                    }
+                }
+                else
+                {
+                    vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock, input.Special);
+                    Lanczos.normalize(ref vector);
+                    for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
+                    {
+                        if (jIndex == (int)(input.VectorJBlock - 0.5M))
+                        {
+                            overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
+                        }
+                        else
+                        {
+                            overlaps[jIndex] = new double[zMatrices[jIndex].GetLength(0)];
+                        }
+                    }
+                }
+            }
+
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input);//add the eigenvectors so that the symmetry can be included as well
+            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, overlaps);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
         }//end SOCJT Routine
+
+        /// <summary>
+        /// Parses a SOCJT 2 vector file and returns the specified vector
+        /// </summary>
+        /// <param name="fileName">The name of vector file</param>
+        /// <param name="index">Which eigenvector</param>
+        /// <param name="jBlock">Which j-block</param>
+        /// <returns></returns>
+        private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock, bool special = false)
+        {
+            var evec = new List<string>();
+            StreamReader vec = new StreamReader(fileName);
+            string line;
+
+            while ((line = vec.ReadLine()) != ("j-block " + Convert.ToString(jBlock)))
+            {
+                continue;
+            }
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + Convert.ToString(index)))
+            {
+                continue;
+            }
+            while ((line = vec.ReadLine()) != ("Eigenvector: " + Convert.ToString(index + 1)) && vec.Peek() != -1)
+            {
+                evec.Add(line);
+            }
+            string[] parsedLine;
+            int jPos = (int)(jBlock - 0.5M);
+            var vecToReturn = new double[GenHamMat.basisPositions[jPos].Count()];
+            char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
+            string hash;
+            int[] vlLambda;
+            int pos;
+            double dummy;
+            for (int i = 0; i < evec.Count(); i++)
+            {
+                parsedLine = evec[i].Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
+                //have this to ignore entries where there is only a space or nothing
+                if(parsedLine.Length == 0 || !double.TryParse(parsedLine[0], out dummy))
+                {
+                    continue;
+                }
+                int nmodes = parsedLine.Length / 2 - 1;
+                vlLambda = new int[nmodes * 2 + 1];
+                for (int j = 1; j < parsedLine.Length; j++)
+                {
+                    vlLambda[j - 1] = Convert.ToInt32(parsedLine[j]);
+                }
+                hash = BasisFunction.GenerateHashCode(vlLambda, nmodes, false);
+                if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                { 
+                    vecToReturn[pos] = FileInfo.ParseDouble(parsedLine[0]);
+                }
+            }
+            //This is a special function used only in calculating intensities using special wavefunctions from the B state.
+            if (special)
+            {
+                var zeroer = new double[vecToReturn.Length];
+                for (int Lambda = -1; Lambda < 2; Lambda += 2)
+                {
+                    for (int v3v = 0; v3v < 2; v3v++)
+                    {
+                        for (int v4v = 0; v4v < 2; v4v++)
+                        {
+                            for (int v3l = -1; v3l < 2; v3l += 2)
+                            {
+                                for (int v4l = -1; v4l < 2; v4l += 2)
+                                {
+                                    if (v4v == 0 && v3v == 0)
+                                    {
+                                        continue;
+                                    }
+                                    if (v3v == 0)
+                                    {
+                                        v3l = 0;
+                                    }
+                                    if (v4v == 0)
+                                    {
+                                        v4l = 0;
+                                    }
+                                    vlLambda = new int[] { 0, 0, v3v, v3l, 1, v4l, Lambda };
+                                    hash = BasisFunction.GenerateHashCode(vlLambda, 3, false);
+                                    if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                                    {
+                                        zeroer[pos] = 1.0;
+                                    }
+                                }//end v4l
+                            }//end v3l
+                        }//end v4v
+                    }//end v3v
+                }//end lambda
+                for (int i = 0; i < zeroer.Length; i++)
+                {
+                    vecToReturn[i] = vecToReturn[i] * zeroer[i];
+                }
+            }
+            return vecToReturn;
+        }
+
+        /// <summary>
+        /// Calculates the overlap integral (dot product) of a provided vector and the eigenvectors
+        /// </summary>
+        /// <param name="eigenvectors">
+        /// Eigenvectors of the Hamiltonian
+        /// </param>
+        /// <param name="overlapVector">
+        /// Vector from John or from file reading.
+        /// </param>
+        /// <returns>
+        /// Array of doubles which correspond to the dot products of the overlapVector with each of the eigenvectors.
+        /// </returns>
+        private static double[] Overlap(double[,] eigenvectors, double[] overlapVector)
+        { 
+            //vector to store the overlaps
+            var overlaps = new double[eigenvectors.GetLength(1)];
+            for (int i = 0; i < overlaps.Length; i++)
+            {
+                for (int j = 0; j < overlapVector.Length; j++)
+                {
+                    overlaps[i] += overlapVector[j] * eigenvectors[j, i];
+                }
+                overlaps[i] = Math.Pow(overlaps[i], 2.0);
+            }
+            return overlaps;
+        }
 
         /// <summary>
         /// Functiont to see if a vector from the Lanczos diagonalization is an eigenvector of the Hamiltonian.
@@ -782,7 +946,7 @@ namespace ConsoleApplication1
         /// <param name="JvecsForOutuput">
         /// Basis Set.
         /// </param>
-        public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput)
+        public static void writeVecFile(FileInfo input, List<double[,]> zMatrices, List<List<BasisFunction>> JvecsForOutuput, double evMin, string file = "")
         {
             StringBuilder vecFile = new StringBuilder();
             vecFile.AppendLine("VecFile " + input.Title);
@@ -799,14 +963,23 @@ namespace ConsoleApplication1
                 {
                     vecFile.AppendLine("Eigenvector: " + (o + 1));
                     vecFile.AppendLine(" ");
-                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, 0.0);
+                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, evMin);
                     vecFile.AppendLine(" ");
                 }
                 vecFile.AppendLine(" ");
             }
             List<string> vecFileOut = new List<string>();
             vecFileOut.Add(vecFile.ToString());
-            File.WriteAllLines((input.FilePath + input.Title + "_vec.out"), vecFileOut);
+            string title;
+            if (file == "")
+            {
+                title = input.FilePath + input.Title + "_vec.out";
+            }
+            else
+            {
+                title = file;
+            }
+            File.WriteAllLines(title, vecFileOut);
         }
 
         /// <summary>
@@ -1025,7 +1198,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
         /// </returns>
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlap)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
@@ -1043,7 +1216,14 @@ namespace ConsoleApplication1
                 {
                     //add call to symmetry checker function here.
                     bool tbool = isA(jvecs[i], zMatrices[i], j, input, false);
-                    eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
+                    if (input.Intensity && input.PrintVector)
+                    {
+                        eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool, overlap[i][j]));
+                    }
+                    else
+                    {
+                        eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
+                    }
                 }
                 if (tempS < maxS)
                 {

@@ -69,6 +69,7 @@ namespace ConsoleApplication1
                 string[] inputFile = FileInfo.FileRead(filepathIN);
                 FileInfo input = new FileInfo();
                 input.SetFileInfo(inputFile, filepath);
+                input.FilePath = filepath;
 
                 //make the fitfile point to something
                 filepathFIT = string.Concat(input.FitFile);
@@ -479,6 +480,7 @@ namespace ConsoleApplication1
 
             /*
             //this sets isQuad = true if there is a cross quadratic term between an A and E mode
+            /*
             if (isQuad == false)
             {
                 for (int i = 0; i < input.nModes; i++)
@@ -629,6 +631,8 @@ namespace ConsoleApplication1
                 eVecs.Add(temp);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
+            SOCJT.writeVecFile(input, eVecs, basisSet, evMin, filepath + input.Title + "_EVecs.out");
+            /*
             StringBuilder output = new StringBuilder();
             for (int i = 0; i < lanczosEVectors.Count; i++)
             {
@@ -654,9 +658,10 @@ namespace ConsoleApplication1
             List<string> ou = new List<string>();
             ou.Add(output.ToString());
             File.WriteAllLines(fileName, ou);
+            */
             if (input.EVectorFile)
             {
-                SOCJT.writeVecFile(input, eVecs, basisSet);
+                SOCJT.writeVecFile(input, eVecs, basisSet, 0.0);
             }
         }//end eVecGenerator
     }//end class Program

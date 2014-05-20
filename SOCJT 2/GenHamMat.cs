@@ -537,7 +537,7 @@ namespace ConsoleApplication1
                 //one mode harmonic and anharmonic terms
                 for (int i = 0; i < input.nModes; i++)
                 {
-                    double temp = modeVals[i, 0] * ((double)vlLambda[n, i] + (double)modeVals[i, 4] / 2.0) - modeVals[i, 1] * Math.Pow((vlLambda[n, i] + (double)modeVals[i, 1] / 2.0), 2.0);
+                    double temp = modeVals[i, 0] * ((double)vlLambda[n, i] + (double)modeVals[i, 4] / 2.0) - modeVals[i, 1] * Math.Pow((vlLambda[n, i] + (double)modeVals[i, 4] / 2.0), 2.0);
                     alglib.sparseadd(diag, n, n, temp);
                 }//end loop over modes
                 continue;
