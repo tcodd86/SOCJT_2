@@ -689,19 +689,37 @@ namespace ConsoleApplication1
                 var zeroer = new double[vecToReturn.Length];
                 for (int Lambda = -1; Lambda < 2; Lambda += 2)
                 {
-                    for (int v3l = -1; v3l < 2; v3l += 2)
+                    for (int v3v = 0; v3v < 2; v3v++)
                     {
-                        for (int v4l = -1; v4l < 2; v4l += 2)
+                        for (int v4v = 0; v4v < 2; v4v++)
                         {
-                            vlLambda = new int[] { 0, 0, 1, v3l, 1, v4l, Lambda };
-                            hash = BasisFunction.GenerateHashCode(vlLambda, 3, false);
-                            if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                            for (int v3l = -1; v3l < 2; v3l += 2)
                             {
-                                zeroer[pos] = 1.0;
-                            }
-                        }
-                    }
-                }
+                                for (int v4l = -1; v4l < 2; v4l += 2)
+                                {
+                                    if (v4v == 0 && v3v == 0)
+                                    {
+                                        continue;
+                                    }
+                                    if (v3v == 0)
+                                    {
+                                        v3l = 0;
+                                    }
+                                    if (v4v == 0)
+                                    {
+                                        v4l = 0;
+                                    }
+                                    vlLambda = new int[] { 0, 0, v3v, v3l, 1, v4l, Lambda };
+                                    hash = BasisFunction.GenerateHashCode(vlLambda, 3, false);
+                                    if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
+                                    {
+                                        zeroer[pos] = 1.0;
+                                    }
+                                }//end v4l
+                            }//end v3l
+                        }//end v4v
+                    }//end v3v
+                }//end lambda
                 for (int i = 0; i < zeroer.Length; i++)
                 {
                     vecToReturn[i] = vecToReturn[i] * zeroer[i];
