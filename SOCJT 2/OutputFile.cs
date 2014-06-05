@@ -80,7 +80,7 @@ namespace ConsoleApplication1
                         file.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(input.EigenvectorCoefficientMinimum) + " are shown)");
                         file.AppendLine(" ");
 
-                        vecBuilder(input, jBasisVecsByJ[i], file, tempMat, j, input.EigenvectorCoefficientMinimum);
+                        vecBuilder(input, jBasisVecsByJ[i], file, tempMat, j, input.EigenvectorCoefficientMinimum, Sigma);
                     }
                     #endregion
                 }
@@ -198,7 +198,7 @@ namespace ConsoleApplication1
         /// <param name="overRide">
         /// True if the isA function shouldn't actually run.
         /// </param>
-        public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin, bool overRide = false)
+        public static void vecBuilder(FileInfo input, List<BasisFunction> jBasisVecsByJ, StringBuilder file, double[,] tempMat, int j, double evMin, decimal S, bool overRide = false)
         {
             bool a1 = SOCJT.isA(jBasisVecsByJ, tempMat, j, input, overRide);
             if (a1)
@@ -216,12 +216,12 @@ namespace ConsoleApplication1
             {
                 file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
             }
-            file.Append("lambda");
+            file.Append("Lambda" + "\t" + "Sigma");
             for (int h = 0; h < jBasisVecsByJ.Count; h++)//goes through basis vectors
             {
                 if (tempMat[h, j] > evMin || tempMat[h, j] < -1.0 * evMin)
                 {
-                    SOCJT.writeVec(tempMat[h, j], jBasisVecsByJ[h], file);
+                    SOCJT.writeVec(tempMat[h, j], jBasisVecsByJ[h], file, S);
                 }
             }
             file.AppendLine("\r");

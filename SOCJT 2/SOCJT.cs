@@ -951,6 +951,7 @@ namespace ConsoleApplication1
             StringBuilder vecFile = new StringBuilder();
             vecFile.AppendLine("VecFile " + input.Title);
             vecFile.AppendLine(" ");
+            decimal S = input.S;
             for (int m = 0; m < zMatrices.Count; m++)
             {
                 vecFile.AppendLine("*************************************");
@@ -963,10 +964,18 @@ namespace ConsoleApplication1
                 {
                     vecFile.AppendLine("Eigenvector: " + (o + 1));
                     vecFile.AppendLine(" ");
-                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, evMin);
+                    OutputFile.vecBuilder(input, JvecsForOutuput[m], vecFile, zMatrices[m], o, evMin, S);
                     vecFile.AppendLine(" ");
                 }
                 vecFile.AppendLine(" ");
+                if (input.IncludeSO)
+                {
+                    S++;
+                    if (S > -1.0M * input.S)
+                    {
+                        S = input.S;
+                    }
+                }
             }
             List<string> vecFileOut = new List<string>();
             vecFileOut.Add(vecFile.ToString());
@@ -1055,7 +1064,7 @@ namespace ConsoleApplication1
                         file.Append("v(" + Convert.ToString(h + 1) + ")" + "\t" + "l(" + Convert.ToString(h + 1) + ")" + "\t");
                     }
                     file.Append("lambda");
-                    
+                    decimal S = input.S;
                     for (int j = 0; j < jBasisVecsByJ.Count; j++)//goes through basis vectors
                     {
                         //first split into quadratic and linear
@@ -1067,11 +1076,11 @@ namespace ConsoleApplication1
                                 int m = 0;                          
                                 if (GenHamMat.basisPositions[jBlockIndex].TryGetValue(hashCode, out m))
                                 {
-                                    writeVec(tempMat[jBlockIndex][m, eigenvectorIndex], jBasisVecsByJ[j][k], file);
+                                    writeVec(tempMat[jBlockIndex][m, eigenvectorIndex], jBasisVecsByJ[j][k], file, S);
                                 }
                                 else
                                 {
-                                    writeVec(0.0, jBasisVecsByJ[j][k], file);
+                                    writeVec(0.0, jBasisVecsByJ[j][k], file, S);
                                 }
                             }//end for loop over J
                         }//end if isQuad
@@ -1082,7 +1091,7 @@ namespace ConsoleApplication1
                                 //write actual values to the eigenvector
                                 for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                                 {
-                                    writeVec(tempMat[jBlockIndex][k, eigenvectorIndex], jBasisVecsByJ[j][k], file);
+                                    writeVec(tempMat[jBlockIndex][k, eigenvectorIndex], jBasisVecsByJ[j][k], file, S);
                                 }//end loop over BasisFunctions in j value for jBasisVecsByJ
                             }
                             else
@@ -1090,10 +1099,18 @@ namespace ConsoleApplication1
                                 //just write a zero for all of the coefficients for this j value
                                 for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                                 {
-                                    writeVec(0.0, jBasisVecsByJ[j][k], file);
+                                    writeVec(0.0, jBasisVecsByJ[j][k], file, S);
                                 }//end loop over BasisFunctions in j value for jBasisVecsByJ
                             }
                         }//end linear option
+                        if (input.IncludeSO)
+                        {
+                            S++;
+                            if (S > -1.0M * input.S)
+                            {
+                                S = input.S;
+                            }
+                        }
                     }//end loop over jValues in jbasisVecsByJ
                     file.AppendLine("\r");
                 }//end loop over the number of eigenvalues
@@ -1116,7 +1133,7 @@ namespace ConsoleApplication1
         /// <param name="file">
         /// StringBuilder to add the function to.
         /// </param>
-        public static void writeVec(double coefficient, BasisFunction func, StringBuilder file)
+        public static void writeVec(double coefficient, BasisFunction func, StringBuilder file, decimal S)
         {
             file.AppendLine("\t");
             file.Append(String.Format("{0,14:0.0000000000}", coefficient));
@@ -1124,7 +1141,7 @@ namespace ConsoleApplication1
             {
                 file.Append("\t" + "  " + Convert.ToString(func.modesInVec[m].V) + "\t" + String.Format("{0,3}", func.modesInVec[m].L));//  "  " + Convert.ToString(jBasisVecsByJ[i][h].modesInVec[m].l));
             }
-            file.Append("\t" + String.Format("{0,4}", func.Lambda));
+            file.Append("\t" + String.Format("{0,4}", func.Lambda) + "\t" + String.Format("{0,5}", S));
         }//end of function writeVec
 
         /// <summary>
