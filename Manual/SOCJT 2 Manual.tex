@@ -233,12 +233,13 @@ describing this
 project, Barckholtz and Miller derived a general method for determining which vibrational
 modes will be \JT\ active. For a given vibrational mode of symmetry
 $e_{s_v}$ and  a given electronic state of symmetry $E_{s_e}$, a value
-for $s_k$ of either 0 or 1 can be chosen to satisfy the equation
+for $s_k$ which is either an even or odd integer,
+0 or 1 by convention, can be chosen to satisfy the equation
 \begin{equation}
 \left( 2s_e + (-1)^{s_k } ks_v \right) \text{ mod } n=0,
 \label{se and sv selection rule}
 \end{equation}
-which means the quantity $\left( 2s_e \pm ks_v \right) $
+This means the quantity $\left( 2s_e \pm ks_v \right) $
 must be an integer multiple of $n$, where $n$ is the order of the
 principal axis of the molecule. The only variable in equation (\ref{se
   and sv selection rule}) is $s_k$, and the values of $s_k$ ($k=1$ and 2)
@@ -274,7 +275,7 @@ Hamiltonian $\hat{\cal H}_{SO}$ is parameterized by the product $a\zeta _e$,
 where $\zeta _e$ is the projection of the electronic orbital angular
 momentum on the $C_3$ axis and $a$ is the spin-orbit coupling constant.
 The remaining parameters of the PES can most easily be defined by noting 
-that, in the limit $a\zeta _e\rightarrow 0$, the form of the potential
+that, in the limit where $a\zeta _e = B_{i,j} = C_{i,j} = 0$, the form of the potential
 $\hat{V}$ along the $i^{th}$ normal coordinate is
 \begin{eqnarray}
   &U_{i,\pm }= \frac12 \lambda _i \rho _i^2 \pm \rho _i k_i
@@ -314,23 +315,23 @@ molecule. From Eqs. \ref{E min, no spin orbit} and \ref{E max,
 coupling is obtained by setting $K_i=0$ and taking the difference,
 which yields
 \begin{equation}
-\epsilon _i^{(1)} = D_i \omega _{e,i}. 
+\epsilon _i^{(1)} \approx D_i \omega _{e,i}. 
 \label{def of epsilon1}
 \end{equation}
 The additional stabilization due to quadratic Jahn-Teller coupling in
 the mode, $\epsilon _i^{(2)}$, is
 \begin{equation}
-\epsilon _i^{(2)} = D_i \omega _{e,i} K_i. \label{def of epsilon2}
+\epsilon _i^{(2)} \approx D_i \omega _{e,i} K_i. \label{def of epsilon2}
 \end{equation}
 The barrier to pseudorotation about the moat is then $2D_i \omega
-_{e,i} K_i$.
+_{e,i} K_i$ which is the difference between the deepest point on the PES and the barrier between the minima.
 
 A common approximation is that the Jahn-Teller stabilization 
 energy in the state is a sum of the Jahn-Teller effect in the individual 
 modes. Under this assumption, the total Jahn-Teller stabilization energy
 is a sum over the individual Jahn-Teller stabilization energies,
 \begin{equation}
-\epsilon _{total} = \sum\limits _i \left[ D_i \omega _{e,i} 
+\epsilon _{total} \approx \sum\limits _i \left[ D_i \omega _{e,i} 
 \left( 1 + K_i \right) \right] .
 \end{equation}
 
@@ -352,7 +353,7 @@ the individual stabilization energies of Eq. \ref{E min, with soc}.
 
 \subsection{The Jahn-Teller quantum numbers $j^{(k)}$}
 
-As the Taylor expansion of the \JT\ Hamiltonian is increased, the
+As the number of terms of the Taylor expansion of the \JT\ Hamiltonian is increased, the
 number of conserved quantum numbers is decreased. Elsewhere\cite{barckholtz}
 we derived the following general form of the ``good'' \JT\ quantum
 number, $j^{(k)}$ for the $k^{th}$-order term of the \JT\ Hamiltonian,
@@ -381,7 +382,7 @@ $\left| j,n_{j},\alpha ,\Sigma \right\rangle $ is
 \right), \label{eigenvector notation}
 \end{equation}
 where the summation runs over all of the basis functions used in the
-calculation. Each eigenvector $\left| j,n_{j},\alpha ,\Sigma \right\rangle $
+calculation. Eq. \ref{eigenvector notation} is only rigorously true in the absence of quadratic coupling. If $K_i\neq0$ then $j$ is not a good quantum number and a symmetry label is used instead. Each eigenvector $\left| j,n_{j},\alpha ,\Sigma \right\rangle $
 has an associated eigenvalue $E_{j,n_{j},\Sigma }$. The notation $\left|
 j,n_{j},\alpha ,\Sigma \right\rangle $ indicates which $j$-block the level
 corresponds to and which eigenvector, $n_{j}$, it is from that symmetry
@@ -551,10 +552,12 @@ a default set of parameters will be used. The {\tt \&FIT\_INFO}, {\tt \&SCAN} an
 may be left out when unneeded. If more than one
 \&NAMELIST group, except for {\tt \&MODE\_INFO}, is included in the input file the values from the second will overwrite the those from the first. 
 
+Each \$NAMELIST group will be explained separately in the following sections. With the exception of $D$ and $K$ all constants in the input file are in \wn. In each section an example will be given of the \&NAMELIST. The values listed in these examples are the default values. The way \socjttwo\ works is that it first initializes an input file object in memory with all of the default values. It then reads the input file and replaces the default values with all user provided values that it finds. This has the effect of making every value an `optional' parameter in the sense that the program will probably not crash if the user does not provide a value for every line of every \&NAMELIST group. The two exceptions to this are the {\tt\&CROSS\_TERMS} and the {\tt\&SCAN} sections which are included only if the user provides them.
+
 BEWARE: There is only some error checking in the input file. It is
 quite possible that the ``garbage in garbage out'' principle
 applies. The values which are explicitly checked for correctness are noted below in their description. Where a numerical value is needed, such as for {\tt AZETA}, a check is done to ensure that it is a number and if it is not, an error is thrown but there are no sanity checks to see that it is a physically reasonable value.
-\newpage
+%\newpage
 \subsection{\&GENERAL}
 
 The {\tt \&GENERAL} namelist group sets the general parameters for the
@@ -732,7 +735,7 @@ specified tolerance.
 
 For the simple Lanczos routine {\tt K\_FACTOR} is not used and the other parameters described above
 have slightly different uses. {\tt NOITS} is the number of Lanczos iterations run, and therefore, the
-size of the Lanczos matrix generated. This routine uses numerically stable versions of the Lanczos recursions (CITE CULLUM) but does not use any orthogonalization so some
+size of the Lanczos matrix generated. This routine uses numerically stable versions of the Lanczos recursions\cite{cullum} but does not use any orthogonalization so some
 eigenvalues will be repeats and others will be spurious values which do not correspond to actual
 eigenvalues of the Hamiltonian. These duplicate and spurious values are removed after diagonalization. {\tt M} is the same as for the block routine and specifies how many eigenvalues should be calculated. {\tt TOL} for the simple Lanczos is used
 in the test to remove duplicate and spurious eigenvalues. Any eigenvalue within {\tt TOL} of another
@@ -902,12 +905,14 @@ the jacobian.
 \end{description}
 
 \subsection{\&CROSS\_TERMS} The {\tt \&CROSS\_TERMS} namelist group specifies
-any coupling terms between two modes and whether they are to be fit.
+any coupling terms between two modes and whether they are to be fit. The values listed below are just an example; there are no default values for this \&NAMESPACE. If multiple cross-terms need to be included the lines starting with {\tt JT} and {\tt FIT} should be included for each term and should be in the order: {\tt JT}, {\tt FIT}, {\tt JT}, {\tt FIT},...
 
 \begin{verbatim}
  &CROSS_TERMS
   JT MODE 1 MODE 2 100.0
   FIT = FALSE
+  JT MODE 2 MODE 3 50.0
+  FIT = TRUE
  /
 \end{verbatim}
 
@@ -1009,7 +1014,7 @@ Sigma = -0.5
  
 \end{verbatim}
 
-which lists the value of $j$ and Sigma for the information which follows. For linear JT problems the value of $j$ listed is straightforward. For quadratic JT problems there will only be two $j$ blocks listed which are 0.5 and 1.5. Since $j$ is not a good quantum number these are the two symmetry blocks, $e$ and $a_1, a_2$ respectively for molecules with a 3-fold axis of symmetry.
+which lists the value of $j$ and Sigma for the information which follows. For linear JT problems the value of $j$ listed is straightforward. For quadratic JT problems there will be two $j$ blocks listed as $j$ = 0.5 and $j$ = 1.5. Since $j$ is not a good quantum number these are the two symmetry blocks of the Hamiltonian which have symmetries $e$ and $a_1, a_2$ respectively for molecules with a 3-fold axis of symmetry. They are listed as $j$ blocks because doing anything else would require extra coding.
 
 \paragraph{Eigenvalues}
 This is followed by the eigenvalues for this $j$-block listed in ascending order.
@@ -1051,7 +1056,7 @@ Lanczos routine took 2500 iterations to complete.
 \end{verbatim}
 
 \paragraph{Eigenvectors}
-The eigenvectors are listed next. The eigenvalue is listed in the first line and then the coefficient minimum is stated. The next line says {\tt Vector is Type} and then either the number 1 or 2. This refers to the symmetry of the eigenvector with respect to the sign of the coefficients of basis functions with the same values of v but values of l and lambda differing by a factor of -1. If the coefficients have the same sign it is listed as Type 1, and if they have opposite sign it is listed as Type 1. This is primarily useful in the $j$-blocks with $a_1/a_2$ symmetry since they will be Type 1 and Type 2 respectively. This determination is made by finding the largest coefficient in the eigenvector and then finding its `partner,' which is the basis function with all v values the same and all angular momentum terms having an opposite sign. The signs of these two basis functions are used for the determination. I have probably not tested this as well as I ought to have but it seems to have been correct so far.
+The eigenvectors are listed next. The eigenvalue is listed in the first line and then the coefficient minimum is stated. This coefficient minimum is variable as the {\tt EV\_MIN} parameter in the {\tt \&IO\_INFO} \&NAMESPACE. The next line says {\tt Vector is Type} and then either the number 1 or 2. This refers to the symmetry of the eigenvector with respect to the sign of the coefficients of basis functions with the same values of v but values of l and lambda differing by a factor of -1. If the coefficients have the same sign it is listed as Type 1, and if they have opposite sign it is listed as Type 1. This is primarily useful in the $j$-blocks with $a_1/a_2$ symmetry since they will be Type 1 and Type 2 respectively. This determination is made by finding the largest coefficient in the eigenvector and then finding its `partner,' which is the basis function with all v values the same and all angular momentum terms having an opposite sign. The signs of these two basis functions are used for the determination. I have probably not tested this as well as I ought to have but it seems to have been correct so far.
 
 \begin{verbatim}
  
@@ -1191,7 +1196,7 @@ The column for {\tt Symm} will only be included if either the Block Lanczos (Und
 \subsection{Fitting output}
 
 When the non-linear least squares routines are used, \socjttwo\ is
-executed at least once for each iteration of the fitting routine. Since numerical derivatives are calculated for each parameter being fit the \socjttwo\ routine may run many times for a given iteration. Secant updates are used to build a model of the Jacobian which is recalculated only when the model is found to be wrong. For more information see the documentation of the Levenberg-Marquardt optimizer at ALGLIB.net\cite{alglib}. At the end of
+executed at least once for each iteration of the fitting routine. Since numerical derivatives are calculated for each parameter being fit the \socjttwo\ routine may run many times for a given iteration. Secant updates are used to build a model of the Jacobian which is recalculated only when the model of the Jacobian is found to be wrong. For more information see the documentation of the Levenberg-Marquardt optimizer at ALGLIB.net\cite{alglib}. At the end of
 the fitting, output similar to the following is generated:
 \begin{verbatim}
 Fit report below...
