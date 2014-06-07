@@ -46,6 +46,7 @@ namespace ConsoleApplication1
             List<int> biAVecPos = new List<int>();
             List<int> biEVecPos = new List<int>();
             List<int> eVecPos = new List<int>();
+            List<int> aVecPos = new List<int>();
             //List to store the alglib sparse matrices for each variable
             var matList = new List<alglib.sparsematrix>();
             //The Tuple stores the row and column of the matrix element in the two int values and the value at that matrix element as the double
@@ -87,6 +88,7 @@ namespace ConsoleApplication1
                 if (basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
                 {
                     modeVals[i, 4] = 1.0;
+                    aVecPos.Add(i);
                 }
                 else
                 {
@@ -125,7 +127,7 @@ namespace ConsoleApplication1
             //loop through each mode to see if a sparse matrix is needed for D and K
             for (int i = 0; i < nModes; i++)
             {
-                if (!basisVectorsByJ[0].modesInVec[i].SymmetryIsA)
+                if (!basisVectorsByJ[0].modesInVec[i].SymmetryIsA || basisVectorsByJ[0].modesInVec[i].DBasis != 0.0)
                 {
                     //means this mode is degenerate, add matrices for D and K
                     alglib.sparsematrix tempMat = new alglib.sparsematrix();
@@ -193,7 +195,30 @@ namespace ConsoleApplication1
                     int[] tempInt;
                     int m;
                     double temp;
-                    string hashCode;                    
+                    string hashCode;
+                    for (int aModes = 0; aModes < aVecPos.Count; aModes++)
+                    {
+                        #region SymmetricGradient
+                        for (int deltaV = -1; deltaV < 2; deltaV += 2)
+                        {
+                            tempInt = (int[])hashInt.Clone();
+                            DeltaVL(ref tempInt, aVecPos[aModes], deltaV, 0, nModes, false);
+                            hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
+                            if (basisPositions[position].TryGetValue(hashCode, out m))
+                            { 
+                                //assign temp here.
+                                temp = (double)vlLambda[n, aVecPos[aModes]];
+                                if (deltaV == 1)
+                                {
+                                    temp += 1.0;
+                                }
+                                temp = Math.Sqrt(temp);
+                                Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
+                                matrixPos[2 * aVecPos[aModes]].Add(ttTemp);
+                            }
+                        }
+                        #endregion
+                    }
                     for (int eModes = 0; eModes < eVecPos.Count; eModes++)
                     {
                         #region Linear

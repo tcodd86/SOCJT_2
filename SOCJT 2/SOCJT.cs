@@ -346,7 +346,15 @@ namespace ConsoleApplication1
                     {
                         if (DorK == 0)
                         {
-                            val = Math.Sqrt(Modes[count].D) * Modes[count].modeOmega;
+                            if (!Modes[count].IsAType)
+                            {
+                                val = Math.Sqrt(Modes[count].D) * Modes[count].modeOmega;
+                            }
+                            else
+                            {
+                                //val = Math.Sqrt(Modes[count].D);
+                                val = Modes[count].D;
+                            }
                         }
                         else
                         {
