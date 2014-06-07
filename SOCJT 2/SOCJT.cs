@@ -158,12 +158,10 @@ namespace ConsoleApplication1
                             }
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
-                                //fitHamList[i] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, false);
                                 fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false, i);                                
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
-                                //fitHamList[i][0] = GenHamMat.genFitMatrix(jBasisVecsByJ[i], isQuad, input, out nColumns, input.parMat, true)[0];
                                 fitHamList[i][0] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, true, i)[0];
                             }
                             numcolumnsA[i] = nColumns;
@@ -248,9 +246,6 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-
-                        /*****************************************************************************************/
-                        //added the -1 to make the basis set correct
                         for (int v = -dynVar2 - 1; v <= dynVar2; v++)                        
                         {
                             if (i + v * 3 >= 0)
@@ -258,8 +253,6 @@ namespace ConsoleApplication1
                                 quadVecs.AddRange(jBasisVecsByJ[i + v * 3]);
                             }
                         }
-                        /*****************************************************************************************/
-
                         //this checks if the matrix was read from file, and if so if the basis set is the correct size
                         if (basisSize.Count != 0)                        
                         { 
@@ -271,12 +264,10 @@ namespace ConsoleApplication1
                         //if matrices aren't made then generate all of them
                         if (!matricesMade)
                         {
-                            //fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false, i - jBasisVecsByJ.Count / 2);
                             fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false, i - jBasisVecsByJ.Count / 2);       
                         }                        
                         else//If they are made then just generate the diagonal elements.
 	                    {
-                            //fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.genFitMatrix(quadVecs, isQuad, input, out nColumns, input.parMat, true)[0];
                             fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true, i - jBasisVecsByJ.Count / 2)[0];		 
 	                    }
 
@@ -364,7 +355,6 @@ namespace ConsoleApplication1
                     }
                     else//means it's a cross term. loop over relevant E and A terms in same order as in genFitMatrix function
                     {
-                        //*
                         int crossMatrixCounter = 0;
                         for (int blOrNot = 0; blOrNot < 2; blOrNot++)
                         {
@@ -401,31 +391,6 @@ namespace ConsoleApplication1
                                 }//end loop over columns of cross-term matrix
                             }//end loop over rows of cross-term matrix
                         }//end loop to go through the cross-term matrix twice
-                        //*/
-
-                        /*
-                        //This code is wrong, it will only ever return the first cross-term
-                        for (int aa = 0; aa < biAVecPos.Count; aa++)
-                        {
-                            for (int e = 0; e < biEVecPos.Count; e++)
-                            {
-                                int crossCount = aa + e;
-                                int row;
-                                int column;
-                                if (biAVecPos[aa] > biEVecPos[e])
-                                {
-                                    column = biAVecPos[aa];
-                                    row = biEVecPos[e];
-                                }
-                                else
-                                {
-                                    column = biEVecPos[e];
-                                    row = biAVecPos[aa];
-                                }
-                                val = input.CrossTermMatrix[row, column];
-                            }//end loop over e elements
-                        }//end loop over a elements
-                        //*/
                         whichCrossMatrix++;
                     }//end else for counting if it's D / K or cross-Term                    
                     mat[i].Add(cTimesSparse(fitHamList[i][j], val));
