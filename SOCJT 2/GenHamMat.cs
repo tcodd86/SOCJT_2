@@ -207,12 +207,12 @@ namespace ConsoleApplication1
                             if (basisPositions[position].TryGetValue(hashCode, out m))
                             { 
                                 //assign temp here.
-                                temp = (double)vlLambda[n, aVecPos[aModes]];
+                                double oneORnone = 0.0;
                                 if (deltaV == 1)
                                 {
-                                    temp += 1.0;
+                                    oneORnone = 1.0;
                                 }
-                                temp = Math.Sqrt(temp);
+                                temp = Math.Sqrt(((double)vlLambda[n, aVecPos[aModes]] + oneORnone));
                                 Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
                                 matrixPos[2 * aVecPos[aModes]].Add(ttTemp);
                             }
