@@ -478,9 +478,7 @@ namespace ConsoleApplication1
                 }
             }//end for
 
-            /*
-            //this sets isQuad = true if there is a cross quadratic term between an A and E mode
-            /*
+            //this sets isQuad = true if there is a cross quadratic term between an two E modes
             if (isQuad == false)
             {
                 for (int i = 0; i < input.nModes; i++)
@@ -493,26 +491,14 @@ namespace ConsoleApplication1
                     {
                         if (input.CrossTermMatrix[j, i] != 0)
                         {
-                            if (Modes[i].IsAType == true)
+                            if (!Modes[i].IsAType && !Modes[j].IsAType)
                             {
-                                if (Modes[j].IsAType == false)
-                                {
-                                    isQuad = true;
-                                    break;
-                                }
+                                isQuad = true;
                             }
-                            else
-                            {
-                                if (Modes[j].IsAType == true)
-                                {
-                                    isQuad = true;
-                                }
-                            }//end else
                         }//end if
                     }//end inner for
                 }//end outer for
             }//end if isQuad == false
-            */
             return isQuad;
         }
 
@@ -632,33 +618,6 @@ namespace ConsoleApplication1
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
             SOCJT.writeVecFile(input, eVecs, basisSet, evMin, filepath + input.Title + "_EVecs.out");
-            /*
-            StringBuilder output = new StringBuilder();
-            for (int i = 0; i < lanczosEVectors.Count; i++)
-            {
-                decimal jblock = (decimal)i + 0.5M;
-                output.AppendLine("************************************");
-                output.AppendLine(" ");
-                output.AppendLine("J-Block " + jblock);
-                output.AppendLine(" ");
-                output.AppendLine("************************************");
-                output.AppendLine(" ");
-                for (int j = 0; j < lanczosEVectors[i].GetLength(1); j++)
-                {
-                    output.AppendLine(" " + "\r");
-                    output.AppendLine("Eigenvector" + "\t" + Convert.ToString(j + 1));
-                    output.AppendLine(" " + "\r");
-                    output.AppendLine("Eigenvector: (Only vectors with coefficients larger than " + Convert.ToString(evMin) + " are shown)");
-                    output.AppendLine(" ");                    
-                    OutputFile.vecBuilder(input, basisSet[i], output, eVecs[i], j, input.EigenvectorCoefficientMinimum, true);
-                }//end j for loop
-                output.AppendLine("\r");
-            }//end i loop
-            string fileName = filepath + input.Title + "_EVecs.out";
-            List<string> ou = new List<string>();
-            ou.Add(output.ToString());
-            File.WriteAllLines(fileName, ou);
-            */
             if (input.EVectorFile)
             {
                 SOCJT.writeVecFile(input, eVecs, basisSet, 0.0);
