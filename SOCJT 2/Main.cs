@@ -91,14 +91,6 @@ namespace ConsoleApplication1
                     }
                 }
 
-                /*
-                //check that spin is integer or half integer only
-                if (input.S % 0.5M != 0M)
-                {
-                    throw new SpinInvalidException();
-                }
-                */
-
                 //initialize the modes
                 List<ModeInfo> Modes = ModeInitialization(inputFile, input);
 
@@ -136,7 +128,6 @@ namespace ConsoleApplication1
                             CalcLargeEvecs(filepath, input, fitt.lanczosEVectors, fitt.basisSet);
                         }
                     }
-
                     //WriteOutputFile(totalTime, filepathOUT, linesToWrite);
                 }//end no scan
 
@@ -244,24 +235,6 @@ namespace ConsoleApplication1
                 {
                     OutputFile.writeMatFile(input);
                 }//end if to write matrix to file
-
-                //Here, if necessary, the eigenvectors for very large matrices are calculated after the rest of the calculations have been done.
-                //This is done because this process may take a large amount of time
-                /*
-                if (runner.lanczosEVectors != null || fitt.lanczosEVectors != null)
-                {
-                    Console.WriteLine("\nEigenvectors being calculated...");
-                    Console.WriteLine("This may take some time.");
-                    if (fit)
-                    {
-                        eVecGenerator(fitt.lanczosEVectors, filepath, fitt.basisSet, input);
-                    }//end if
-                    else
-                    {
-                        eVecGenerator(runner.lanczosEVectors, filepath, runner.basisSet, input);
-                    }//end else
-                }//end if
-                */
             }//end try block
 
             //Exception handling
