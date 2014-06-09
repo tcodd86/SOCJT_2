@@ -1114,7 +1114,6 @@ namespace ConsoleApplication1
 
                 //assign alpha value for this iteration
                 //***************************************************************
-                //alphas[i] = vxv(vi, Axvi);                
                 alphas[i] = Alpha_i(Axvi, viminusone, vi, betas[i]);
                 //***************************************************************
 
@@ -1155,7 +1154,6 @@ namespace ConsoleApplication1
                 //calculate viplusone and beta i + 1.
                 viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
                 //***************************************************************
-                //betas[i + 1] = Math.Sqrt(vxv(viplusone, Axvi));
                 betas[i + 1] = Magnitude(viplusone);
                 //***************************************************************
                 for (int j = 0; j < viplusone.Length; j++)
