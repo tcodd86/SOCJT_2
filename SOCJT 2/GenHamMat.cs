@@ -384,12 +384,15 @@ namespace ConsoleApplication1
                                                 if (changeLambda == 0)
                                                 {
                                                     tbool = true;
+                                                    continue;
                                                 }
                                                 tempInt = (int[])hashInt.Clone();
                                                 //get DeltaVL for the first mode
-                                                DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm]], deltaV, deltal, nModes, tbool);
+                                                //DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm]], deltaV, deltal, nModes, tbool);
+                                                DeltaVL(ref tempInt, crossQuadPos[crossTerm], deltaV, deltal, nModes, tbool);
                                                 //get DeltaVL for the second mode
-                                                DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm + 1]], deltaV2, deltal2, nModes);
+                                                //DeltaVL(ref tempInt, eVecPos[crossQuadPos[crossTerm + 1]], deltaV2, deltal2, nModes);
+                                                DeltaVL(ref tempInt, crossQuadPos[crossTerm + 1], deltaV2, deltal2, nModes);
                                                 //generate the hashcode
                                                 hashCode = BasisFunction.GenerateHashCode(tempInt, nModes);
                                                 //if it exists, then assign it to the linear value                            
@@ -397,8 +400,9 @@ namespace ConsoleApplication1
                                                 {
                                                     if (m > n)
                                                     {
-                                                        temp = LinearMatrixElement(vlLambda, n, eVecPos[crossQuadPos[crossTerm]], nModes, deltal, deltaV);
-                                                        temp *= LinearMatrixElement(vlLambda, n, eVecPos[crossQuadPos[crossTerm + 1]], nModes, deltal, deltaV);
+                                                        temp = LinearMatrixElement(vlLambda, n, crossQuadPos[crossTerm], nModes, deltal, deltaV);
+                                                        temp *= LinearMatrixElement(vlLambda, n, crossQuadPos[crossTerm + 1], nModes, deltal2, deltaV2);
+                                                        temp *= 0.5;
                                                         Tuple<int, int, double> ttTemp = new Tuple<int, int, double>(n, m, temp);// basisVectorsByJ[n].modesInVec[mode].v     basisVectorsByJ[n].modesInVec[mode].l
                                                         matrixPos[2 * nModes + crossCount].Add(ttTemp);
                                                     }
