@@ -161,7 +161,7 @@ namespace ConsoleApplication1
                             {
                                 Modes[input.ScanList[n].Mode - 1].K = input.ScanList[n].Start + input.ScanList[n].Step * (double)h;
                             }
-                            if (input.ScanList[n].varToFit.ToUpper() == "B")
+                            if (input.ScanList[n].varToFit.ToUpper() == "B" || input.ScanList[n].varToFit.ToUpper() == "C")
                             {
                                 int tRow = input.ScanList[n].Mode;
                                 int tCol = input.ScanList[n].Cross;
