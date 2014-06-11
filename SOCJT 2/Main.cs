@@ -462,7 +462,7 @@ namespace ConsoleApplication1
                     }
                     for (int j = i + 1; j < input.nModes; j++)
                     {
-                        if (input.CrossTermMatrix[j, i] != 0)
+                        if (input.CrossTermMatrix[i, j] != 0)
                         {
                             if (!Modes[i].IsAType && !Modes[j].IsAType)
                             {
