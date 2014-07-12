@@ -416,10 +416,10 @@ namespace ConsoleApplication1
         /// </param>
         public static void function(double[] x, double[] fi, Object obj)//, MasterObject Master)
         {
-            MasterObject Master = null;
-            if (obj as MasterObject != null)
+            MasterObject Master = obj as MasterObject;
+            if (Master == null)
             {
-                Master = obj as MasterObject;
+                return;
             }
             int j = 0;
             double[] temp;
