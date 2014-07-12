@@ -619,14 +619,14 @@ namespace ConsoleApplication1
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
                         vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
-                        Lanczos.normalize(ref vector);
+                        Lanczos.normalize(vector);
                         overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
                     }
                 }
                 else
                 {
                     vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock, input.Special);
-                    Lanczos.normalize(ref vector);
+                    Lanczos.normalize(vector);
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
                         if (jIndex == (int)(input.VectorJBlock - 0.5M))
@@ -639,11 +639,9 @@ namespace ConsoleApplication1
                         }
                     }
                 }
-                for (int inten = 0; inten < overlaps.Count; inten++)
+                foreach (double[] overlap in overlaps)
                 {
-                    double[] temp = overlaps[inten];
-                    Lanczos.normalize(ref temp);
-                    overlaps[inten] = temp;
+                    Lanczos.normalize(overlap);
                 }
             }
 
@@ -828,7 +826,7 @@ namespace ConsoleApplication1
         private static void EigenvectorCheck(alglib.sparsematrix hamiltonianArray, double eigenvalue, double[] temp)
         {
             var V = new double[temp.Length];
-            Lanczos.normalize(ref temp);
+            Lanczos.normalize(temp);
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
             double magnitude = Lanczos.Magnitude(V);

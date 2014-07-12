@@ -536,7 +536,7 @@ namespace ConsoleApplication1
             {
                 X[i] = randy.NextDouble();
             }
-            normalize(ref X);
+            normalize(X);
             return X;
         }
 
@@ -1308,7 +1308,7 @@ namespace ConsoleApplication1
         /// <param name="X">
         /// Vector to be normalized.
         /// </param>
-        public static void normalize(ref double[] X)
+        public static void normalize(double[] X)
         {
             double sum = 0.0;
             for (int i = 0; i < X.Length; i++)
@@ -1337,7 +1337,7 @@ namespace ConsoleApplication1
                 {
                     temp[i] = X[i, j];
                 }
-                normalize(ref temp);
+                normalize(temp);
                 for (int i = 0; i < X.GetLength(0); i++)
                 {
                     X[i, j] = temp[i];
