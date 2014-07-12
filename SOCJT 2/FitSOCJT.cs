@@ -416,8 +416,11 @@ namespace ConsoleApplication1
         /// </param>
         public static void function(double[] x, double[] fi, Object obj)//, MasterObject Master)
         {
-            //MasterObject Master = ConsoleApplication1.FitSOCJT.Masterly;
-            MasterObject Master = (MasterObject) obj;//(ConsoleApplication1.MasterObject)obj;
+            MasterObject Master = null;
+            if (obj as MasterObject != null)
+            {
+                Master = obj as MasterObject;
+            }
             int j = 0;
             double[] temp;
             if (Master.nInput.FitAzeta == true)
