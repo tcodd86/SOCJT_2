@@ -608,7 +608,6 @@ namespace ConsoleApplication1
             for (int count = 0; count < eigenvalues.Count; count++)
             {
                 overlaps.Add(new double[eigenvalues[count].Length]);
-                //overlaps[count] = new double[eigenvalues[count].Length];
             }
 
             if (input.Intensity && input.PrintVector)
@@ -639,6 +638,12 @@ namespace ConsoleApplication1
                             overlaps[jIndex] = new double[zMatrices[jIndex].GetLength(0)];
                         }
                     }
+                }
+                for (int inten = 0; inten < overlaps.Count; inten++)
+                {
+                    double[] temp = overlaps[inten];
+                    Lanczos.normalize(ref temp);
+                    overlaps[inten] = temp;
                 }
             }
 
