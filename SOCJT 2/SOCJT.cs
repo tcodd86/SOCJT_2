@@ -73,7 +73,7 @@ namespace ConsoleApplication1
             for (int i = 0; i < input.nModes; i++)
             {
                 basisByMode.Add(new List<BasisByMode>());
-                basisByMode[i] = BasisByMode.genVLCombinations(Modes[i], i);
+                basisByMode[i] = BasisByMode.GenVLCombinations(Modes[i], i);
             }//end for            
 
             //Generates all of the JBasisVectors to be used in calculation.

@@ -60,7 +60,7 @@ namespace ConsoleApplication1
         /// What number mode this is
         /// </param>
         /// <param name="l">
-        /// The value of the vibrational angular momentum (always zero if symmetryIsA is true)
+        /// The value of the vibrational angular momentum
         /// </param>
         /// <param name="v">
         /// Value of the principal vibrational quantum number
@@ -101,7 +101,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// List of all possible BasisByMode objects for a given mode.
         /// </returns>
-        public static List<BasisByMode> genVLCombinations(ModeInfo mode1, int modeNumber)
+        public static List<BasisByMode> GenVLCombinations(ModeInfo mode1, int modeNumber)
         {
             //List to return
             List<BasisByMode> basisVectors = new List<BasisByMode>();
