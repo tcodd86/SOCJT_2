@@ -658,7 +658,10 @@ namespace ConsoleApplication1
         /// <param name="fileName">The name of vector file</param>
         /// <param name="index">Which eigenvector</param>
         /// <param name="jBlock">Which j-block</param>
-        /// <returns></returns>
+        /// <param name="special">A parameter for a one off calculation. Leave at default.</param>
+        /// <returns>
+        /// The eigenvector read from file in the right order.
+        /// </returns>
         private static double[] ReadSOCJT2Vector(string fileName, int index, decimal jBlock, bool special = false)
         {
             var evec = new List<string>();
