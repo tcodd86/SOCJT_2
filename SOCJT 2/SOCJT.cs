@@ -416,6 +416,9 @@ namespace ConsoleApplication1
             //add SO stuff here
             if (input.IncludeSO == true)
             {
+                //Jvecs for output
+                //
+                //var tempBasisList = new List<List<BasisFunction>>();
                 decimal minS = input.S * -1M;
                 List<alglib.sparsematrix> tempMatList = new List<alglib.sparsematrix>();
                 List<int> tempNumbColumns = new List<int>();
@@ -427,14 +430,27 @@ namespace ConsoleApplication1
                         alglib.sparsematrix tempMat = new alglib.sparsematrix();
                         alglib.sparsecopy(array1[i], out tempMat);
                         tempMatList.Add(tempMat);
+                        if (isQuad)
+                        {
+                            JvecsForOutuput.Add(jbasisoutA[i]);
+                        }
+                        else
+                        {
+                            JvecsForOutuput.Add(jBasisVecsByJ[i]);
+                        }
+                        //jbasisoutA for quadratic
+                        //jBasisVecsByJ for linear
+                        //tempBasisList.Add(JvecsForOutuput[i]);
                         for (int k = 0; k < numcolumnsA[i]; k++)
                         {
-                            double temp = input.Azeta * (double)jbasisoutA[i][k].Lambda * (double)j;
+                            double temp = input.Azeta * (double)JvecsForOutuput[i][k].Lambda * (double)j;
                             alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
                         }//end loop over diagonal matrix elements
                         tempNumbColumns.Add(numcolumnsA[i]);
                         //means SO only in j = 0.5 block for quadratic cases
-                        if (i > 0 && isQuad)
+                        //if (i > 0 && isQuad)
+                        //means SO only in degenerate blocks
+                        if((i - 1) % 3 == 0)
                         {
                             break;
                         }
@@ -445,6 +461,8 @@ namespace ConsoleApplication1
                 numcolumnsA = tempNumbColumns.ToArray();
                 array1 = null;
                 array1 = tempMatList.ToArray();
+                //JvecsForOutuput.Clear();
+                //JvecsForOutuput = tempBasisList;
                 zMatrices.Clear();
                 eigenvalues.Clear();
                 for (int i = 0; i < array1.Length; i++)
@@ -455,12 +473,9 @@ namespace ConsoleApplication1
             }//end if inclSO == true
             #endregion
 
-            else
+            for (int i = 0; i < array1.Length; i++)
             {
-                for (int i = 0; i < array1.Length; i++)
-                {
-                    alglib.sparseconverttocrs(array1[i]);
-                }
+                alglib.sparseconverttocrs(array1[i]);
             }
 
             #region Lanczos
@@ -575,17 +590,20 @@ namespace ConsoleApplication1
             input.DiagonalizationTime = (double)howMuchTime / 1000D;
             #endregion
 
-            if (isQuad == false)
+            if (input.IncludeSO == false)
             {
-                JvecsForOutuput = jBasisVecsByJ;
-            }//end if
-            else
-            {
-                for (int i = 0; i < jbasisoutA.Length; i++)
+                if (isQuad == false)
                 {
-                    JvecsForOutuput.Add(jbasisoutA[i]);
-                }
-            }//end else
+                    JvecsForOutuput = jBasisVecsByJ;
+                }//end if
+                else
+                {
+                    for (int i = 0; i < jbasisoutA.Length; i++)
+                    {
+                        JvecsForOutuput.Add(jbasisoutA[i]);
+                    }
+                }//end else
+            }
 
             //writes the eigenvectors to disk if that has been requested
             //if NTooBig == true then the separate eigenvector file will be made after the eigenvectors are calculated
@@ -1221,7 +1239,7 @@ namespace ConsoleApplication1
                         eigen.Add(new Eigenvalue(J, j + 1, tempS, evs[i][j], tbool));
                     }
                 }
-                if (tempS < maxS)
+                if (tempS < maxS && (J - 1.5M) % 3M != 0M)
                 {
                     tempS++;
                 }
@@ -1236,10 +1254,10 @@ namespace ConsoleApplication1
             bubbleSort(ref eigenarray);
             double ZPE = eigenarray[0].Evalue;
             int[] temp = new int[evs.Count];
-            for (int i = 0; i < evs.Count; i++)
-            {
-                temp[i] = 1;
-            }
+            //for (int i = 0; i < evs.Count; i++)
+            //{
+            //    temp[i] = 1;
+            //}
             for (int i = 0; i < eigenarray.Length; i++)
             {
                 eigenarray[i].Evalue = eigenarray[i].Evalue - ZPE;
@@ -1249,14 +1267,14 @@ namespace ConsoleApplication1
             {
                 SOnumb = 1;
             }
-            for (int i = 0; i < eigenarray.Length; i++)
-            {
-                int Snumb = (int)(eigenarray[i].Sigma - S);
-                int j = (int)(eigenarray[i].JBlock - 0.5M);
-                int place = j * SOnumb + Snumb;
-                eigenarray[i].Number = temp[place];
-                temp[place]++;
-            }
+            //for (int i = 0; i < eigenarray.Length; i++)
+            //{
+            //    int Snumb = (int)(eigenarray[i].Sigma - S);
+            //    int j = (int)(eigenarray[i].JBlock - 0.5M);
+            //    int place = j * SOnumb + Snumb;
+            //    eigenarray[i].Number = temp[place];
+            //    temp[place]++;
+            //}
             return eigenarray;
         }
 

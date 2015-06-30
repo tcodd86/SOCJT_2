@@ -145,7 +145,7 @@ namespace ConsoleApplication1
                 file.Clear();
                 if (input.IncludeSO == true)
                 {
-                    if (Sigma < input.S)
+                    if (Sigma < input.S && (J - 1.5M) % 3 != 0)
                     {
                         Sigma++;
                     }
