@@ -217,7 +217,7 @@ namespace ConsoleApplication1
             {
                 Console.WriteLine("Calculating eigenvectors.");
                 Masterly.nInput.PrintVector = true;
-                Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput);
+                Masterly.nSoc.SOCJTroutine(Masterly.nModes, Masterly.nIsQuad, Masterly.nInputFile, Masterly.nInput,input.useAbsoluteEV);
                 //now assign the lanczosEVectors to those from the SOCJT routine
                 lanczosEVectors = Masterly.nSoc.lanczosEVectors;
                 basisSet = Masterly.nSoc.basisSet;
@@ -470,7 +470,7 @@ namespace ConsoleApplication1
                     }
                 }
             }
-            Master.nSoc.SOCJTroutine(Master.nModes, Master.nIsQuad, Master.nInputFile, Master.nInput);
+            Master.nSoc.SOCJTroutine(Master.nModes, Master.nIsQuad, Master.nInputFile, Master.nInput, Master.nInput.useAbsoluteEV); 
             temp = FitSOCJT.ComparerVec(Master.nFitFile, Master.nSoc.finalList, Master.nInput.Origin, true);
             for (int i = 0; i < temp.Length; i++)
             {

@@ -18,7 +18,7 @@ namespace ConsoleApplication1
         /// Number of modes in the calculation
         /// </summary>
         private int _nModes;
-        public int nModes 
+        public int nModes
         {
             get { return _nModes; }
             private set
@@ -31,7 +31,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// Title of the calculations
         /// </summary>
-        public string Title { get; private set;}
+        public string Title { get; private set; }
 
         /// <summary>
         /// Value of spin
@@ -39,7 +39,7 @@ namespace ConsoleApplication1
         private decimal _S;
         public decimal S
         {
-            get { return _S; } 
+            get { return _S; }
             private set
             {
                 //check that spin is integer or half integer only
@@ -48,7 +48,7 @@ namespace ConsoleApplication1
                     throw new InvalidInput("S");
                 }
                 _S = value;
-            } 
+            }
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace ConsoleApplication1
         public decimal maxJ
         {
             get { return _maxJ; }
-            set 
+            set
             {
                 NonnegativeCheck(value, 0M, "MAXJ");
                 if (value % 0.5M != 0M || value < 0.5M)
@@ -149,7 +149,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// True if the eigenvectors should be printed in the output file.
         /// </summary>
-        public bool PrintVector { get; set; }  
+        public bool PrintVector { get; set; }
 
         /// <summary>
         /// True if a file with the eigenvectors should be printed.
@@ -175,7 +175,7 @@ namespace ConsoleApplication1
         /// Number of eigenvalues/eigenvectors to find
         /// </summary>
         private int _M;
-        public int M 
+        public int M
         {
             get { return _M; }
             private set
@@ -189,7 +189,7 @@ namespace ConsoleApplication1
         /// Size of block (number of columns) in Block Lanczos
         /// </summary>
         private int _kFactor;
-        public int kFactor 
+        public int kFactor
         {
             get { return _kFactor; }
             private set
@@ -203,11 +203,11 @@ namespace ConsoleApplication1
         /// Max number of iterations to run the block Lanczos or size of Lanczos matrix to be generated in Naive Lanczos
         /// </summary>
         private int _noIts;
-        public int NumberOfIts 
+        public int NumberOfIts
         {
             get { return _noIts; }
-            private set 
-            { 
+            private set
+            {
                 NonnegativeCheck(value, 0, "NOITS");
                 _noIts = value;
             }
@@ -217,7 +217,7 @@ namespace ConsoleApplication1
         /// Tolerance used in Block Lanczos for convergance or in Naive Lanczos for eigenvalue comparison
         /// </summary>
         private double _tol;
-        public double Tolerance 
+        public double Tolerance
         {
             get { return _tol; }
             private set
@@ -236,7 +236,7 @@ namespace ConsoleApplication1
         /// F-Tolerance value for LM optimization
         /// </summary>
         private double _fTol;
-        public double FTol 
+        public double FTol
         {
             get { return _fTol; }
             private set
@@ -273,7 +273,7 @@ namespace ConsoleApplication1
                 _gTol = value;
             }
         }
-        
+
         /// <summary>
         /// Max number of iterations (steps) in the LM optimizer
         /// </summary>
@@ -281,7 +281,7 @@ namespace ConsoleApplication1
         public int MaxOptimizerSteps
         {
             get { return _maxFev; }
-            private set 
+            private set
             {
                 NonnegativeCheck(value, 0, "MAXFEV");
                 _maxFev = value;
@@ -398,7 +398,7 @@ namespace ConsoleApplication1
         public bool IncludeSO { get; private set; }
 
         public List<Tuple<decimal, int, int>> eVecs { get; private set; }
-        
+
         /// <summary>
         /// True if using kappa and eta for linear and quadratic JT coupling instead of D and K
         /// </summary>
@@ -458,7 +458,7 @@ namespace ConsoleApplication1
         /// Boolean indicating whether or not an eigenvector will be checked for accuracy
         /// </summary>
         public bool CheckEigenvector { get; private set; }
-        
+
         /// <summary>
         /// File name of the eigenvector being checked
         /// </summary>
@@ -504,13 +504,18 @@ namespace ConsoleApplication1
         /// </summary>
         public bool Special { get; private set; }
 
+        /// <summary>
+        /// Bool used to output absolute eigenvalues instead.
+        /// </summary>
+        public bool useAbsoluteEV { get; private set; }
+
         #endregion properties
 
         /// <summary>
         /// Constructor for FileInfo object. Sets reasonable values for most properties in case user forgets something in input file.
         /// </summary>
         public FileInfo()
-        {            
+        {
             FitAzeta = false;
             MinJBool = false;
             FitOrigin = false;
@@ -528,7 +533,9 @@ namespace ConsoleApplication1
             CheckEigenvector = false;
             JSInten = false;
             Intensity = false;
-            
+            useAbsoluteEV = false;
+
+
             MatrixFile = "matrix.txt";
             Title = "TITLE";
             FitFile = "fit.fit";
@@ -536,18 +543,18 @@ namespace ConsoleApplication1
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
-            minJ = 0.5M;            
+            minJ = 0.5M;
 
             //S1 and S2 values for 3-fold symmetry
             S1 = 0;
             S2 = 1;
-            
+
             Origin = 0.0;
             ParMatrix = 1;
             nModes = 1;
             S = 0.5M;
             Azeta = 0.0;
-            EigenvectorCoefficientMinimum = 0.2;            
+            EigenvectorCoefficientMinimum = 0.2;
             ParVectorMultiplication = 1;
             ParMatrix = 1;
             ParJ = 2;
@@ -562,7 +569,7 @@ namespace ConsoleApplication1
             Factor = 0.001;
             EigenvectorTolerance = 0.0001;
         }
-        
+
         /// <summary>
         /// Reads a text file into memory and parses it into a string array.
         /// </summary>
@@ -582,7 +589,7 @@ namespace ConsoleApplication1
                 string[] SOCJTNewLine;
                 char[] delimiters = new char[] { '\t', '\r', '=', ' ' };
                 while ((lineS = SOCJTin.ReadLine()) != null)
-                {                    
+                {
                     SOCJTNewLine = lineS.Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
                     for (int i = 0; i < SOCJTNewLine.Length; i++)
                     {
@@ -678,7 +685,7 @@ namespace ConsoleApplication1
                         }
                     }//end for loop
                     continue;
-                    #endregion                    
+                    #endregion
                 }//end GENERAL if
 
                 if (inputf[i].ToUpper() == "&IO_INFO")
@@ -736,7 +743,7 @@ namespace ConsoleApplication1
                         }
                     }//end for loop
                     continue;
-                    #endregion                    
+                    #endregion
                 }//end IO INFO if
 
                 if (inputf[i].ToUpper() == "&SOLVE_INFO")
@@ -793,6 +800,11 @@ namespace ConsoleApplication1
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
                             BlockLanczos = TorF(inputf[u + 1]);
+                        }
+                        if (inputf[u].ToUpper() == "ABSOLUTE")
+                        {
+                            useAbsoluteEV = TorF(inputf[u + 1]);
+                            continue;
                         }
                         if (inputf[u] == "/")
                         {
@@ -890,7 +902,7 @@ namespace ConsoleApplication1
                     }//end CROSS_TERM for
                     #endregion
                 }//end CROSS_TERM if
-                
+
                 if (inputf[i].ToUpper() == "&SCAN")
                 {
                     #region &SCAN
