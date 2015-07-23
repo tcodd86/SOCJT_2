@@ -36,17 +36,35 @@ namespace ConsoleApplication1
 
                 Directory.SetCurrentDirectory(fileDirectory);
 
-                //prompt user to enter input file name
-                Console.WriteLine("Enter file name including extension:");
-                string inFileName = Console.ReadLine();
+                string inFileName = args[0]; // Used for NFG SOCJT file. I don't know why the commented section below doesn't work.
+                string outFile = args[1];
 
-                //obtain output file name.  If blank, default value of input + .out is used
-                Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
-                string outFile = Console.ReadLine();
-                if (outFile == "" || outFile == " ")
-                {
-                    outFile = string.Concat(inFileName, ".out");
-                }
+                //if (args == null || args.Length == 0)
+                //{
+                //    Console.WriteLine("Enter file name including extension:");
+                //    inFileName = Console.ReadLine();
+
+                //    //obtain output file name.  If blank, default value of input + .out is used
+                //    Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
+                //    outFile = Console.ReadLine();
+                //    if (outFile == "" || outFile == " ")
+                //    {
+                //        outFile = string.Concat(inFileName, ".out");
+                //    }
+                //}
+
+                //Original Input
+                //prompt user to enter input file name
+                //Console.WriteLine("Enter file name including extension:");
+                //string inFileName = Console.ReadLine();
+
+                ////obtain output file name.  If blank, default value of input + .out is used
+                //Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
+                //string outFile = Console.ReadLine();
+                //if (outFile == "" || outFile == " ")
+                //{
+                //    outFile = string.Concat(inFileName, ".out");
+                //}
 
                 //start timer for overall program execution
                 Stopwatch totalTime = new Stopwatch();
