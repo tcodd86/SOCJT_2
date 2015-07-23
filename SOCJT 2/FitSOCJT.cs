@@ -43,7 +43,7 @@ namespace ConsoleApplication1
             {
                 userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false);
             }
-            
+
             //initializes the X vector, boundary conditions and variable scales
             //xList will contain each parameter being fit
             List<double> xList = new List<double>();
@@ -76,7 +76,7 @@ namespace ConsoleApplication1
             }
             //for each mode
             for (int i = 0; i < input.nModes; i++)
-            {   
+            {
                 //for Omega
                 if (Modes[i].fitOmega == true)
                 {
@@ -153,7 +153,7 @@ namespace ConsoleApplication1
             //this is an ugly solution to the problem of using the ALGLIB routines since I need to pass a large amount of information
             //to this routine but can only include one object in the arguments.  Therefore, I created the MasterObject just to store
             //this information which I pass to the ALGLIB routine.  Where it's used, it is cast from object to a MasterObject.
-            SOCJT run = new SOCJT();            
+            SOCJT run = new SOCJT();
             MasterObject Masterly = new MasterObject();
 
             //here, if using simple lanczos and wanting evecs, set pVector to false so that they are not calculated each step of the fit
@@ -266,7 +266,7 @@ namespace ConsoleApplication1
             file.AppendLine("A * zeta e = " + Convert.ToString(Masterly.nInput.Azeta));
 
             /* This is written for data analysis with the NFGSOCJT2 program */
-            file.Append("\n" + "NFG_OUTPUT" + "\t");
+            /* file.Append("\n" + "NFG_OUTPUT" + "\t");
             for (int ii = 0; ii < Masterly.nInput.nModes; ii++)
             {
                 double JTSE;
@@ -301,7 +301,7 @@ namespace ConsoleApplication1
                 }
             }
             file.Append(String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.Origin) / userInput.Length))));
-            file.AppendLine(" ");
+            file.AppendLine(" "); */
 
             file.AppendLine("Final Parameters for Each Mode:");
             file.AppendLine("Mode #" + "\t" + "V(min)" + "\t" + "V(max)" + "\t" + "Omega(E)" + "\t" + "wexe" + "\t" + "D" + "\t" + "K" + "\t" + "JTSE" + "\t" + "Omega(A)" + "\t" + "A Type?");
@@ -320,7 +320,7 @@ namespace ConsoleApplication1
             }
             file.AppendLine("  ");
             if (input.FitOrigin == true)
-            { 
+            {
                 file.AppendLine("Origin Shift = " + String.Format("{0,8:0.000}", -1.0 * Masterly.nInput.Origin));
             }
             file.AppendLine("  ");
@@ -344,7 +344,7 @@ namespace ConsoleApplication1
                     }
                 }
                 file.AppendLine(" ");
-            }            
+            }
 
             file.AppendLine("Fitting Results:");
             if (input.FitOrigin == true)
@@ -509,7 +509,7 @@ namespace ConsoleApplication1
                     }
                 }
             }
-            Master.nSoc.SOCJTroutine(Master.nModes, Master.nIsQuad, Master.nInputFile, Master.nInput, Master.nInput.useAbsoluteEV); 
+            Master.nSoc.SOCJTroutine(Master.nModes, Master.nIsQuad, Master.nInputFile, Master.nInput, Master.nInput.useAbsoluteEV);
             temp = FitSOCJT.ComparerVec(Master.nFitFile, Master.nSoc.finalList, Master.nInput.Origin, true);
             for (int i = 0; i < temp.Length; i++)
             {
