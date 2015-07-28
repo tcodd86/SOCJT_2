@@ -36,27 +36,31 @@ namespace ConsoleApplication1
 
                 Directory.SetCurrentDirectory(fileDirectory);
 
-                /* string inFileName = args[0]; // Used for NFG SOCJT file. I don't know why the commented section below doesn't work.
-                string outFile = args[1];
+                string inFileName; // Used for NFG SOCJT file. I don't know why the commented section below doesn't work.
+                string outFile;
 
-                //if (args == null || args.Length == 0)
-                //{
-                //    Console.WriteLine("Enter file name including extension:");
-                //    inFileName = Console.ReadLine();
+                if (args == null || args.Length == 0)
+                {
+                    Console.WriteLine("Enter file name including extension:");
+                    inFileName = Console.ReadLine();
 
-                //    //obtain output file name.  If blank, default value of input + .out is used
-                //    Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
-                //    outFile = Console.ReadLine();
-                //    if (outFile == "" || outFile == " ")
-                //    {
-                //        outFile = string.Concat(inFileName, ".out");
-                //    }
-                //}
-                */
+                    //obtain output file name.  If blank, default value of input + .out is used
+                    Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
+                    outFile = Console.ReadLine();
+                    if (outFile == "" || outFile == " ")
+                    {
+                        outFile = string.Concat(inFileName, ".out");
+                    }
+                }
+                else
+                {
+                    inFileName = args[0];
+                    outFile = args[1];
+                } 
 
                 //Original Input
                 //prompt user to enter input file name
-                Console.WriteLine("Enter file name including extension:");
+                /*Console.WriteLine("Enter file name including extension:");
                 string inFileName = Console.ReadLine();
 
                 //obtain output file name.  If blank, default value of input + .out is used
@@ -65,7 +69,7 @@ namespace ConsoleApplication1
                 if (outFile == "" || outFile == " ")
                 {
                     outFile = string.Concat(inFileName, ".out");
-                }
+                }*/
 
                 //start timer for overall program execution
                 Stopwatch totalTime = new Stopwatch();

@@ -509,6 +509,11 @@ namespace ConsoleApplication1
         /// </summary>
         public bool useAbsoluteEV { get; private set; }
 
+        /// <summary>
+        /// Bool used to produce output files for the Normal Fit Generator
+        /// </summary>
+        public bool useNFG { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -534,6 +539,7 @@ namespace ConsoleApplication1
             JSInten = false;
             Intensity = false;
             useAbsoluteEV = false;
+            useNFG = false;
 
 
             MatrixFile = "matrix.txt";
@@ -823,7 +829,10 @@ namespace ConsoleApplication1
                         if (inputf[u].ToUpper() == "FITFILE")
                         {
                             FitFile = inputf[u + 1];
-                            continue;
+                        }
+                        if(inputf[u].ToUpper() == "NFG")
+                        {
+                            useNFG = true;
                         }
                         if (inputf[u].ToUpper() == "FTOL")
                         {
