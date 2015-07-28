@@ -55,7 +55,7 @@ namespace ConsoleApplication1
                 */
 
                 //Original Input
-                prompt user to enter input file name
+                //prompt user to enter input file name
                 Console.WriteLine("Enter file name including extension:");
                 string inFileName = Console.ReadLine();
 

@@ -369,6 +369,7 @@ namespace ConsoleApplication1
                     {
                         for (int crossTerm = 0; crossTerm < crossQuadPos.Count; crossTerm += 2)
                         {
+                            crossCount++; // Moved this up since without it, the matrix was adding onto the last one.
                             for (int deltal = -1; deltal < 2; deltal += 2)
                             {
                                 for (int deltaV = -1; deltaV < 2; deltaV += 2)
@@ -412,7 +413,7 @@ namespace ConsoleApplication1
                                     }//end loop over linear l values
                                 }//end loop over deltaV
                             }//end loop over linear l values
-                            crossCount++;
+                            // crossCount++; // Moved this up.
                         }//end loop over cross quadratic terms
                     }
                     #endregion
