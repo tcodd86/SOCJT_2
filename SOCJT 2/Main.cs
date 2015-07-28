@@ -128,7 +128,7 @@ namespace ConsoleApplication1
                     if (!fit)
                     {
                         SOCJT runner = new SOCJT();
-                        linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input, input.useAbsoluteEV));
+                        linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
                         WriteOutputFile(totalTime, filepathOUT, linesToWrite);
                         //Here, if necessary, the eigenvectors for very large matrices are calculated after the rest of the calculations have been done.
                         //This is done because this process may take a large amount of time
@@ -227,7 +227,7 @@ namespace ConsoleApplication1
 
                         //now make output file for each step
                         linesToWrite = OutputFile.inputFileMaker(input, Modes);
-                        linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input, input.useAbsoluteEV));
+                        linesToWrite.AddRange(runner.SOCJTroutine(Modes, isQuad, inputFile, input));
 
                         string stepFile = filepathOUT + "_step_" + Convert.ToString(h + 1) + ".out";
                         File.WriteAllLines(stepFile, linesToWrite);

@@ -35,9 +35,8 @@ namespace ConsoleApplication1
         //this list stores the untransformed eigenvectors
         public List<double[,]> lanczosEVectors { get; private set; }
 
-        public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input, bool useAbsolute)
+        public List<string> SOCJTroutine(List<ModeInfo> Modes, bool isQuad, string[] inputFile, FileInfo input)
         {
-            useAbsolute = input.useAbsoluteEV;
             //Sets minimum and maximum j values.
             Stopwatch measurer = new Stopwatch();
             long howMuchTime;
@@ -665,7 +664,7 @@ namespace ConsoleApplication1
             }
 
             List<string> linesToWrite = new List<string>();
-            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, overlaps, input.useAbsoluteEV);//add the eigenvectors so that the symmetry can be included as well
+            finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, overlaps);//add the eigenvectors so that the symmetry can be included as well
             linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
             outp = linesToWrite;                
             return linesToWrite;   
@@ -1213,9 +1212,8 @@ namespace ConsoleApplication1
         /// <returns>
         /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
         /// </returns>
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlap, bool isAbsolute)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlap)
         {
-            isAbsolute = input.useAbsoluteEV;
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
             decimal J = 0.5M;
@@ -1254,7 +1252,7 @@ namespace ConsoleApplication1
             }
             Eigenvalue[] eigenarray = eigen.ToArray();
             bubbleSort(ref eigenarray);
-            if (isAbsolute == false)
+            if (input.useAbsoluteEV == false)
             {
                 double ZPE = eigenarray[0].Evalue;
                 int[] temp = new int[evs.Count];
