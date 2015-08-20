@@ -36,7 +36,7 @@ namespace ConsoleApplication1
 
                 Directory.SetCurrentDirectory(fileDirectory);
 
-                string inFileName; // Used for NFG SOCJT file. I don't know why the commented section below doesn't work.
+                string inFileName; 
                 string outFile;
 
                 if (args == null || args.Length == 0)
@@ -77,6 +77,7 @@ namespace ConsoleApplication1
 
                 //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
+                //filepath += "/"; // FOR THE CLUSTER
                 filepath += "\\";
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
