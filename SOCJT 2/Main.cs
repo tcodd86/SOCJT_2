@@ -36,8 +36,31 @@ namespace ConsoleApplication1
 
                 Directory.SetCurrentDirectory(fileDirectory);
 
+                string inFileName; 
+                string outFile;
+
+                if (args == null || args.Length == 0)
+                {
+                    Console.WriteLine("Enter file name including extension:");
+                    inFileName = Console.ReadLine();
+
+                    //obtain output file name.  If blank, default value of input + .out is used
+                    Console.WriteLine("Enter output file name or press enter to use " + inFileName + ".out:");
+                    outFile = Console.ReadLine();
+                    if (outFile == "" || outFile == " ")
+                    {
+                        outFile = string.Concat(inFileName, ".out");
+                    }
+                }
+                else
+                {
+                    inFileName = args[0];
+                    outFile = args[1];
+                } 
+
+                //Original Input
                 //prompt user to enter input file name
-                Console.WriteLine("Enter file name including extension:");
+                /*Console.WriteLine("Enter file name including extension:");
                 string inFileName = Console.ReadLine();
 
                 //obtain output file name.  If blank, default value of input + .out is used
@@ -46,7 +69,7 @@ namespace ConsoleApplication1
                 if (outFile == "" || outFile == " ")
                 {
                     outFile = string.Concat(inFileName, ".out");
-                }
+                }*/
 
                 //start timer for overall program execution
                 Stopwatch totalTime = new Stopwatch();
@@ -54,6 +77,7 @@ namespace ConsoleApplication1
 
                 //set input, output, and fit file values.
                 string filepath = string.Concat(fileDirectory);
+                //filepath += "/"; // FOR THE CLUSTER
                 filepath += "\\";
                 string filepathIN = string.Copy(filepath);
                 string filepathOUT = string.Copy(filepath);
@@ -99,7 +123,7 @@ namespace ConsoleApplication1
 
                 //Determines if any values are being fit
                 bool fit = IsFit(input, Modes);
-                                
+
                 //main subroutine execution when not running a scan
                 if (input.Scan == false)
                 {
@@ -576,9 +600,9 @@ namespace ConsoleApplication1
                     lanczosVector = vecRead(file, j, ref vecIn);
                     for (int m = 0; m < numberOfEigenvalues; m++)
                     {
-                        //read in the right vector to memory from the lanczos vector file                    
+                        //read in the right vector to memory from the lanczos vector file
                         for (int n = 0; n < lanczosVector.Length; n++)
-                        {                            
+                        {
                             temp[n, m] += lanczosVector[n] * lanczosEVectors[i][j, m];
                         }//end loop over rows of lanczos Vector
                     }//end loop over columns of lanczosEVectors

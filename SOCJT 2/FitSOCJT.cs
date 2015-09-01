@@ -43,7 +43,7 @@ namespace ConsoleApplication1
             {
                 userInput[i] = new Eigenvalue(Convert.ToDecimal(fitF[i * 4 + 2]), Convert.ToInt16(fitF[i * 4 + 3]), Convert.ToDecimal(fitF[i * 4 + 4]), Convert.ToDouble(fitF[i * 4 + 1]), false);
             }
-            
+
             //initializes the X vector, boundary conditions and variable scales
             //xList will contain each parameter being fit
             List<double> xList = new List<double>();
@@ -76,7 +76,7 @@ namespace ConsoleApplication1
             }
             //for each mode
             for (int i = 0; i < input.nModes; i++)
-            {   
+            {
                 //for Omega
                 if (Modes[i].fitOmega == true)
                 {
@@ -153,7 +153,7 @@ namespace ConsoleApplication1
             //this is an ugly solution to the problem of using the ALGLIB routines since I need to pass a large amount of information
             //to this routine but can only include one object in the arguments.  Therefore, I created the MasterObject just to store
             //this information which I pass to the ALGLIB routine.  Where it's used, it is cast from object to a MasterObject.
-            SOCJT run = new SOCJT();            
+            SOCJT run = new SOCJT();
             MasterObject Masterly = new MasterObject();
 
             //here, if using simple lanczos and wanting evecs, set pVector to false so that they are not calculated each step of the fit
@@ -264,6 +264,48 @@ namespace ConsoleApplication1
             file.AppendLine(" ");
 
             file.AppendLine("A * zeta e = " + Convert.ToString(Masterly.nInput.Azeta));
+
+            /* This is written for data analysis with the NFG program */
+            if (input.useNFG == true)
+            {
+                file.Append("\n" + "NFG_OUTPUT" + "\t");
+                for (int ii = 0; ii < Masterly.nInput.nModes; ii++)
+                {
+                    double JTSE;
+                    if (Masterly.nModes[ii].IsAType == true)
+                    {
+                        JTSE = 0.0;
+                    }
+                    else
+                    {
+                        JTSE = Masterly.nModes[ii].D * Masterly.nModes[ii].modeOmega * (Masterly.nModes[ii].K + 1.0);
+                    }
+                    file.Append(String.Format("{0,7:0.00}", Masterly.nModes[ii].modeOmega) + "\t" + String.Format("{0,4:0.00}", Masterly.nModes[ii].wExe) + "\t" + String.Format("{0,5:0.0000}", Masterly.nModes[ii].D) + "\t" + String.Format("{0,5:0.0000}", Masterly.nModes[ii].K) + "\t" + String.Format("{0,4:0.00}", JTSE) + "\t");
+                }
+                if (input.IncludeCrossTerms == true)
+                {
+                    for (int i = 0; i < input.nModes; i++)
+                    {
+                        for (int j = 0; j < input.nModes; j++)
+                        {
+                            if (input.CrossTermMatrix[i, j] != 0.0 || input.CrossTermFit[i, j] == true)
+                            {
+                                if (i < j)
+                                {
+                                    file.Append(String.Format("{0,10:0.0000}", input.CrossTermMatrix[i, j]) + "\t");
+                                }
+                                else
+                                {
+                                    file.Append(String.Format("{0,10:0.00}", input.CrossTermMatrix[i, j]) + "\t");
+                                }
+                            }
+                        }
+                    }
+                }
+                file.Append(String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.Origin) / userInput.Length))));
+                file.AppendLine(" ");
+            } // end if useNFG == true
+
             file.AppendLine("Final Parameters for Each Mode:");
             file.AppendLine("Mode #" + "\t" + "V(min)" + "\t" + "V(max)" + "\t" + "Omega(E)" + "\t" + "wexe" + "\t" + "D" + "\t" + "K" + "\t" + "JTSE" + "\t" + "Omega(A)" + "\t" + "A Type?");
             for (int i = 0; i < Masterly.nInput.nModes; i++)
@@ -281,7 +323,7 @@ namespace ConsoleApplication1
             }
             file.AppendLine("  ");
             if (input.FitOrigin == true)
-            { 
+            {
                 file.AppendLine("Origin Shift = " + String.Format("{0,8:0.000}", -1.0 * Masterly.nInput.Origin));
             }
             file.AppendLine("  ");
@@ -305,7 +347,7 @@ namespace ConsoleApplication1
                     }
                 }
                 file.AppendLine(" ");
-            }            
+            }
 
             file.AppendLine("Fitting Results:");
             if (input.FitOrigin == true)

@@ -1252,16 +1252,19 @@ namespace ConsoleApplication1
             }
             Eigenvalue[] eigenarray = eigen.ToArray();
             bubbleSort(ref eigenarray);
-            double ZPE = eigenarray[0].Evalue;
-            int[] temp = new int[evs.Count];
-            //for (int i = 0; i < evs.Count; i++)
-            //{
-            //    temp[i] = 1;
-            //}
-            for (int i = 0; i < eigenarray.Length; i++)
+            if (input.useAbsoluteEV == false)
             {
-                eigenarray[i].Evalue = eigenarray[i].Evalue - ZPE;
-            }
+                double ZPE = eigenarray[0].Evalue;
+                int[] temp = new int[evs.Count];
+                //for (int i = 0; i < evs.Count; i++)
+                //{
+                //    temp[i] = 1;
+                //}
+                for (int i = 0; i < eigenarray.Length; i++)
+                {
+                    eigenarray[i].Evalue = eigenarray[i].Evalue - ZPE;
+                }
+            }//end ZPE loop
             int SOnumb = (int)(-2M * S) + 1;
             if (inclSO == false)
             {
