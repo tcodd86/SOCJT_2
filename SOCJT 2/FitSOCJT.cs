@@ -302,8 +302,12 @@ namespace ConsoleApplication1
                         }
                     }
                 }
+                for (int ll = 0; ll < resultM.GetLength(0); ll++)
+                {
+                    file.Append(String.Format("{0,10:0.00}", Math.Sqrt(resultM[ll, ll])) + "\t");
+                }
                 file.Append(String.Format("{0,10:0.000}", (Math.Sqrt(FitSOCJT.Comparer(userInput, Masterly.nSoc.finalList, Masterly.nInput.Origin) / userInput.Length))));
-                file.AppendLine(" ");
+                file.AppendLine("\n");
             } // end if useNFG == true
 
             file.AppendLine("Final Parameters for Each Mode:");
