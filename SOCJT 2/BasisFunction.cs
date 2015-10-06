@@ -271,11 +271,11 @@ namespace ConsoleApplication1
             {
                 for (int i = 0; i < 2 * nModes; i += 2)
                 {
-                    s += vlLambda[i] + " ";
-                    s += vlLambda[i + 1] + " ";
+                    s += vlLambda[i] + " "; //v
+                    s += vlLambda[i + 1] + " "; //l
                 }
             }
-            s += vlLambda[nModes * 2];
+            s += vlLambda[nModes * 2]; //lambda
             return s;
         }
     }//end class JBasisVector

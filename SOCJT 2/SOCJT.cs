@@ -43,13 +43,13 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
-            if (isQuad == true)
-            {
-                if (input.maxJ < 7.5M)
-                {
-                    input.maxJ = 7.5M;
-                }
-            }
+            //if (isQuad == true)
+            //{
+            //    if (input.maxJ < 7.5M)
+            //    {
+            //        input.maxJ = 7.5M;
+            //    }
+            //}
             if (isQuad == true)
             {
                 jMax = input.maxJ;
@@ -510,7 +510,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, i, input.FilePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.nModes, input.Tolerance, input.PrintVector, input.useSeed, input.SeedFile, i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
