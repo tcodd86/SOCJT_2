@@ -506,7 +506,8 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <returns>
         /// Normalized, random vector of length N.
         /// </returns>
-        private static double[] RANDOM(int N, int nModes, bool useSeed, string SeedFile)
+        /// 
+        private static double[] RANDOM(int N, bool useSeed, List<int> SeedVectorPositions)
         {
             
             var X = new double[N];
@@ -520,35 +521,39 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             }
             else
             {
-                Seed SeedVector = new Seed(SeedFile, nModes);
-                string tmpHash;
-                int m;
+                //Seed SeedVector = new Seed(SeedFile, nModes);
+                //string tmpHash;
+                //int m;
                 for(int i = 0; i < N; i++)
                 {
                     X[i] = 0;
                 }
-                for(int i = 0; i < SeedVector.SeedIndex; i++)
-                {
-                    try
-                    {
-                        tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                    }
-                    catch
-                    {
-                        throw new Exception("Check seed file.");
-                    }
-                    int jBlock = 0;
-                    for (int j = 0; j < SeedVector.SeedIndex; j++)
-                    {
-                        jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
-                    }
-                    if (SeedVector.vlLambdaSeed[i][2 * nModes] == -1) // If Lambda = -1, then we want the first index to be the floor of j, or jBlock - 1. 
-                    {
-                        jBlock--; // Floor j
-                    }
+                //for(int i = 0; i < SeedVector.SeedIndex; i++)
+                //{
+                //    try
+                //    {
+                //        tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
+                //    }
+                //    catch
+                //    {
+                //        throw new Exception("Check seed file.");
+                //    }
+                //    int jBlock = 0;
+                //    for (int j = 0; j < SeedVector.SeedIndex; j++)
+                //    {
+                //        jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
+                //    }
+                //    if (SeedVector.vlLambdaSeed[i][2 * nModes] == -1) // If Lambda = -1, then we want the first index to be the floor of j, or jBlock - 1. 
+                //    {
+                //        jBlock--; // Floor j
+                //    }
                     
-                    GenHamMat.basisPositions[jBlock].TryGetValue(tmpHash, out m);
-                    X[m] = 1;
+                //    GenHamMat.basisPositions[jBlock].TryGetValue(tmpHash, out m);
+                //    X[m] = 1;
+                //}
+                for (int i = 0; i < SeedVectorPositions.Count(); i++)
+                {
+                    X[SeedVectorPositions[i]] = 1;
                 }
             }
             normalize(X);
@@ -804,7 +809,13 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="file">
         /// FileInfo object
         /// </param>
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, int nModes, double tol, bool evsNeeded, bool useSeed, string SeedFile, int n, string file)
+        /// <param name="SeedVectorPositions">
+        /// List that holds positions of seed vector to be set to 1
+        /// </param>
+        /// <param name="useSeed">
+        /// Bool to check if seed vector is meant to be inputted
+        /// </param>
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, bool useSeed, List<int> SeedVectorPositions, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -824,7 +835,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                LanczosIterations(A, its, nModes, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedFile, NTooBig, writer);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedVectorPositions, NTooBig, writer);
                 writer.Close();
             }
             else //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
@@ -834,7 +845,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 {
                     lanczosVecs = new double[N, its];
                 }
-                LanczosIterations(A, its, nModes, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedFile, NTooBig);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedVectorPositions, NTooBig);
             }
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -877,6 +888,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     normalize(ref transEvecs);
                     //then set equal to z
                     z = transEvecs;
+                    //z = lanczosVecs;
                 }
                 /*
                 else
@@ -1062,11 +1074,11 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="writer">
         /// StreamWriter for writing LanczosVectors to disc if necessary, null by default
         /// </param>
-        private static void LanczosIterations(alglib.sparsematrix A, int its, int nModes, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool useSeed, string SeedFile, bool NTooBig, StreamWriter writer = null)
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool useSeed, List<int> SeedVectorPositions, bool NTooBig, StreamWriter writer = null)
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
-            var vi = RANDOM(N, nModes, useSeed, SeedFile);
+            var vi = RANDOM(N, useSeed, SeedVectorPositions);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];

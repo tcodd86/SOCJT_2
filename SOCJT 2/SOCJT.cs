@@ -478,6 +478,17 @@ namespace ConsoleApplication1
                 alglib.sparseconverttocrs(array1[i]);
             }
 
+            #region Seed
+            // Makes a List of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
+            // var SeedPositionsByJ = new List<List<int>>();
+            var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
+            SeedPositionsByJ = null;
+            if (input.useSeed)
+            {
+                SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad);
+            }
+            #endregion
+
             #region Lanczos
             int[] IECODE = new int[array1.Length];
             int[] ITER = new int[array1.Length];
@@ -510,7 +521,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.nModes, input.Tolerance, input.PrintVector, input.useSeed, input.SeedFile, i, input.FilePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, input.useSeed, SeedPositionsByJ[i], i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
@@ -1513,5 +1524,56 @@ namespace ConsoleApplication1
             //return matricesMade;
             return basisSizeList;
         }//end matReadFunction
+
+        private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
+        {
+            Seed SeedVector = new Seed(SeedFile, nModes);
+            //var SeedPositionsByJ = new List<List<int>>();
+            var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
+            for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
+            {
+                SeedPositionsByJ[i] = new List<int>();
+            }
+            int position;
+            string tmpHash;
+
+            for (int i = 0; i < SeedVector.SeedIndex; i++) // Adds each seed vector into List, sorted by J
+            {
+                try
+                {
+                    tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
+                }
+                catch
+                {
+                    throw new Exception("Check seed file.");
+                }
+
+                decimal jBlock = 0;
+                int jIndex = 0;
+                for (int j = 0; j < nModes; j++)
+                {
+                    jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
+                }
+                jBlock += (decimal)SeedVector.vlLambdaSeed[i][2 * nModes] / 2;
+                if (isQuad == false)
+                {
+                    jIndex = (int)(Math.Abs(jBlock) - 0.5M); // Floor j
+                }
+                if (isQuad == true)
+                {
+                    if ((jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
+                    {
+                        jIndex = 1;
+                    }
+                    else
+                    {
+                        jIndex = 0;
+                    }
+                }
+                GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position);
+                SeedPositionsByJ[jIndex].Add(position);
+            }
+            return SeedPositionsByJ;
+        }//end GenerateSeedPositions function
     }//end class SOCJT
 }
