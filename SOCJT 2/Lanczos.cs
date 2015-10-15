@@ -511,7 +511,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         {
             
             var X = new double[N];
-            if (!useSeed)
+            if (!useSeed || SeedVectorPositions.Count() == 0) // Means we are not using the seed OR there is no seed for this j which means this is a block with symmetry we don't care about selecting for.
             {
                 Random randy = new Random(6821);
                 for (int i = 0; i < N; i++)
@@ -519,38 +519,12 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     X[i] = randy.NextDouble();
                 }
             }
-            else
+            else // use Seed and we have nonzero elements for this seed in this j block.
             {
-                //Seed SeedVector = new Seed(SeedFile, nModes);
-                //string tmpHash;
-                //int m;
-                for(int i = 0; i < N; i++)
+                for(int i = 0; i < N; i++) // Initialize
                 {
                     X[i] = 0;
                 }
-                //for(int i = 0; i < SeedVector.SeedIndex; i++)
-                //{
-                //    try
-                //    {
-                //        tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                //    }
-                //    catch
-                //    {
-                //        throw new Exception("Check seed file.");
-                //    }
-                //    int jBlock = 0;
-                //    for (int j = 0; j < SeedVector.SeedIndex; j++)
-                //    {
-                //        jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
-                //    }
-                //    if (SeedVector.vlLambdaSeed[i][2 * nModes] == -1) // If Lambda = -1, then we want the first index to be the floor of j, or jBlock - 1. 
-                //    {
-                //        jBlock--; // Floor j
-                //    }
-                    
-                //    GenHamMat.basisPositions[jBlock].TryGetValue(tmpHash, out m);
-                //    X[m] = 1;
-                //}
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
                     X[SeedVectorPositions[i]] = 1;

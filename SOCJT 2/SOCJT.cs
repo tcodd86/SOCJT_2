@@ -482,7 +482,10 @@ namespace ConsoleApplication1
             // Makes a List of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
             // var SeedPositionsByJ = new List<List<int>>();
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
-            SeedPositionsByJ = null;
+            for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
+            {
+                SeedPositionsByJ[i] = new List<int>();
+            }
             if (input.useSeed)
             {
                 SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad);
