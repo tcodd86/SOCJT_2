@@ -511,7 +511,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         {
             
             var X = new double[N];
-            if (!useSeed)
+            if (!useSeed || SeedVectorPositions.Count() == 0) // Means not using Seed or no seed vector component in this j block which means we can ignore selecting symmetry in this block.
             {
                 Random randy = new Random(6821);
                 for (int i = 0; i < N; i++)
@@ -519,38 +519,12 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     X[i] = randy.NextDouble();
                 }
             }
-            else
+            else // using Seed and there is a component of the seed
             {
-                //Seed SeedVector = new Seed(SeedFile, nModes);
-                //string tmpHash;
-                //int m;
                 for(int i = 0; i < N; i++)
                 {
                     X[i] = 0;
                 }
-                //for(int i = 0; i < SeedVector.SeedIndex; i++)
-                //{
-                //    try
-                //    {
-                //        tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                //    }
-                //    catch
-                //    {
-                //        throw new Exception("Check seed file.");
-                //    }
-                //    int jBlock = 0;
-                //    for (int j = 0; j < SeedVector.SeedIndex; j++)
-                //    {
-                //        jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
-                //    }
-                //    if (SeedVector.vlLambdaSeed[i][2 * nModes] == -1) // If Lambda = -1, then we want the first index to be the floor of j, or jBlock - 1. 
-                //    {
-                //        jBlock--; // Floor j
-                //    }
-                    
-                //    GenHamMat.basisPositions[jBlock].TryGetValue(tmpHash, out m);
-                //    X[m] = 1;
-                //}
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
                     X[SeedVectorPositions[i]] = 1;
