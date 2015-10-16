@@ -1537,20 +1537,11 @@ namespace ConsoleApplication1
             {
                 SeedPositionsByJ[i] = new List<int>();
             }
-            int position;
-            string tmpHash;
 
             for (int i = 0; i < SeedVector.SeedIndex; i++) // Adds each seed vector into List, sorted by J
             {
-                try
-                {
-                    tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                }
-                catch
-                {
-                    throw new Exception("Check seed file.");
-                }
-
+                int position;
+                string tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
                 decimal jBlock = 0;
                 int jIndex = 0;
                 for (int j = 0; j < nModes; j++)
@@ -1564,7 +1555,7 @@ namespace ConsoleApplication1
                 }
                 if (isQuad == true)
                 {
-                    if ((jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
+                    if ((int)(jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
                     {
                         jIndex = 1;
                     }
