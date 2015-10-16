@@ -35,12 +35,19 @@ namespace ConsoleApplication1
                     if (line == "/")
                     {
                         ii = 0;
-                        vlLambdaSeed.Add(tmpArray);
+                        vlLambdaSeed.Add(tmpArray); // Array of nonzero elements in the seed vector. vlLambdaSeed[0] is one position, vlLambdaSeed[1] is another, and so on...
                         SeedIndex++;
                         tmpArray = new int[2 * nModes + 1]; // Recreate array so that a new array is referenced.
                         continue;
                     }
-                    tmpArray[ii] = int.Parse(line); // Array of nonzero elements in the seed vector. vlLambdaSeed[0] is one position, vlLambdaSeed[1] is another, and so on...
+                    try
+                    {
+                        tmpArray[ii] = int.Parse(line);
+                    }
+                    catch (IndexOutOfRangeException)
+                    {
+                        throw new Exception("Improper number of quantum numbers in seed vector.");
+                    }
                     ii++;
                 }
             } // End lock

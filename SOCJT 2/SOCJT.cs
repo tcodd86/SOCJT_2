@@ -1561,6 +1561,10 @@ namespace ConsoleApplication1
                     }
                     else
                     {
+                        if ((int)(jBlock - 2.5M) % 3 == 0) // Means j = 5/2 + 3n, which is degerate with 1/2 + 3n and not included.
+                        {
+                            continue;
+                        }
                         jIndex = 0;
                     }
                 }
