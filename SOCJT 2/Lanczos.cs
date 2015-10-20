@@ -506,12 +506,14 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <returns>
         /// Normalized, random vector of length N.
         /// </returns>
-        /// 
-        private static double[] RANDOM(int N, bool useSeed, List<int> SeedVectorPositions)
+        /// <param name="SeedVectorPositions">
+        /// List of positions in starting vector to be non zero for this specific j
+        /// </param>
+        private static double[] RANDOM(int N, List<int> SeedVectorPositions)
         {
             
             var X = new double[N];
-            if (!useSeed || SeedVectorPositions.Count() == 0) // Means not using Seed or no seed vector component in this j block which means we can ignore selecting symmetry in this block.
+            if (SeedVectorPositions.Count() == 0) // Means not using Seed or no seed vector component in this j block which means we can ignore selecting symmetry in this block.
             {
                 Random randy = new Random(6821);
                 for (int i = 0; i < N; i++)
@@ -784,12 +786,9 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// FileInfo object
         /// </param>
         /// <param name="SeedVectorPositions">
-        /// List that holds positions of seed vector to be set to 1
+        /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        /// <param name="useSeed">
-        /// Bool to check if seed vector is meant to be inputted
-        /// </param>
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, bool useSeed, List<int> SeedVectorPositions, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, List<int> SeedVectorPositions, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -798,6 +797,11 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             betas[0] = 0.0;
             var lanczosVecs = new double[0, 0];
             bool NTooBig = false;
+            bool useSeed = false;
+            if(SeedVectorPositions.Count() != 0)
+            {
+                useSeed = true;
+            }
             if (N * its > basisSetLimit)
             {
                 NTooBig = true;
@@ -809,17 +813,17 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedVectorPositions, NTooBig, writer);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, NTooBig, writer);
                 writer.Close();
             }
             else //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
             {
                 //initialize array for eigenvectors if necessary
-                if (evsNeeded)
+                if (evsNeeded || useSeed)
                 {
                     lanczosVecs = new double[N, its];
                 }
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, useSeed, SeedVectorPositions, NTooBig);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, NTooBig);
             }
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -836,7 +840,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 tBetas[i] = betas[i + 2];
             }
             //Diagonalize Lanczos Matrix to find M correct eigenvalues
-            LanczosMatrixDiagonalization(ref evs, ref z, tol, M, alphas, nBetas, tAlphas, tBetas, evsNeeded);
+            LanczosMatrixDiagonalization(ref evs, ref z, tol, M, alphas, nBetas, tAlphas, tBetas, evsNeeded, useSeed);
             //if needed, build array of eigenvectors to return
             if (evsNeeded)
             {
@@ -906,7 +910,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="correctEvs">
         /// Tuple to store the positions of the correct eigenvalues so that the correct eigenvectors may be extracted.
         /// </param>
-        private static void LanczosMatrixDiagonalization(ref double[] evs, ref double[,] z, double tol, int M, double[] alphas, double[] nBetas, double[] tAlphas, double[] tBetas, bool evsNeeded)
+        private static void LanczosMatrixDiagonalization(ref double[] evs, ref double[,] z, double tol, int M, double[] alphas, double[] nBetas, double[] tAlphas, double[] tBetas, bool evsNeeded, bool useSeed)
         {
             //dummy matrix for diagonalization of T^2
             var ZZ = new double[0, 0];
@@ -916,6 +920,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             {
                 evsRequested = its - its / 5;
             }
+            double seedtol = 1E-10;
             //Tuple so that we know which eigenvectors to pull if necessary
             List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
             //since the vectors alphas and tAlphas are overwritten by the diagonaliztion routine but may be needed at a later point they are stored here so that if the diagonalization needs to run
@@ -936,7 +941,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 correctEvs = new List<Tuple<int, double>>();
                 //set flag for eigenvectors and initialize eigenvector array if necessary
                 int zz = 0;
-                if (evsNeeded)
+                if (evsNeeded || useSeed)
                 {
                     zz = 2;
                     z = new double[its, evsRequested];
@@ -983,14 +988,36 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                         //loop over elements of tAlphas to see if this ev is also in tAlphas, if not add it to the output list
                         if (!temp)
                         {
-                            correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                            continue;
+                            if (useSeed)
+                            {
+                                if(z[0,i] > seedtol)
+                                {
+                                    correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                                    continue;
+                                }
+                            }
+                            else
+                            {
+                                correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                                continue;
+                            }                           
                         }
                     }
                     else //means this evalue has a repeat and is a true eigenvalue of A
                     {
-                        correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                        i += repeater - 1;
+                        if (useSeed)
+                        {
+                            if (z[0, i] > seedtol)
+                            {
+                                correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                                i += repeater - 1;
+                            }
+                        }
+                        else
+                        {
+                            correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
+                            i += repeater - 1;
+                        }                       
                     }
                 }
                 evalsFound = correctEvs.Count();
@@ -1048,11 +1075,14 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="writer">
         /// StreamWriter for writing LanczosVectors to disc if necessary, null by default
         /// </param>
-        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, bool useSeed, List<int> SeedVectorPositions, bool NTooBig, StreamWriter writer = null)
+        /// <param name="SeedVectorPositions">
+        /// List of positions in starting vector to be non zero for this specific j
+        /// </param>
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, List<int> SeedVectorPositions, bool NTooBig, StreamWriter writer = null)
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
-            var vi = RANDOM(N, useSeed, SeedVectorPositions);
+            var vi = RANDOM(N, SeedVectorPositions);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
@@ -1067,10 +1097,10 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 alphas[i] = Alpha_i(Axvi, viminusone, vi, betas[i]);
                 //***************************************************************
                 //if calculating the eigenvectors then store the lanczos vectors here
-                if (evsNeeded)
+                if (evsNeeded || SeedVectorPositions.Count() != 0)
                 {
                     //store in memory if small enough
-                    if (!NTooBig)
+                    if (!NTooBig || SeedVectorPositions.Count() != 0)
                     {
                         for (int j = 0; j < N; j++)
                         {

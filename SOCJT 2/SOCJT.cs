@@ -479,7 +479,7 @@ namespace ConsoleApplication1
             }
 
             #region Seed
-            // Makes a List of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
+            // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
             // var SeedPositionsByJ = new List<List<int>>();
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
@@ -524,7 +524,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, input.useSeed, SeedPositionsByJ[i], i, input.FilePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
