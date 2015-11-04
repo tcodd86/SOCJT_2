@@ -17,6 +17,11 @@ namespace ConsoleApplication1
         /// </summary>
         public int SeedIndex { get; private set; }
 
+        /// <summary>
+        /// Array that stores the relative value of each seed.
+        /// </summary>
+        public List<double> SeedValue = new List<double>();
+
         private Object thisLock = new Object();
 
         public Seed(string SeedFile, int nModes)
@@ -25,31 +30,62 @@ namespace ConsoleApplication1
             {
                 SeedIndex = 0;
                 int ii = 0;
-                string line;
+                string[] FullSeedFile = FileInfo.FileRead(SeedFile);
                 int[] tmpArray = new int[2 * nModes + 1];
+                bool ValueSkip = false;
 
-                System.IO.StreamReader SeedVectorFile = new System.IO.StreamReader(SeedFile);
-
-                while ((line = SeedVectorFile.ReadLine()) != null)
+                for(int i = 0; i < FullSeedFile.Length; i++)
                 {
-                    if (line == "/")
+                    if (FullSeedFile[i].ToUpper() == "VALUE")
                     {
-                        ii = 0;
-                        vlLambdaSeed.Add(tmpArray); // Array of nonzero elements in the seed vector. vlLambdaSeed[0] is one position, vlLambdaSeed[1] is another, and so on...
-                        SeedIndex++;
-                        tmpArray = new int[2 * nModes + 1]; // Recreate array so that a new array is referenced.
+                        SeedValue.Add(Convert.ToDouble(FullSeedFile[i + 1]));
+                        ValueSkip = true;
                         continue;
                     }
-                    try
+                    if (ValueSkip)
                     {
-                        tmpArray[ii] = int.Parse(line);
+                        ValueSkip = false;
+                        continue;
                     }
-                    catch (IndexOutOfRangeException)
+                    if(FullSeedFile[i] == "/")
                     {
-                        throw new Exception("Improper number of quantum numbers in seed vector.");
+                        ii = 0;
+                        vlLambdaSeed.Add(tmpArray);
+                        SeedIndex++;
+                        tmpArray = new int[2 * nModes + 1];
+                        continue;
                     }
+                    tmpArray[ii] = int.Parse(FullSeedFile[i]);
                     ii++;
                 }
+
+                //SeedIndex = 0;
+                //int ii = 0;
+                //string line;
+                //int[] tmpArray = new int[2 * nModes + 1];
+
+                //System.IO.StreamReader SeedVectorFile = new System.IO.StreamReader(SeedFile);
+
+                //while ((line = SeedVectorFile.ReadLine()) != null)
+                //{
+                //    if (line == "/")
+                //    {
+                //        ii = 0;
+                //        vlLambdaSeed.Add(tmpArray); // Array of nonzero elements in the seed vector. vlLambdaSeed[0] is one position, vlLambdaSeed[1] is another, and so on...
+                //        SeedIndex++;
+                //        tmpArray = new int[2 * nModes + 1]; // Recreate array so that a new array is referenced.
+                //        continue;
+                //    }
+                //    try
+                //    {
+                //        tmpArray[ii] = int.Parse(line);
+                //    }
+                //    catch (IndexOutOfRangeException)
+                //    {
+                //        throw new Exception("Improper number of quantum numbers in seed vector.");
+                //    }
+                //    ii++;
+                //}
             } // End lock
         } // end Seed
     } // end Class

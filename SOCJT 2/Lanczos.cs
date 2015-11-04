@@ -509,7 +509,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="SeedVectorPositions">
         /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        private static double[] RANDOM(int N, List<int> SeedVectorPositions)
+        private static double[] RANDOM(int N, List<int> SeedVectorPositions, List<double> SeedValuesByJ)
         {
             
             var X = new double[N];
@@ -529,7 +529,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 }
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
-                    X[SeedVectorPositions[i]] = 1;
+                    X[SeedVectorPositions[i]] = SeedValuesByJ[i];
                 }
             }
             normalize(X);
@@ -788,7 +788,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="SeedVectorPositions">
         /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, List<int> SeedVectorPositions, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, List<int> SeedVectorPositions, List<double> SeedVectorValues, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -813,7 +813,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, NTooBig, writer);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorValues, NTooBig, writer);
                 writer.Close();
             }
             else //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
@@ -823,7 +823,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 {
                     lanczosVecs = new double[N, its];
                 }
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, NTooBig);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorValues, NTooBig);
             }
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -1078,11 +1078,11 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="SeedVectorPositions">
         /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, List<int> SeedVectorPositions, bool NTooBig, StreamWriter writer = null)
+        private static void LanczosIterations(alglib.sparsematrix A, int its, bool evsNeeded, ref double[] alphas, ref double[] betas, ref double[,] lanczosVecs, List<int> SeedVectorPositions, List<double> SeedVectorValues, bool NTooBig, StreamWriter writer = null)
         {
             int N = A.innerobj.m;
             //initialize vectors to store the various vectors used in the Lanczos iterations
-            var vi = RANDOM(N, SeedVectorPositions);
+            var vi = RANDOM(N, SeedVectorPositions, SeedVectorValues);
             var viminusone = new double[N];
             var viplusone = new double[N];
             double[] Axvi = new double[N];
