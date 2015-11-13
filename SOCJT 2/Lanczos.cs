@@ -498,7 +498,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             T = null;
         }//end function Random for BlockLanczos Routine
         /// <summary>
-        /// Function to generate a normalized vector of length N filled with random numbers
+        /// Function to generate a normalized vector of length N filled with random numbers or the Seed Vector
         /// </summary>
         /// <param name="N">
         /// Length of the vector to be returned.
@@ -525,7 +525,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             {
                 for(int i = 0; i < N; i++)
                 {
-                    X[i] = 0;
+                    X[i] = 0; // Initialize
                 }
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
@@ -920,7 +920,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             {
                 evsRequested = its - its / 5;
             }
-            double seedtol = 1E-10;
+            double seedtol = 1E-14;
             //Tuple so that we know which eigenvectors to pull if necessary
             List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
             //since the vectors alphas and tAlphas are overwritten by the diagonaliztion routine but may be needed at a later point they are stored here so that if the diagonalization needs to run
@@ -990,7 +990,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                         {
                             if (useSeed)
                             {
-                                if(z[0,i] > seedtol)
+                                if (Math.Abs(z[0, i]) > seedtol) // This is the dot product of the seed vector with this lanczos eigenvector, toss if zero
                                 {
                                     correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
                                     continue;
@@ -1007,7 +1007,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     {
                         if (useSeed)
                         {
-                            if (z[0, i] > seedtol)
+                            if (Math.Abs(z[0, i]) > seedtol) // This is the dot product of the seed vector with this lanczos eigenvector, toss if zero
                             {
                                 correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
                                 i += repeater - 1;

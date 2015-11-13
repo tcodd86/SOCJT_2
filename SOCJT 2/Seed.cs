@@ -8,7 +8,7 @@ namespace ConsoleApplication1
     class Seed
     {
         /// <summary>
-        /// Array that stores v, l, Lambda for the seed in the order v1, l1, ... , Lambda
+        /// List of Arrays. Each array stores v, l, Lambda for a basis function in the seed in the order v1, l1, ... , Lambda. Each list is a new basis function in the expansion.
         /// </summary>
         public List<int[]> vlLambdaSeed = new List<int[]>();
 
@@ -18,15 +18,15 @@ namespace ConsoleApplication1
         public int SeedIndex { get; private set; }
 
         /// <summary>
-        /// Array that stores the relative value of each seed.
+        /// List that stores the coefficient on each basis function in the seed vector. 
         /// </summary>
         public List<double> SeedValue = new List<double>();
 
         private Object thisLock = new Object();
 
-        public Seed(string SeedFile, int nModes)
+        public Seed(string SeedFile, int nModes) // This function reads the seed file and stores everything needed to generate the basis positions.
         {
-            lock (thisLock)
+            lock (thisLock) // I don't know if I need this
             {
                 SeedIndex = 0;
                 int ii = 0;
@@ -38,54 +38,26 @@ namespace ConsoleApplication1
                 {
                     if (FullSeedFile[i].ToUpper() == "VALUE")
                     {
-                        SeedValue.Add(Convert.ToDouble(FullSeedFile[i + 1]));
-                        ValueSkip = true;
+                        SeedValue.Add(Convert.ToDouble(FullSeedFile[i + 1])); // Adds the coefficient to the list
+                        ValueSkip = true; // Tells program to skip the "/" line
                         continue;
                     }
-                    if (ValueSkip)
+                    if (ValueSkip) // Skips the "/" Line
                     {
                         ValueSkip = false;
                         continue;
                     }
                     if(FullSeedFile[i] == "/")
                     {
-                        ii = 0;
-                        vlLambdaSeed.Add(tmpArray);
-                        SeedIndex++;
-                        tmpArray = new int[2 * nModes + 1];
+                        ii = 0; // Reset index
+                        vlLambdaSeed.Add(tmpArray); // Add array to list
+                        SeedIndex++; // Count the basis function
+                        tmpArray = new int[2 * nModes + 1]; // Free the array to reuse
                         continue;
                     }
-                    tmpArray[ii] = int.Parse(FullSeedFile[i]);
-                    ii++;
+                    tmpArray[ii] = int.Parse(FullSeedFile[i]); // Adds each v or l or Lambda to array
+                    ii++; // Raises index
                 }
-
-                //SeedIndex = 0;
-                //int ii = 0;
-                //string line;
-                //int[] tmpArray = new int[2 * nModes + 1];
-
-                //System.IO.StreamReader SeedVectorFile = new System.IO.StreamReader(SeedFile);
-
-                //while ((line = SeedVectorFile.ReadLine()) != null)
-                //{
-                //    if (line == "/")
-                //    {
-                //        ii = 0;
-                //        vlLambdaSeed.Add(tmpArray); // Array of nonzero elements in the seed vector. vlLambdaSeed[0] is one position, vlLambdaSeed[1] is another, and so on...
-                //        SeedIndex++;
-                //        tmpArray = new int[2 * nModes + 1]; // Recreate array so that a new array is referenced.
-                //        continue;
-                //    }
-                //    try
-                //    {
-                //        tmpArray[ii] = int.Parse(line);
-                //    }
-                //    catch (IndexOutOfRangeException)
-                //    {
-                //        throw new Exception("Improper number of quantum numbers in seed vector.");
-                //    }
-                //    ii++;
-                //}
             } // End lock
         } // end Seed
     } // end Class

@@ -479,8 +479,8 @@ namespace ConsoleApplication1
             }
 
             #region Seed
-            // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
-            // var SeedPositionsByJ = new List<List<int>>();
+            // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero.
+            // The Lanczos routine is parallelized by j, and the routine takes the list at [j] to implement the seed vector. Empty list will indicate that no seed is being used.
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
             var SeedValuesByJ = new List<double>[GenHamMat.basisPositions.Count];
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
@@ -1530,38 +1530,53 @@ namespace ConsoleApplication1
             return basisSizeList;
         }//end matReadFunction
 
+        /// <summary>
+        /// Function that takes the inputted seed vector information and creates an array of lists of integers and an array of lists of doubles. Each array element corresponds to a different j value. 
+        /// Each list holds the positions of basis function to be nonzero in the seed vector, or the coefficient of that seed vector. They have to be partitioned by j because SOCJT handles each j block
+        /// separately. The function specifically goes through each basis function and calculates the j value. If we are in the nonquadratic case, then the index for the jth block is just Floor(j). 
+        /// If we are in the quadratic case, then the index is 0 for j = 1/2 +- 3n (these are degenerate with j = 5/2 +- 3n. so j = 5/2 +- 3n should not be included and the function skips it) and 1 for
+        /// j = 3/2 +- 3n, e and a1/a2 respectively. The position and coefficient is added onto the list stored in the array at this point.
+        /// </summary>
+        /// <param name="SeedFile"></param>
+        /// String for the name of the seed file.
+        /// <param name="nModes"></param>
+        /// Integer for the number of modes.
+        /// <param name="isQuad"></param>
+        /// Boolean for whether or not the Hamiltonian is in the quadratic or nonquadratic case.
+        /// <param name="SeedValuesByJ"></param>
+        /// Array of lists that stores the coefficients for each basis function in the seed vector in order, sorted by j.
+        /// <returns></returns>
         private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad, ref List<double>[] SeedValuesByJ) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
         {
             Seed SeedVector = new Seed(SeedFile, nModes);
-            //var SeedPositionsByJ = new List<List<int>>();
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count]; // An array of lists. The first index points to the j list and in the j list are all positions for that j.
-            SeedValuesByJ = new List<double>[GenHamMat.basisPositions.Count]; // This holds the relative value of the seed position for each j.
+            SeedValuesByJ = new List<double>[GenHamMat.basisPositions.Count]; // This holds the coefficients of the basis function in the seed vector for each j.
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
             {
                 SeedPositionsByJ[i] = new List<int>(); // Initialize a new list for each j.
                 SeedValuesByJ[i] = new List<double>();
             }
 
-            for (int i = 0; i < SeedVector.SeedIndex; i++) // Adds each seed vector into List, sorted by J
+            for (int i = 0; i < SeedVector.SeedIndex; i++) // Goes through each position on the seed vector and sorts them by j.
             {
-                int position;
-                string tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                decimal jBlock = 0;
-                int jIndex = 0;
+                int position; // Stores position in the basis.
+                string tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false); // hashcode to get the position
+                decimal jBlock = 0; // Will store j
+                int jIndex = 0; // Which index corresponds to that value of j
                 for (int j = 0; j < nModes; j++)
                 {
                     jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
                 }
-                jBlock += (decimal)SeedVector.vlLambdaSeed[i][2 * nModes] / 2;
+                jBlock += (decimal)SeedVector.vlLambdaSeed[i][2 * nModes] / 2; // Total, jBlock = \sum_i l_i + Lambda / 2 (the j value)
                 if (isQuad == false)
                 {
-                    jIndex = (int)(Math.Abs(jBlock) - 0.5M); // Floor j
+                    jIndex = (int)(Math.Abs(jBlock) - 0.5M); // Floor(j) is the index for each j value in the nonquadratic case
                 }
                 if (isQuad == true)
                 {
                     if ((int)(jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
                     {
-                        jIndex = 1;
+                        jIndex = 1; // Index for a1/a2 block
                     }
                     else
                     {
@@ -1569,12 +1584,16 @@ namespace ConsoleApplication1
                         {
                             continue;
                         }
-                        jIndex = 0;
+                        jIndex = 0; // Index for e block
                     }
                 }
-                GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position);
-                SeedPositionsByJ[jIndex].Add(position);
-                SeedValuesByJ[jIndex].Add(SeedVector.SeedValue[i]);
+                GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position); // Generates position of the basis function. Requires the j index and hashcode. Stores into position.
+                if (position == 0)
+                {
+                    throw new System.ArgumentException("Error in seed vector. Recheck seed file"); // It is highly unlikely that position 0 will be used, and this is the default for improper vectors so I throw an error.
+                }
+                SeedPositionsByJ[jIndex].Add(position); // Adds position
+                SeedValuesByJ[jIndex].Add(SeedVector.SeedValue[i]); // Add coefficient
             }
             return SeedPositionsByJ;
         }//end GenerateSeedPositions function
