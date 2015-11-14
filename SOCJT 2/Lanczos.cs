@@ -509,7 +509,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="SeedVectorPositions">
         /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        private static double[] RANDOM(int N, List<int> SeedVectorPositions, List<double> SeedValuesByJ)
+        private static double[] RANDOM(int N, List<int> SeedVectorPositions, List<double> SeedCoefficients)
         {
             
             var X = new double[N];
@@ -529,7 +529,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 }
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
-                    X[SeedVectorPositions[i]] = SeedValuesByJ[i];
+                    X[SeedVectorPositions[i]] = SeedCoefficients[i];
                 }
             }
             normalize(X);
@@ -788,7 +788,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
         /// <param name="SeedVectorPositions">
         /// List of positions in starting vector to be non zero for this specific j
         /// </param>
-        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, List<int> SeedVectorPositions, List<double> SeedVectorValues, int n, string file)
+        public static void NaiveLanczos(ref double[] evs, ref double[,] z, alglib.sparsematrix A, int its, double tol, bool evsNeeded, List<int> SeedVectorPositions, List<double> SeedVectorCoefficients, int n, string file)
         {
             int N = A.innerobj.m;
             int M = evs.Length;
@@ -813,17 +813,17 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 string fileDirectory = file + "temp_vecs_" + n + ".tmp";
                 StreamWriter writer = new StreamWriter(fileDirectory);
                 writer.WriteLine("Temporary storage of Lanczos Vectors. \n");
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorValues, NTooBig, writer);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorCoefficients, NTooBig, writer);
                 writer.Close();
             }
             else //means either the eigenvectors are not needed or they are needed and the basis set is sufficiently small that lanczos vectors will be kept in memory
             {
                 //initialize array for eigenvectors if necessary
-                if (evsNeeded || useSeed)
+                if (evsNeeded) 
                 {
                     lanczosVecs = new double[N, its];
                 }
-                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorValues, NTooBig);
+                LanczosIterations(A, its, evsNeeded, ref alphas, ref betas, ref lanczosVecs, SeedVectorPositions, SeedVectorCoefficients, NTooBig);
             }
             double[] nBetas = new double[its - 1];
             //tAlphas and tBetas are diagonal and off diagonal for matix "T^2"
@@ -920,7 +920,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             {
                 evsRequested = its - its / 5;
             }
-            double seedtol = 1E-14;
+            double seedtol = 1E-10; // Tolerance to reject eigenvalues. Higher means lower threshold.
             //Tuple so that we know which eigenvectors to pull if necessary
             List<Tuple<int, double>> correctEvs = new List<Tuple<int, double>>();
             //since the vectors alphas and tAlphas are overwritten by the diagonaliztion routine but may be needed at a later point they are stored here so that if the diagonalization needs to run
@@ -1097,10 +1097,10 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 alphas[i] = Alpha_i(Axvi, viminusone, vi, betas[i]);
                 //***************************************************************
                 //if calculating the eigenvectors then store the lanczos vectors here
-                if (evsNeeded || SeedVectorPositions.Count() != 0)
+                if (evsNeeded)
                 {
                     //store in memory if small enough
-                    if (!NTooBig || SeedVectorPositions.Count() != 0)
+                    if (!NTooBig)
                     {
                         for (int j = 0; j < N; j++)
                         {

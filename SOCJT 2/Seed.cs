@@ -20,7 +20,7 @@ namespace ConsoleApplication1
         /// <summary>
         /// List that stores the coefficient on each basis function in the seed vector. 
         /// </summary>
-        public List<double> SeedValue = new List<double>();
+        public List<double> SeedCoefficient = new List<double>();
 
         private Object thisLock = new Object();
 
@@ -36,9 +36,9 @@ namespace ConsoleApplication1
 
                 for(int i = 0; i < FullSeedFile.Length; i++)
                 {
-                    if (FullSeedFile[i].ToUpper() == "VALUE")
+                    if (FullSeedFile[i].ToUpper() == "COEFFICIENT")
                     {
-                        SeedValue.Add(Convert.ToDouble(FullSeedFile[i + 1])); // Adds the coefficient to the list
+                        SeedCoefficient.Add(Convert.ToDouble(FullSeedFile[i + 1])); // Adds the coefficient to the list
                         ValueSkip = true; // Tells program to skip the "/" line
                         continue;
                     }

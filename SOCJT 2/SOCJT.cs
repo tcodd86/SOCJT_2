@@ -482,15 +482,15 @@ namespace ConsoleApplication1
             // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero.
             // The Lanczos routine is parallelized by j, and the routine takes the list at [j] to implement the seed vector. Empty list will indicate that no seed is being used.
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
-            var SeedValuesByJ = new List<double>[GenHamMat.basisPositions.Count];
+            var SeedCoefficientsByJ = new List<double>[GenHamMat.basisPositions.Count];
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
             {
                 SeedPositionsByJ[i] = new List<int>(); // Initialize seed position list for each j
-                SeedValuesByJ[i] = new List<double>();
+                SeedCoefficientsByJ[i] = new List<double>();
             }
             if (input.useSeed)
             {
-                SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad, ref SeedValuesByJ);
+                SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad, ref SeedCoefficientsByJ);
             }
             #endregion
 
@@ -526,7 +526,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], SeedValuesByJ[i], i, input.FilePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], SeedCoefficientsByJ[i], i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
@@ -1543,18 +1543,18 @@ namespace ConsoleApplication1
         /// Integer for the number of modes.
         /// <param name="isQuad"></param>
         /// Boolean for whether or not the Hamiltonian is in the quadratic or nonquadratic case.
-        /// <param name="SeedValuesByJ"></param>
+        /// <param name="SeedCoefficientsByJ"></param>
         /// Array of lists that stores the coefficients for each basis function in the seed vector in order, sorted by j.
         /// <returns></returns>
-        private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad, ref List<double>[] SeedValuesByJ) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
+        private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad, ref List<double>[] SeedCoefficientsByJ) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
         {
             Seed SeedVector = new Seed(SeedFile, nModes);
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count]; // An array of lists. The first index points to the j list and in the j list are all positions for that j.
-            SeedValuesByJ = new List<double>[GenHamMat.basisPositions.Count]; // This holds the coefficients of the basis function in the seed vector for each j.
+            SeedCoefficientsByJ = new List<double>[GenHamMat.basisPositions.Count]; // This holds the coefficients of the basis function in the seed vector for each j.
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
             {
                 SeedPositionsByJ[i] = new List<int>(); // Initialize a new list for each j.
-                SeedValuesByJ[i] = new List<double>();
+                SeedCoefficientsByJ[i] = new List<double>();
             }
 
             for (int i = 0; i < SeedVector.SeedIndex; i++) // Goes through each position on the seed vector and sorts them by j.
@@ -1580,20 +1580,20 @@ namespace ConsoleApplication1
                     }
                     else
                     {
-                        if ((int)(jBlock - 2.5M) % 3 == 0) // Means j = 5/2 + 3n, which is degerate with 1/2 + 3n and not included.
-                        {
-                            continue;
-                        }
+                        //if ((int)(jBlock - 2.5M) % 3 == 0) // Means j = 5/2 + 3n, which is degerate with 1/2 + 3n and not included.
+                        //{
+                        //    continue;
+                        //}
                         jIndex = 0; // Index for e block
                     }
                 }
                 GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position); // Generates position of the basis function. Requires the j index and hashcode. Stores into position.
                 if (position == 0)
                 {
-                    throw new System.ArgumentException("Error in seed vector. Recheck seed file"); // It is highly unlikely that position 0 will be used, and this is the default for improper vectors so I throw an error.
+                    throw new System.ArgumentException("Error in seed vector. Recheck seed file. \nReminder that j = 5/2 + 3n should not be included."); // It is highly unlikely that position 0 will be used, and this is the default for improper vectors so I throw an error.
                 }
                 SeedPositionsByJ[jIndex].Add(position); // Adds position
-                SeedValuesByJ[jIndex].Add(SeedVector.SeedValue[i]); // Add coefficient
+                SeedCoefficientsByJ[jIndex].Add(SeedVector.SeedCoefficient[i]); // Add coefficient
             }
             return SeedPositionsByJ;
         }//end GenerateSeedPositions function
