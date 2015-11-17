@@ -43,13 +43,13 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
-            //if (isQuad == true)
-            //{
-            //    if (input.maxJ < 7.5M)
-            //    {
-            //        input.maxJ = 7.5M;
-            //    }
-            //}
+            if (isQuad == true)
+            {
+                if (input.maxJ < 7.5M)
+                {
+                    input.maxJ = 7.5M;
+                }
+            }
             if (isQuad == true)
             {
                 jMax = input.maxJ;
