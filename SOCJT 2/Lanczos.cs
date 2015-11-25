@@ -523,10 +523,6 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             }
             else // using Seed and there is a component of the seed
             {
-                for(int i = 0; i < N; i++)
-                {
-                    X[i] = 0; // Initialize
-                }
                 for (int i = 0; i < SeedVectorPositions.Count(); i++)
                 {
                     X[SeedVectorPositions[i]] = SeedCoefficients[i];
@@ -993,14 +989,15 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                                 if (Math.Abs(z[0, i]) > seedtol) // This is the dot product of the seed vector with this lanczos eigenvector, toss if zero
                                 {
                                     correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                                    continue;
+                                    // continue;
                                 }
                             }
                             else
                             {
                                 correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                                continue;
-                            }                           
+                                //continue;
+                            }
+                            continue;
                         }
                     }
                     else //means this evalue has a repeat and is a true eigenvalue of A
@@ -1010,14 +1007,15 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                             if (Math.Abs(z[0, i]) > seedtol) // This is the dot product of the seed vector with this lanczos eigenvector, toss if zero
                             {
                                 correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                                i += repeater - 1;
+                                //i += repeater - 1;
                             }
                         }
                         else
                         {
                             correctEvs.Add(new Tuple<int, double>(i, alphas[i]));
-                            i += repeater - 1;
-                        }                       
+                            //i += repeater - 1;
+                        }
+                        i += repeater - 1;
                     }
                 }
                 evalsFound = correctEvs.Count();

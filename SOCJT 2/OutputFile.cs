@@ -302,6 +302,8 @@ namespace ConsoleApplication1
             file.AppendLine("PARVEC = " + Convert.ToString(input.ParVectorMultiplication));
             file.AppendLine("PARMAT = " + Convert.ToString(input.ParMatrix));
             file.AppendLine("PARJ = " + Convert.ToString(input.ParJ));
+            file.AppendLine("SEED = " + Convert.ToString(input.useSeed));
+            file.AppendLine("SEEDFILE = " + Convert.ToString(input.SeedFile));
             file.AppendLine("/");
             file.AppendLine("  ");
 

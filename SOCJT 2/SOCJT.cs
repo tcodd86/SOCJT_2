@@ -543,7 +543,7 @@ namespace ConsoleApplication1
                         eigenvalues[i][j] = evs[j];                        
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit))
+                    if (input.BlockLanczos) // || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit)) // I don't know what this second condition is for.
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
