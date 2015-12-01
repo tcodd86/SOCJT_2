@@ -43,13 +43,13 @@ namespace ConsoleApplication1
             decimal jMin;
             decimal jMax;
             //If is quadratic makes sure that the maxJ is at least 7.5
-            //if (isQuad == true)
-            //{
-            //    if (input.maxJ < 7.5M)
-            //    {
-            //        input.maxJ = 7.5M;
-            //    }
-            //}
+            if (isQuad == true)
+            {
+                if (input.maxJ < 7.5M)
+                {
+                    input.maxJ = 7.5M;
+                }
+            }
             if (isQuad == true)
             {
                 jMax = input.maxJ;
@@ -81,7 +81,7 @@ namespace ConsoleApplication1
             //hamiltonianVecs are the total list of all J vectors in the Hamiltonian
 
             //Sorts the hamiltonianVecs by J and puts them into a List of Lists of JBasisVectors.
-            List<List<BasisFunction>> jBasisVecsByJ = new List<List<BasisFunction>>();            
+            List<List<BasisFunction>> jBasisVecsByJ = new List<List<BasisFunction>>();
             for (decimal i = jMin; i <= jMax; i++)
             {
                 jBasisVecsByJ.Add(GenHamMat.SortByJ(hamiltonianVecs, i));
@@ -97,12 +97,12 @@ namespace ConsoleApplication1
             GenHamMat.basisPositions = new List<Dictionary<string, int>>();
 
             #region Hamiltonian
-            List<alglib.sparsematrix> sHamMatrix = new List<alglib.sparsematrix>();            
-            alglib.sparsematrix[] array1;            
+            List<alglib.sparsematrix> sHamMatrix = new List<alglib.sparsematrix>();
+            alglib.sparsematrix[] array1;
             int[] numcolumnsA;
             //smallMat = false;            
             //Creates the Hamiltonian matrices for linear cases            
-            int numQuadMatrix = 0;            
+            int numQuadMatrix = 0;
             List<int> a = new List<int>();
 
             if (input.M > input.NumberOfIts)
@@ -115,7 +115,7 @@ namespace ConsoleApplication1
                 #region LinearHamiltonian
                 measurer.Reset();
                 measurer.Start();
-                int h = 0;                
+                int h = 0;
                 array1 = new alglib.sparsematrix[jBasisVecsByJ.Count];
                 List<int> basisSize = new List<int>();
                 basisSet = jBasisVecsByJ;
@@ -132,7 +132,7 @@ namespace ConsoleApplication1
                 }
                 numcolumnsA = new int[jBasisVecsByJ.Count];
 
-                
+
                 //put items up to length in here
                 for (int i = (int)(jMin - 0.5M); i < (int)(jMax + 0.5M); i++)
                 {
@@ -158,7 +158,7 @@ namespace ConsoleApplication1
                             }
                             if (!matricesMade)//if matrices not made then generate all matrices
                             {
-                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false, i);                                
+                                fitHamList[i] = GenHamMat.GenMatrixHash(jBasisVecsByJ[i], isQuad, input, out nColumns, input.ParMatrix, false, i);
                             }
                             else//this makes sure that the diagonal portion is regenerated on each call.
                             {
@@ -246,7 +246,7 @@ namespace ConsoleApplication1
                     {
                         List<BasisFunction> quadVecs = new List<BasisFunction>();
                         int nColumns;
-                        for (int v = -dynVar2 - 1; v <= dynVar2; v++)                        
+                        for (int v = -dynVar2 - 1; v <= dynVar2; v++)
                         {
                             if (i + v * 3 >= 0)
                             {
@@ -254,9 +254,9 @@ namespace ConsoleApplication1
                             }
                         }
                         //this checks if the matrix was read from file, and if so if the basis set is the correct size
-                        if (basisSize.Count != 0)                        
-                        { 
-                            if(basisSize[i - jBasisVecsByJ.Count / 2] != quadVecs.Count)
+                        if (basisSize.Count != 0)
+                        {
+                            if (basisSize[i - jBasisVecsByJ.Count / 2] != quadVecs.Count)
                             {
                                 throw new MatrixFileError();
                             }
@@ -264,12 +264,12 @@ namespace ConsoleApplication1
                         //if matrices aren't made then generate all of them
                         if (!matricesMade)
                         {
-                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false, i - jBasisVecsByJ.Count / 2);       
-                        }                        
+                            fitHamList[i - jBasisVecsByJ.Count / 2] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, false, i - jBasisVecsByJ.Count / 2);
+                        }
                         else//If they are made then just generate the diagonal elements.
-	                    {
-                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true, i - jBasisVecsByJ.Count / 2)[0];		 
-	                    }
+                        {
+                            fitHamList[i - jBasisVecsByJ.Count / 2][0] = GenHamMat.GenMatrixHash(quadVecs, isQuad, input, out nColumns, input.ParMatrix, true, i - jBasisVecsByJ.Count / 2)[0];
+                        }
 
                         jbasisoutA[i - jBasisVecsByJ.Count / 2] = quadVecs;
                         numcolumnsA[i - jBasisVecsByJ.Count / 2] = nColumns;
@@ -302,7 +302,7 @@ namespace ConsoleApplication1
                     basisSet.Add(jbasisoutA[jj]);
                 }
                 matricesMade = true;
-                measurer.Stop();                    
+                measurer.Stop();
                 howMuchTime = measurer.ElapsedMilliseconds;
                 input.MatrixGenerationTime = (double)howMuchTime / 1000D;
                 if (a.Count > 0)
@@ -316,7 +316,7 @@ namespace ConsoleApplication1
                 }
                 #endregion
             }//end else
-            #endregion            
+            #endregion
 
             //list where each element of mat is a list of alglib.sparsematrix objects.  One for each off-diagonal parameter (D, K, B)
             var mat = new List<List<alglib.sparsematrix>>();
@@ -326,7 +326,7 @@ namespace ConsoleApplication1
             GenHamMat.BilinearInitialization(jBasisVecsByJ[0][0].modesInVec, input.nModes, out bilinear, out biAVecPos, out biEVecPos, input.CrossTermMatrix);
             //code here to convert the alglib matrices to matrices for each j block
 
-            
+
             for (int i = 0; i < fitHamList.Count; i++)
             {
                 int whichCrossMatrix = 0;
@@ -339,7 +339,7 @@ namespace ConsoleApplication1
                 //go through each member of the list and multiply it by the appropriate value, combine them all
                 //skip the first one which is the diagonal elements and isn't multiplied by anything.
                 for (int j = 1; j < fitHamList[i].Count; j++)
-                { 
+                {
                     count = (j - 1) / 2;
                     DorK = (j - 1) % 2;
                     if (count < input.nModes)
@@ -378,7 +378,7 @@ namespace ConsoleApplication1
                                         //if this is a bilinear term, only add it if blOrNot == 0
                                         //crossMatrixCounter will keep going 
                                         if ((biAVecPos.Exists(x => x == row) || biAVecPos.Exists(x => x == column)) && blOrNot == 0)
-                                        { 
+                                        {
                                             //means this is a bilinear term                                            
                                             if (crossMatrixCounter == whichCrossMatrix)
                                             {
@@ -393,7 +393,7 @@ namespace ConsoleApplication1
                                             {
                                                 val = input.CrossTermMatrix[row, column];
                                             }//end conditional to see if this is the cross-term element we want  
-                                            crossMatrixCounter++; 
+                                            crossMatrixCounter++;
                                         }
                                     }//end conditional to see if this matrix element is 0
                                 }//end loop over columns of cross-term matrix
@@ -450,7 +450,7 @@ namespace ConsoleApplication1
                         //means SO only in j = 0.5 block for quadratic cases
                         //if (i > 0 && isQuad)
                         //means SO only in degenerate blocks
-                        if((i - 1) % 3 == 0)
+                        if ((i - 1) % 3 == 0)
                         {
                             break;
                         }
@@ -479,16 +479,18 @@ namespace ConsoleApplication1
             }
 
             #region Seed
-            // Makes a List of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero. - HT
-            // var SeedPositionsByJ = new List<List<int>>();
+            // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero.
+            // The Lanczos routine is parallelized by j, and the routine takes the list at [j] to implement the seed vector. Empty list will indicate that no seed is being used.
             var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
+            var SeedCoefficientsByJ = new List<double>[GenHamMat.basisPositions.Count];
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
             {
-                SeedPositionsByJ[i] = new List<int>();
+                SeedPositionsByJ[i] = new List<int>(); // Initialize seed position list for each j
+                SeedCoefficientsByJ[i] = new List<double>();
             }
             if (input.useSeed)
             {
-                SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad);
+                SeedPositionsByJ = GenerateSeedPositions(input.SeedFile, input.nModes, isQuad, ref SeedCoefficientsByJ);
             }
             #endregion
 
@@ -503,8 +505,8 @@ namespace ConsoleApplication1
             {
                 lanczosEVectors = new List<double[,]>();
                 for (int i = 0; i < array1.Length; i++)
-                { 
-                    lanczosEVectors.Add(new double[0,0]);
+                {
+                    lanczosEVectors.Add(new double[0, 0]);
                 }
             }
             ParallelOptions options2 = new ParallelOptions();
@@ -524,7 +526,7 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, input.useSeed, SeedPositionsByJ[i], i, input.FilePath);
+                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], SeedCoefficientsByJ[i], i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
@@ -533,15 +535,15 @@ namespace ConsoleApplication1
                         IECODE[i] = -1;
                         ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.NumberOfIts, input.Tolerance, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.ParVectorMultiplication);
                     }
-                 
+
                     //initialize eigenvalues to have a length.                    
-                    eigenvalues[i] = new double[evs.Length - 1];                    
-                    for (int j = 0; j < evs.Length - 1; j++)                    
-                    {                    
-                        eigenvalues[i][j] = evs[j];                        
+                    eigenvalues[i] = new double[evs.Length - 1];
+                    for (int j = 0; j < evs.Length - 1; j++)
+                    {
+                        eigenvalues[i][j] = evs[j];
                     }
                     //I think this should be only for if block lanczos or naive lanczos with already calculated eigenvectors
-                    if (input.BlockLanczos || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit))
+                    if (input.BlockLanczos) // || (!input.BlockLanczos && array1[i].innerobj.m * input.NumberOfIts < Lanczos.basisSetLimit)) // I don't know what this second condition is for.
                     {
                         zMatrices[i] = new double[numcolumnsA[i], evs.Length - 1];//changed input.M to evs.Length - 1
                         for (int j = 0; j < numcolumnsA[i]; j++)
@@ -565,8 +567,8 @@ namespace ConsoleApplication1
                             }
                         }
                     }
-                    temp = null;                    
-                    evs = null;                    
+                    temp = null;
+                    evs = null;
                 }//end for
                 );
             }//end try
@@ -643,7 +645,7 @@ namespace ConsoleApplication1
             }
 
             if (input.Intensity && input.PrintVector)
-            { 
+            {
                 //code here to read vector and take dot product
                 double[] vector;
                 if (input.JSInten)
@@ -679,9 +681,9 @@ namespace ConsoleApplication1
 
             List<string> linesToWrite = new List<string>();
             finalList = setAndSortEVs(eigenvalues, input.S, input.IncludeSO, zMatrices, JvecsForOutuput, input, overlaps);//add the eigenvectors so that the symmetry can be included as well
-            linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);                
-            outp = linesToWrite;                
-            return linesToWrite;   
+            linesToWrite = OutputFile.makeOutput(input, zMatrices, array1, JvecsForOutuput, eigenvalues, isQuad, finalList, IECODE, ITER);
+            outp = linesToWrite;
+            return linesToWrite;
         }//end SOCJT Routine
 
         /// <summary>
@@ -724,7 +726,7 @@ namespace ConsoleApplication1
             {
                 parsedLine = evec[i].Split(delimiters, StringSplitOptions.RemoveEmptyEntries);
                 //have this to ignore entries where there is only a space or nothing
-                if(parsedLine.Length == 0 || !double.TryParse(parsedLine[0], out dummy))
+                if (parsedLine.Length == 0 || !double.TryParse(parsedLine[0], out dummy))
                 {
                     continue;
                 }
@@ -736,7 +738,7 @@ namespace ConsoleApplication1
                 }
                 hash = BasisFunction.GenerateHashCode(vlLambda, nmodes, false);
                 if (GenHamMat.basisPositions[jPos].TryGetValue(hash, out pos))
-                { 
+                {
                     vecToReturn[pos] = FileInfo.ParseDouble(parsedLine[0]);
                 }
             }
@@ -798,7 +800,7 @@ namespace ConsoleApplication1
         /// Array of doubles which correspond to the dot products of the overlapVector with each of the eigenvectors.
         /// </returns>
         private static double[] Overlap(double[,] eigenvectors, double[] overlapVector)
-        { 
+        {
             //vector to store the overlaps
             var overlaps = new double[eigenvectors.GetLength(1)];
             for (int i = 0; i < overlaps.Length; i++)
@@ -1047,7 +1049,7 @@ namespace ConsoleApplication1
             StringBuilder file = new StringBuilder();
             file.AppendLine(" ");
             file.AppendLine("Eigenvectors in complete basis set for " + input.Title);
-            file.AppendLine(" ");            
+            file.AppendLine(" ");
             //loop over jBlocks
             for (int jBlockIndex = 0; jBlockIndex < eigenvalues.Count; jBlockIndex++)
             {
@@ -1056,7 +1058,7 @@ namespace ConsoleApplication1
                 file.AppendLine(" ");
                 //loop over all of the eigenvalues found
                 for (int eigenvectorIndex = 0; eigenvectorIndex < eigenvalues[jBlockIndex].Length; eigenvectorIndex++)
-                {                    
+                {
                     file.AppendLine(" " + "\r");
                     file.AppendLine("Eigenvalue" + "\t" + Convert.ToString(eigenvectorIndex + 1) + " = " + String.Format("{0,10:0.0000}", tempEvalue[jBlockIndex][eigenvectorIndex]));
                     bool a1 = SOCJT.isA(JvecsForOutput[jBlockIndex], tempMat[jBlockIndex], eigenvectorIndex, input, false);
@@ -1084,7 +1086,7 @@ namespace ConsoleApplication1
                             for (int k = 0; k < jBasisVecsByJ[j].Count; k++)
                             {
                                 string hashCode = BasisFunction.GenerateHashCode(jBasisVecsByJ[j][k]);
-                                int m = 0;                          
+                                int m = 0;
                                 if (GenHamMat.basisPositions[jBlockIndex].TryGetValue(hashCode, out m))
                                 {
                                     writeVec(tempMat[jBlockIndex][m, eigenvectorIndex], jBasisVecsByJ[j][k], file, S);
@@ -1180,9 +1182,9 @@ namespace ConsoleApplication1
             {
                 if (jBasisVec.J == eigenvector[i].J && jBasisVec.Lambda == eigenvector[i].Lambda)
                 {
-                    for(int j = 0; j < jBasisVec.modesInVec.Count; j++)
+                    for (int j = 0; j < jBasisVec.modesInVec.Count; j++)
                     {
-                    
+
                         if (jBasisVec.modesInVec[j].V == eigenvector[i].modesInVec[j].V && jBasisVec.modesInVec[j].L == eigenvector[i].modesInVec[j].L)
                         {
                             if (j == jBasisVec.modesInVec.Count - 1)
@@ -1226,7 +1228,7 @@ namespace ConsoleApplication1
         /// <returns>
         /// Eigenvalue array with eigenvalue objects all initialized and sorted by value.
         /// </returns>
-        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>>jvecs, FileInfo input, List<double[]> overlap)
+        public static Eigenvalue[] setAndSortEVs(List<double[]> evs, decimal S, bool inclSO, List<double[,]> zMatrices, List<List<BasisFunction>> jvecs, FileInfo input, List<double[]> overlap)
         {
             List<Eigenvalue> eigen = new List<Eigenvalue>();
             int counter = 0;
@@ -1418,9 +1420,9 @@ namespace ConsoleApplication1
             int t1 = 0;
             alglib.sparsematrix B = new alglib.sparsematrix();
             alglib.sparsecreate(A.innerobj.m, A.innerobj.n, out B);
-            while(alglib.sparseenumerate(A, ref t0, ref t1, out i, out j, out oldVal))
+            while (alglib.sparseenumerate(A, ref t0, ref t1, out i, out j, out oldVal))
             {
-                alglib.sparseadd(B, i, j, oldVal * val);                
+                alglib.sparseadd(B, i, j, oldVal * val);
             }
             return B;
         }//end method cTimesSparse
@@ -1438,7 +1440,7 @@ namespace ConsoleApplication1
         {
             int i;
             int j;
-            double oldVal;            
+            double oldVal;
             alglib.sparsematrix B = new alglib.sparsematrix();
             alglib.sparsecreate(mat[0].innerobj.m, mat[0].innerobj.n, out B);
             for (int m = 0; m < mat.Count; m++)
@@ -1481,7 +1483,7 @@ namespace ConsoleApplication1
                 {
                     matFile = FileInfo.FileRead(input.MatrixFilePath);
                 }
-                catch(FileNotFoundException)
+                catch (FileNotFoundException)
                 {
                     throw new FileNotFoundException("The matrix file does not exist.");
                 }
@@ -1528,53 +1530,70 @@ namespace ConsoleApplication1
             return basisSizeList;
         }//end matReadFunction
 
-        private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
+        /// <summary>
+        /// Function that takes the inputted seed vector information and creates an array of lists of integers and an array of lists of doubles. Each array element corresponds to a different j value. 
+        /// Each list holds the positions of basis function to be nonzero in the seed vector, or the coefficient of that seed vector. They have to be partitioned by j because SOCJT handles each j block
+        /// separately. The function specifically goes through each basis function and calculates the j value. If we are in the nonquadratic case, then the index for the jth block is just Floor(j). 
+        /// If we are in the quadratic case, then the index is 0 for j = 1/2 +- 3n (these are degenerate with j = 5/2 +- 3n. so j = 5/2 +- 3n should not be included and the function skips it) and 1 for
+        /// j = 3/2 +- 3n, e and a1/a2 respectively. The position and coefficient is added onto the list stored in the array at this point.
+        /// </summary>
+        /// <param name="SeedFile"></param>
+        /// String for the name of the seed file.
+        /// <param name="nModes"></param>
+        /// Integer for the number of modes.
+        /// <param name="isQuad"></param>
+        /// Boolean for whether or not the Hamiltonian is in the quadratic or nonquadratic case.
+        /// <param name="SeedCoefficientsByJ"></param>
+        /// Array of lists that stores the coefficients for each basis function in the seed vector in order, sorted by j.
+        /// <returns></returns>
+        private static List<int>[] GenerateSeedPositions(string SeedFile, int nModes, bool isQuad, ref List<double>[] SeedCoefficientsByJ) // This generates a List of integers in the second dimension which holds all basis functions to be nonzero. The first dimension holds the Floor(j) value. - HT
         {
             Seed SeedVector = new Seed(SeedFile, nModes);
-            //var SeedPositionsByJ = new List<List<int>>();
-            var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
+            var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count]; // An array of lists. The first index points to the j list and in the j list are all positions for that j.
+            SeedCoefficientsByJ = new List<double>[GenHamMat.basisPositions.Count]; // This holds the coefficients of the basis function in the seed vector for each j.
             for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
             {
-                SeedPositionsByJ[i] = new List<int>();
+                SeedPositionsByJ[i] = new List<int>(); // Initialize a new list for each j.
+                SeedCoefficientsByJ[i] = new List<double>();
             }
-            int position;
-            string tmpHash;
 
-            for (int i = 0; i < SeedVector.SeedIndex; i++) // Adds each seed vector into List, sorted by J
+            for (int i = 0; i < SeedVector.SeedIndex; i++) // Goes through each position on the seed vector and sorts them by j.
             {
-                try
-                {
-                    tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false);
-                }
-                catch
-                {
-                    throw new Exception("Check seed file.");
-                }
-
-                decimal jBlock = 0;
-                int jIndex = 0;
+                int position; // Stores position in the basis.
+                string tmpHash = BasisFunction.GenerateHashCode(SeedVector.vlLambdaSeed[i], nModes, false); // hashcode to get the position
+                decimal jBlock = 0; // Will store j
+                int jIndex = 0; // Which index corresponds to that value of j
                 for (int j = 0; j < nModes; j++)
                 {
                     jBlock += SeedVector.vlLambdaSeed[i][1 + 2 * j]; // Sum of l
                 }
-                jBlock += (decimal)SeedVector.vlLambdaSeed[i][2 * nModes] / 2;
+                jBlock += (decimal)SeedVector.vlLambdaSeed[i][2 * nModes] / 2; // Total, jBlock = \sum_i l_i + Lambda / 2 (the j value)
                 if (isQuad == false)
                 {
-                    jIndex = (int)(Math.Abs(jBlock) - 0.5M); // Floor j
+                    jIndex = (int)(Math.Abs(jBlock) - 0.5M); // Floor(j) is the index for each j value in the nonquadratic case
                 }
                 if (isQuad == true)
                 {
-                    if ((jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
+                    if ((int)(jBlock - 1.5M) % 3 == 0) // j = 3/2 + 3n means a1/a2 block
                     {
-                        jIndex = 1;
+                        jIndex = 1; // Index for a1/a2 block
                     }
                     else
                     {
-                        jIndex = 0;
+                        //if ((int)(jBlock - 2.5M) % 3 == 0) // Means j = 5/2 + 3n, which is degerate with 1/2 + 3n and not included.
+                        //{
+                        //    continue;
+                        //}
+                        jIndex = 0; // Index for e block
                     }
                 }
-                GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position);
-                SeedPositionsByJ[jIndex].Add(position);
+                GenHamMat.basisPositions[jIndex].TryGetValue(tmpHash, out position); // Generates position of the basis function. Requires the j index and hashcode. Stores into position.
+                if (position == 0)
+                {
+                    throw new System.ArgumentException("Error in seed vector. Recheck seed file. \nReminder that j = 5/2 + 3n should not be included."); // It is highly unlikely that position 0 will be used, and this is the default for improper vectors so I throw an error.
+                }
+                SeedPositionsByJ[jIndex].Add(position); // Adds position
+                SeedCoefficientsByJ[jIndex].Add(SeedVector.SeedCoefficient[i]); // Add coefficient
             }
             return SeedPositionsByJ;
         }//end GenerateSeedPositions function
