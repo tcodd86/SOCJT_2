@@ -322,6 +322,10 @@ namespace ConsoleApplication1
             file.AppendLine("&FIT_INFO");
             file.AppendLine("FITFILE" + " = " + input.FitFile);
             file.AppendLine("FTOL" + " = " + Convert.ToString(input.FTol));
+            if (input.useNFG)
+            {
+                file.AppendLine("NFG = True ");
+            }
             file.AppendLine("XTOL" + " = " + Convert.ToString(input.XTol));
             file.AppendLine("GTOL" + " = " + Convert.ToString(input.GTol));
             file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.MaxOptimizerSteps));
