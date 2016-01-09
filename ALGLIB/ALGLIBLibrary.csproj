@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{5BEA7E2C-FEDD-453A-AC14-3D95BAC117DA}</ProjectGuid>
+    <ProjectGuid>{4FB3D319-6652-44D2-BADD-A91399BDE40F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Lanczos</RootNamespace>
-    <AssemblyName>Lanczos</AssemblyName>
+    <RootNamespace>ALGLIBLibrary</RootNamespace>
+    <AssemblyName>ALGLIBLibrary</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -40,14 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="alglibinternal.cs" />
+    <Compile Include="alglibmisc.cs" />
+    <Compile Include="ap.cs" />
+    <Compile Include="linalg.cs" />
+    <Compile Include="optimization.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
-      <Project>{4fb3d319-6652-44d2-badd-a91399bde40f}</Project>
-      <Name>ALGLIBLibrary</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ALGLIB
+namespace MathLibrary
 {
     public class Class1
     {
