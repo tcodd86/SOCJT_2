@@ -7,6 +7,10 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections;
 
+using ExceptionLibrary;
+using LanczosLibrary;
+using MathLibrary;
+
 namespace ConsoleApplication1
 {
     class SOCJT
@@ -637,14 +641,14 @@ namespace ConsoleApplication1
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
                         vector = EigenvectorReader(input.FilePath + input.VectorName, jIndex);
-                        Lanczos.normalize(vector);
+                        MatrixFunctions.normalize(vector);
                         overlaps[jIndex] = Overlap(zMatrices[jIndex], vector);
                     }
                 }
                 else
                 {
                     vector = ReadSOCJT2Vector(input.VectorName, input.VectorIndex, input.VectorJBlock, input.Special);
-                    Lanczos.normalize(vector);
+                    MatrixFunctions.normalize(vector);
                     for (int jIndex = 0; jIndex < eigenvalues.Count(); jIndex++)
                     {
                         if (jIndex == (int)(input.VectorJBlock - 0.5M))
@@ -659,7 +663,7 @@ namespace ConsoleApplication1
                 }
                 foreach (double[] overlap in overlaps)
                 {
-                    Lanczos.normalize(overlap);
+                    MatrixFunctions.normalize(overlap);
                 }
             }
 
@@ -847,7 +851,7 @@ namespace ConsoleApplication1
         private static void EigenvectorCheck(alglib.sparsematrix hamiltonianArray, double eigenvalue, double[] temp)
         {
             var V = new double[temp.Length];
-            Lanczos.normalize(temp);
+            MatrixFunctions.normalize(temp);
             alglib.sparsemv(hamiltonianArray, temp, ref V);
             double sum = 0.0;
             double magnitude = Lanczos.Magnitude(V);

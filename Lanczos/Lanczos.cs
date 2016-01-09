@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.IO;
-using System.Reflection;
 
-namespace ConsoleApplication1
+using MathLibrary;
+
+namespace LanczosLibrary
 {
     /// <summary>
     /// This class contains the functions and subroutines for the block Lanczos routine.
@@ -26,7 +25,7 @@ namespace ConsoleApplication1
     /// Where the FORTRAN used functions TRED and TRED2 I have used functions from ALGLIB
     /// PROJECT by Bochkanov, Sergey.
     /// </summary>
-    static class Lanczos
+    public static class Lanczos
     {
         public static int basisSetLimit = 100000000;//40000 * 2000;
 
@@ -536,7 +535,7 @@ namespace ConsoleApplication1
             {
                 X[i] = randy.NextDouble();
             }
-            normalize(X);
+            MatrixFunctions.normalize(X);
             return X;
         }
 
@@ -892,7 +891,7 @@ namespace ConsoleApplication1
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);//changed tempEvecs to z
 
                     //then normalize
-                    normalize(ref transEvecs);
+                    MatrixFunctions.normalize(ref transEvecs);
 
                     //then set equal to z
                     z = transEvecs;
@@ -1020,7 +1019,7 @@ namespace ConsoleApplication1
 
                     if (repeater == 0)    //means there is some problem in the alphas vectors (probably NaN error)
                     {
-                        throw new RepeaterError();
+                        throw new ExceptionLibrary.RepeaterError();
                     }
                     //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
                     if (repeater == 1)
@@ -1301,49 +1300,6 @@ namespace ConsoleApplication1
             }//end for
             return count;
         }//end repeat
-
-        /// <summary>
-        /// Normalizes the vector X
-        /// </summary>
-        /// <param name="X">
-        /// Vector to be normalized.
-        /// </param>
-        public static void normalize(double[] X)
-        {
-            double sum = 0.0;
-            for (int i = 0; i < X.Length; i++)
-            {
-                sum += X[i] * X[i];
-            }
-            sum = Math.Sqrt(sum);
-            for (int i = 0; i < X.Length; i++)
-            {
-                X[i] /= sum;
-            }
-        }//end normalize
-
-        /// <summary>
-        /// Normalizes a collection of vectors stored as a 2D array.
-        /// </summary>
-        /// <param name="X">
-        /// 2D array containing the vectors to be normalized
-        /// </param>
-        public static void normalize(ref double[,] X)
-        {
-            double[] temp = new double[X.GetLength(0)];
-            for (int j = 0; j < X.GetLength(1); j++)
-            {
-                for (int i = 0; i < X.GetLength(0); i++)
-                {
-                    temp[i] = X[i, j];
-                }
-                normalize(temp);
-                for (int i = 0; i < X.GetLength(0); i++)
-                {
-                    X[i, j] = temp[i];
-                }
-            }//end loop over columns
-        }//end normalize
 
         /// <summary>
         /// Calculates the magnitude of a vector

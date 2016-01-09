@@ -127,18 +127,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="alglibinternal.cs" />
-    <Compile Include="alglibmisc.cs" />
-    <Compile Include="ap.cs" />
-    <Compile Include="Exceptions.cs" />
     <Compile Include="Scanner.cs" />
-    <Compile Include="Lanczos.cs" />
     <Compile Include="MasterObject.cs" />
     <Compile Include="FitSOCJT.cs" />
     <Compile Include="Eigenvalue.cs" />
-    <Compile Include="optimization.cs" />
     <Compile Include="SOCJT.cs" />
-    <Compile Include="linalg.cs" />
     <Compile Include="OutputFile.cs" />
     <Compile Include="GenHamMat.cs" />
     <Compile Include="BasisFunction.cs" />
@@ -174,6 +167,24 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
+      <Project>{4FB3D319-6652-44D2-BADD-A91399BDE40F}</Project>
+      <Name>ALGLIBLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExceptionLibrary\ExceptionLibrary.csproj">
+      <Project>{97278faf-ed59-4aa4-820e-412796c1342b}</Project>
+      <Name>ExceptionLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lanczos\LanczosLibrary.csproj">
+      <Project>{5bea7e2c-fedd-453a-ac14-3d95bac117da}</Project>
+      <Name>LanczosLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MathLibrary\MathLibrary.csproj">
+      <Project>{2927f724-4c8d-48b0-8ab8-1ae5a7214b92}</Project>
+      <Name>MathLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

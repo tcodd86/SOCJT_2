@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ConsoleApplication1
+namespace ExceptionLibrary
 {
-    class BasisSetTooSmallException : ApplicationException
+    public class BasisSetTooSmallException : ApplicationException
     {
         public string EMessage { get; private set; }
 
@@ -30,7 +30,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class AEAnharmonicTermException : ApplicationException
+    public class AEAnharmonicTermException : ApplicationException
     {
         public AEAnharmonicTermException()
         { 
@@ -38,7 +38,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class InvalidInput : ApplicationException
+    public class InvalidInput : ApplicationException
     {
         public string EMessage { get; private set; }
         public InvalidInput(string mess)
@@ -47,7 +47,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class RepeaterError : ApplicationException
+    public class RepeaterError : ApplicationException
     {
         public RepeaterError()
         { 
@@ -55,7 +55,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class FileNameError : ApplicationException
+    public class FileNameError : ApplicationException
     {
         public string EMessage { get; private set; }
         public FileNameError(string error)
@@ -76,7 +76,7 @@ namespace ConsoleApplication1
         }
     }
 
-    class MatrixFileError : ApplicationException
+    public class MatrixFileError : ApplicationException
     {
         public MatrixFileError()
         {

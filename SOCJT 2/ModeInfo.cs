@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
+using ExceptionLibrary;
+
 namespace ConsoleApplication1
 {
     /// <summary>

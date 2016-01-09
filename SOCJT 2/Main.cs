@@ -6,6 +6,9 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 
+using ExceptionLibrary;
+using MathLibrary;
+
 namespace ConsoleApplication1
 {
     class MainS
@@ -610,7 +613,7 @@ namespace ConsoleApplication1
                 //here delete the temp lanczos vector file
                 vecIn.Close();
                 File.Delete(file);
-                Lanczos.normalize(ref temp);
+                MatrixFunctions.normalize(ref temp);
                 eVecs.Add(temp);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file

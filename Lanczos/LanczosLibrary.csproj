@@ -40,13 +40,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
+    <Compile Include="Lanczos.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
       <Project>{4fb3d319-6652-44d2-badd-a91399bde40f}</Project>
       <Name>ALGLIBLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ExceptionLibrary\ExceptionLibrary.csproj">
+      <Project>{97278faf-ed59-4aa4-820e-412796c1342b}</Project>
+      <Name>ExceptionLibrary</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MathLibrary\MathLibrary.csproj">
+      <Project>{2927f724-4c8d-48b0-8ab8-1ae5a7214b92}</Project>
+      <Name>MathLibrary</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -5,6 +5,8 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 
+using ExceptionLibrary;
+
 namespace ConsoleApplication1
 {
     /// <summary>
