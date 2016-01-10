@@ -24,7 +24,7 @@ namespace ConsoleApplication1
                 fileDirectory = Console.ReadLine();
                 if (fileDirectory == "")
                 {
-                    fileDirectory = "C:\\SOCJT 2";
+                    fileDirectory = "C:\\SOCJT 2\\";
                 }
 
                 if (Directory.Exists(fileDirectory) == false)

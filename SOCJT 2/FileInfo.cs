@@ -516,6 +516,16 @@ namespace ConsoleApplication1
         /// </summary>
         public bool useNFG { get; private set; }
 
+        /// <summary>
+        /// Bool used to use special seed vector
+        /// </summary>
+        public bool useSeed { get; private set; }
+
+        /// <summary>
+        /// String that contains the file path for the seed vector
+        /// </summary>
+        public string SeedFile { get; private set; }
+
         #endregion properties
 
         /// <summary>
@@ -542,12 +552,14 @@ namespace ConsoleApplication1
             Intensity = false;
             useAbsoluteEV = false;
             useNFG = false;
+            useSeed = false;
 
 
             MatrixFile = "matrix.txt";
             Title = "TITLE";
             FitFile = "fit.fit";
             VectorName = "vector.txt";
+            SeedFile = "seed.txt";
 
             //these are reasonable values of J for a basic quadratic problem
             maxJ = 7.5M;
@@ -795,7 +807,6 @@ namespace ConsoleApplication1
                             {
                                 ParMatrix = 1;
                             }
-                            continue;
                         }
                         if (inputf[u].ToUpper() == "PARJ")
                         {
@@ -808,10 +819,21 @@ namespace ConsoleApplication1
                         if (inputf[u].ToUpper() == "BLOCK_LANCZOS")
                         {
                             BlockLanczos = TorF(inputf[u + 1]);
+                            continue;
                         }
                         if (inputf[u].ToUpper() == "ABSOLUTE")
                         {
                             useAbsoluteEV = TorF(inputf[u + 1]);
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "SEED")
+                        {
+                            useSeed = TorF(inputf[u + 1]);
+                            continue;
+                        }
+                        if (inputf[u].ToUpper() == "SEEDFILE")
+                        {
+                            SeedFile = inputf[u + 1];
                             continue;
                         }
                         if (inputf[u] == "/")

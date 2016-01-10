@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -131,6 +131,7 @@
     <Compile Include="MasterObject.cs" />
     <Compile Include="FitSOCJT.cs" />
     <Compile Include="Eigenvalue.cs" />
+    <Compile Include="Seed.cs" />
     <Compile Include="SOCJT.cs" />
     <Compile Include="OutputFile.cs" />
     <Compile Include="GenHamMat.cs" />

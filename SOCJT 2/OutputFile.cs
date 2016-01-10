@@ -302,6 +302,8 @@ namespace ConsoleApplication1
             file.AppendLine("PARVEC = " + Convert.ToString(input.ParVectorMultiplication));
             file.AppendLine("PARMAT = " + Convert.ToString(input.ParMatrix));
             file.AppendLine("PARJ = " + Convert.ToString(input.ParJ));
+            file.AppendLine("SEED = " + Convert.ToString(input.useSeed));
+            file.AppendLine("SEEDFILE = " + Convert.ToString(input.SeedFile));
             file.AppendLine("/");
             file.AppendLine("  ");
 
@@ -320,6 +322,10 @@ namespace ConsoleApplication1
             file.AppendLine("&FIT_INFO");
             file.AppendLine("FITFILE" + " = " + input.FitFile);
             file.AppendLine("FTOL" + " = " + Convert.ToString(input.FTol));
+            if (input.useNFG)
+            {
+                file.AppendLine("NFG = True ");
+            }
             file.AppendLine("XTOL" + " = " + Convert.ToString(input.XTol));
             file.AppendLine("GTOL" + " = " + Convert.ToString(input.GTol));
             file.AppendLine("MAXFEV" + " = " + Convert.ToString(input.MaxOptimizerSteps));
