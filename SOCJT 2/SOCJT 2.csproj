@@ -130,6 +130,7 @@
     <Compile Include="FitSOCJT.cs" />
     <Compile Include="Eigenvalue.cs" />
     <Compile Include="optimization.cs" />
+    <Compile Include="Seed.cs" />
     <Compile Include="SOCJT.cs" />
     <Compile Include="linalg.cs" />
     <Compile Include="OutputFile.cs" />

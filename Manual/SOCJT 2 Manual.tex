@@ -742,6 +742,8 @@ in the test to remove duplicate and spurious eigenvalues. Any eigenvalue within 
 is removed as a duplicate and this is the same test used to remove spurious values. A value
 of 10$^{-6}$ works for most cases but it may be necessary to use a smaller value. This test may cause eigenvalues which are degenerate within {\tt TOL} with another eigenvalue of the same symmetry to be wrongly discarded. This is unfortunately unavoidable since we are using the Cullum test to remove spurious eigenvalues.
 
+An option to specify the starting, or seed, vector is included and \texttt{SEEDFILE} contains the path to the seed vector file. For more information on the format of the seed file, refer to Section \ref{seedformat}.
+
 Defaults are
 
 \begin{verbatim}
@@ -754,6 +756,8 @@ Defaults are
   PARMAT = 1
   PARJ = 2
   BLOCK_LANCZOS = F
+  SEED = F
+  SEEDFILE = seed.txt
   /
 \end{verbatim}
 
@@ -797,6 +801,10 @@ Defaults are
 
 \item[BLOCK\_LANCZOS] Boolean value to indicate if the block Lanczos
   routine should be used. Boolean.
+  
+\item[SEED] Boolean value to indicate if a specified seed vector should be used. Boolean.
+
+\item[SEEDFILE] The name of the file containing the positions of nonzero coefficients in the seed vector and those coefficients. String.
 
 \end{description}
 
@@ -1381,7 +1389,52 @@ The three ``quantum numbers'' $j$,
 $n_j$, and $\Sigma $ define each unique energy level, and can be found
 at the end of the output of a \socjttwo\ run.
 
+\subsection{The Seed Vector}
 
+In the case of no quadratic coupling, the symmetry of eigenvalues can be determined fully from their $j$ value. However, in the case of quadratic coupling, all $j$ mod 3 are coupled and it is difficult to distinguish between $a_1$ and $a_2$ symmetry. SOCJT 2 is able to compute the symmetries of the eigenvalues by checking the coefficients on the true eigenvector expansion in the direct product basis. This requires the program to convert from the Lanczos basis to the direct product basis, which requires the program to store all the Lanczos vectors. This requires N $*$ NOITS bytes and is a critical memory bottleneck that limits this calculation.
+
+The seed vector is a user specified vector that will serve as the first vector in the Lanczos Algorithm. Essentially, each vector produced from the Lanczos Algorithm is a linear combination of the Hamiltonian applied to the previous vector, the previous vector, and the second previous vector. This method utilizes the fact that the Hamiltonian is totally symmetric, and thus does not change the symmetry of a vector it is applied to. Therefore, if we start with a seed vector with a certain symmetry, all proceeding vectors will have the same symmetry. Our Krylov Space will only have vectors of the same symmetry as the seed vector and thus our final eigenvectors will only be of that symmetry.
+
+This is mathematically exact, but numerically there is round off error and all eigenvalues will be obtained. However, if an eigenvector has a different symmetry than the seed vector, then it will have zero overlap with the seed vector in the exact case. For the numerical case, SOCJT 2 checks the dot product of each eigenvector with the seed vector, and throws away the corresponding eigenvalues with lower than $10^{-10}$ overlap. This is efficient because SOCJT 2 already computes the eigenvectors in the Lanczos basis, which only requires NOITS $*$ NOITS storage.
+
+An issue arises of ``accidental orthogonality.'' Different symmetry is not the only reason for zero overlap. For example, if a non-totally symmetric mode has an $a_1$ component and an $a_1$ seed vector does not have any vibrational quanta of a totally symmetric mode, then the combination band of the totally symmetric mode and the $a_1$ component of the non-totally symmetric mode will have zero overlap with the seed vector, even though they have the same symmetry. Therefore, some thought is required in choosing a sufficiently robust seed vector. In the example case, more components of the combination band should be added to the seed vector.
+
+\subsubsection{Format of the Seed Vector File} \label{seedformat}
+
+An additional file, named {\tt SEEDFILE}, is required if a seed vector is being specified and must be in the same directory as the input file. It contains a list of quantum numbers specifying the basis functions that have nonzero coefficients in the seed vector expansion and their relative (unnormalized) coefficient immediately following. The seed vector will be normalized in the program. 
+This file is of the format 
+\begin{verbatim}
+0
+0
+0
+0
+1
+1
+1
+1
+-1
+COEFFICIENT = 1
+/
+0
+0
+0
+0
+1
+-1
+1
+-1
+1
+COEFFICIENT = 1
+/
+\end{verbatim}
+For example, this file would correspond to the seed vector
+\begin{align*}
+	\frac{1}{\sqrt{2}}|0,0\rangle |0,0\rangle |1,1\rangle |1,1 \rangle |-1\rangle + 
+	\frac{1}{\sqrt{2}}|0,0\rangle |0,0\rangle |1,-1\rangle |1,-1 \rangle |1\rangle
+\end{align*}
+Each basis position is separated by a / at the end. For each position, a list of integers separated by spaces or line breaks correspond to the quantum numbers of the basis function, in the order of vibrational quantum number and then vibrational angular momentum quantum number, and repeat for the next mode. The last integer is the electronic angular momentum. The order is $v_1, l_1, v_2, l_2, \ldots, \Lambda$. Therefore, there should be a list of NMODES * 2 + 1 integers. Note that nondegenerate modes do not have vibrational angular momentum, and should have an $l$ inputted as 0. \texttt{COEFFICIENT =} indicates the relative coefficient on this basis function and takes any double precision number. / ends the current basis function definition and there should be a / after every definition.
+
+Currently, the only check that the seed vector is inputted incorrectly is triggered when the program is told to run a calculation with a seed vector with nonzero coefficient at the 0 position. This is because any impossible inputs will default to 0.
 \bibliographystyle{unsrt}
 \bibliography{SOCJT_BIB}
 
