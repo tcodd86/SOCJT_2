@@ -42,6 +42,13 @@
   <ItemGroup>
     <Compile Include="MatrixFunctions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SparseMatrix.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
+      <Project>{4fb3d319-6652-44d2-badd-a91399bde40f}</Project>
+      <Name>ALGLIBLibrary</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

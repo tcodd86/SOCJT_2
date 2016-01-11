@@ -529,7 +529,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     X[SeedVectorPositions[i]] = SeedCoefficients[i];
                 }
             }
-            MatrixFunctions.normalize(X);
+            MatrixFunctions.Normalize(X);
             return X;
         }
         /// <summary>
@@ -860,7 +860,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     double[,] transEvecs = new double[N, evs.Length];
                     alglib.rmatrixgemm(N, evs.Length, its, 1.0, lanczosVecs, 0, 0, 0, z, 0, 0, 0, 0.0, ref transEvecs, 0, 0);//changed tempEvecs to z
                     //then normalize
-                    MatrixFunctions.normalize(ref transEvecs);
+                    MatrixFunctions.Normalize(ref transEvecs);
                     //then set equal to z
                     z = transEvecs;
                     //z = lanczosVecs;
@@ -1130,7 +1130,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 //calculate viplusone and beta i + 1.
                 viplusone = betavplusone(Axvi, alphas[i], vi, betas[i], viminusone);
                 //***************************************************************
-                betas[i + 1] = Magnitude(viplusone);
+                betas[i + 1] = MatrixFunctions.Magnitude(viplusone);
                 //***************************************************************
                 for (int j = 0; j < viplusone.Length; j++)
                 {
@@ -1143,6 +1143,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 Console.WriteLine("Lanczos iteration " + (i + 1) + " done.");
             }//end loop to generate Lanczos matrix
         }//end LanczosIterations
+
         /// <summary>
         /// Calculates alpha according to Cullum 4.3.1
         /// </summary>
@@ -1168,29 +1169,9 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             {
                 temp[i] = Axvi[i] - beta_i * v_iminusone[i];
             }
-            return vxv(v_i, temp);
+            return MatrixFunctions.DotProduct(v_i, temp);
         }
-        /// <summary>
-        /// Dot product of two vectors
-        /// </summary>
-        /// <param name="v">
-        /// Vector 1
-        /// </param>
-        /// <param name="u">
-        /// Vector 2
-        /// </param>
-        /// <returns>
-        /// Scalar product of vectors v and u
-        /// </returns>
-        private static double vxv(double[] v, double[] u)
-        {
-            double product = 0.0;
-            for (int i = 0; i < v.Length; i++)
-            {
-                product += v[i] * u[i];
-            }
-            return product;
-        }//end vxv
+
         private static double[] betavplusone(double[] avi, double alphai, double[] vi, double betai, double[] viminusone)
         {
             var product = new double[avi.Length];
@@ -1200,24 +1181,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
             }
             return product;
         }//end betavplusone
-        /// <summary>
-        /// Computes the projection of v onto u.
-        /// </summary>
-        /// <param name="u"></param>
-        /// <param name="v"></param>
-        /// <returns></returns>
-        private static double[] projection(double[] u, double[] v)
-        {
-            double uv = vxv(u, v);
-            double uu = vxv(u, u);
-            uv /= uu;
-            double[] proj = new double[u.Length];
-            for (int i = 0; i < u.Length; i++)
-            {
-                proj[i] = uv * u[i];
-            }
-            return proj;
-        }//end projection
+                
         /// <summary>
         /// Checks if alphas is in tAlphas.
         /// </summary>
@@ -1242,7 +1206,8 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 }
             }
             return temp;
-        }//end checkInTT
+        }
+
         /// <summary>
         /// Checks a certain entry in an array to see how many times that same value, to within the tolerance, is in the array.
         /// </summary>
@@ -1269,25 +1234,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                 }//end if < tol
             }//end for
             return count;
-        }//end repeat
-
-        /// <summary>
-        /// Calculates the magnitude of a vector
-        /// </summary>
-        /// <param name="vec">
-        /// Vector whose magnitude is to be found
-        /// </param>
-        /// <returns>
-        /// Magnitude of vec.
-        /// </returns>
-        public static double Magnitude(double[] vec)
-        {
-            double sum = 0.0;
-            for (int i = 0; i < vec.Length; i++)
-            {
-                sum += vec[i] * vec[i];
-            }
-            return Math.Sqrt(sum);
         }
+
     }//end class Lanczos
 }

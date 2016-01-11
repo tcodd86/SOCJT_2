@@ -613,7 +613,7 @@ namespace ConsoleApplication1
                 //here delete the temp lanczos vector file
                 vecIn.Close();
                 File.Delete(file);
-                MatrixFunctions.normalize(ref temp);
+                MatrixFunctions.Normalize(ref temp);
                 eVecs.Add(temp);
             }//end loop to generate eigenvectors
             //here use basis sets and eigenvectors and write them to file
