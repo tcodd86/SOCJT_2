@@ -45,9 +45,9 @@
     <Compile Include="SparseMatrix.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
+    <ProjectReference Include="..\ALGLIB\ALGLIB.csproj">
       <Project>{4fb3d319-6652-44d2-badd-a91399bde40f}</Project>
-      <Name>ALGLIBLibrary</Name>
+      <Name>ALGLIB</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -5,7 +5,7 @@ using System.Text;
 using System.IO;
 using System.Globalization;
 
-using ExceptionLibrary;
+using CustomExceptions;
 
 namespace ConsoleApplication1
 {

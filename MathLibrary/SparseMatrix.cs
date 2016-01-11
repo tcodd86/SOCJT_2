@@ -25,7 +25,6 @@ namespace MathLibrary
             }
         }
 
-
         private void Initialize(alglib.sparsematrix matrix, bool isCRS)
         {
             sparseMatrix = matrix;
@@ -84,40 +83,38 @@ namespace MathLibrary
         {
             return new SparseMatrix(sparseMatrix, IsCRS);
         }
-
-
+        
         /// <summary>
-        /// Takes a list of alglib.sparsematrix objects and combines them.
+        /// Takes a list of upper diagonal SparseMatrix objects and combines them. Assumes element 0 is the diagonal elements.
         /// </summary>
-        /// <param name="mat">
-        /// List of alglib.sparsematrix objects to be combined
+        /// <param name="matrixList">
+        /// List of matrices to be combined
         /// </param>
         /// <returns>
-        /// alglib.sparsematrix object which contains all elements of all alglib.sparsematrix objects in the List mat.
+        /// SparseMatrix which contains all elements of all matrices in the list.
         /// </returns>
-        private static SparseMatrix Aggregator(List<SparseMatrix> mat)
+        private static SparseMatrix Aggregator(List<SparseMatrix> matrixList)
         {
             int row;
             int column;
-            double oldVal;
-            var B = new SparseMatrix(mat[0].Rows, mat[0].Columns);
+            double value;
+            var combinedMatrix = new SparseMatrix(matrixList[0].Rows, matrixList[0].Columns);
 
-            for (int m = 0; m < mat.Count; m++)
+            for (int m = 0; m < matrixList.Count; m++)
             {
                 int t0 = 0;
                 int t1 = 0;
-                while (mat[m].EnumerateElements(ref t0, ref t1, out row, out column, out oldVal))
+                while (matrixList[m].EnumerateElements(ref t0, ref t1, out row, out column, out value))
                 {
-                    B.AddElement(row, column, oldVal);
-                    alglib.sparseadd(B, row, column, oldVal);
+                    combinedMatrix.AddElement(row, column, value);
                     //adds lower diagonal matrix elements for all off-diagonal matrices (first element in mat is the diagonal elements so don't do this for it). 
                     if (m != 0)
                     {
-                        alglib.sparseadd(B, column, row, oldVal);
+                        combinedMatrix.AddElement(column, row, value);
                     }
                 }
             }
-            return B;
+            return combinedMatrix;
         }
 
     }

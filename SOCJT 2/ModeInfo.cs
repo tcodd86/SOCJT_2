@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Globalization;
 
-using ExceptionLibrary;
+using CustomExceptions;
 
 namespace ConsoleApplication1
 {

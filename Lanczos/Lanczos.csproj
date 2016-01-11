@@ -44,13 +44,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
+    <ProjectReference Include="..\ALGLIB\ALGLIB.csproj">
       <Project>{4fb3d319-6652-44d2-badd-a91399bde40f}</Project>
-      <Name>ALGLIBLibrary</Name>
+      <Name>ALGLIB</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ExceptionLibrary\ExceptionLibrary.csproj">
+    <ProjectReference Include="..\ExceptionLibrary\Utilities.csproj">
       <Project>{97278faf-ed59-4aa4-820e-412796c1342b}</Project>
-      <Name>ExceptionLibrary</Name>
+      <Name>Utilities</Name>
     </ProjectReference>
     <ProjectReference Include="..\MathLibrary\MathLibrary.csproj">
       <Project>{2927f724-4c8d-48b0-8ab8-1ae5a7214b92}</Project>

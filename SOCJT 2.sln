@@ -5,9 +5,9 @@ VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOCJT 2", "SOCJT 2\SOCJT 2.csproj", "{ABCCF1D0-BDE8-433C-AB61-A7869E29532A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALGLIBLibrary", "ALGLIB\ALGLIBLibrary.csproj", "{4FB3D319-6652-44D2-BADD-A91399BDE40F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALGLIB", "ALGLIB\ALGLIB.csproj", "{4FB3D319-6652-44D2-BADD-A91399BDE40F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LanczosLibrary", "Lanczos\LanczosLibrary.csproj", "{5BEA7E2C-FEDD-453A-AC14-3D95BAC117DA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lanczos", "Lanczos\Lanczos.csproj", "{5BEA7E2C-FEDD-453A-AC14-3D95BAC117DA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileIO", "FileIO\FileIO.csproj", "{7DB9B89A-AAD4-43A4-A4C1-90D8C2E0D731}"
 EndProject
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MathLibrary", "MathLibrary\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProject1", "UnitTestProject1\UnitTestProject1.csproj", "{D084B086-13F4-48FB-980E-965B60168C94}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExceptionLibrary", "ExceptionLibrary\ExceptionLibrary.csproj", "{97278FAF-ED59-4AA4-820E-412796C1342B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Utilities", "ExceptionLibrary\Utilities.csproj", "{97278FAF-ED59-4AA4-820E-412796C1342B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

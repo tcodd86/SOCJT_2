@@ -6,7 +6,7 @@ using System.Reflection;
 
 using MathLibrary;
 
-namespace LanczosLibrary
+namespace Lanczos
 {
     /// <summary>
     /// This class contains the functions and subroutines for the block Lanczos routine.
@@ -977,7 +977,7 @@ System.Diagnostics.Stopwatch orthogTimer = new System.Diagnostics.Stopwatch();
                     int repeater = repeat(i, alphas, tol);
                     if (repeater == 0) //means there is some problem in the alphas vectors (probably NaN error)
                     {
-                        throw new ExceptionLibrary.RepeaterError();
+                        throw new CustomExceptions.RepeaterError();
                     }
                     //this evaluates to true if the ev is not a repeat by evaluating function repeat for alphas[i], this is condition 3.
                     if (repeater == 1)

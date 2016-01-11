@@ -6,7 +6,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 
-using ExceptionLibrary;
+using CustomExceptions;
 using MathLibrary;
 
 namespace ConsoleApplication1

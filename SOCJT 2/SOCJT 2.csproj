@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -170,17 +170,17 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ALGLIB\ALGLIBLibrary.csproj">
+    <ProjectReference Include="..\ALGLIB\ALGLIB.csproj">
       <Project>{4FB3D319-6652-44D2-BADD-A91399BDE40F}</Project>
-      <Name>ALGLIBLibrary</Name>
+      <Name>ALGLIB</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ExceptionLibrary\ExceptionLibrary.csproj">
+    <ProjectReference Include="..\ExceptionLibrary\Utilities.csproj">
       <Project>{97278faf-ed59-4aa4-820e-412796c1342b}</Project>
-      <Name>ExceptionLibrary</Name>
+      <Name>Utilities</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Lanczos\LanczosLibrary.csproj">
+    <ProjectReference Include="..\Lanczos\Lanczos.csproj">
       <Project>{5bea7e2c-fedd-453a-ac14-3d95bac117da}</Project>
-      <Name>LanczosLibrary</Name>
+      <Name>Lanczos</Name>
     </ProjectReference>
     <ProjectReference Include="..\MathLibrary\MathLibrary.csproj">
       <Project>{2927f724-4c8d-48b0-8ab8-1ae5a7214b92}</Project>

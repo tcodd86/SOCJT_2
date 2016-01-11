@@ -7,8 +7,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections;
 
-using ExceptionLibrary;
-using LanczosLibrary;
+using CustomExceptions;
+using Lanczos;
 using MathLibrary;
 
 namespace ConsoleApplication1
@@ -505,7 +505,7 @@ namespace ConsoleApplication1
             measurer.Reset();
             measurer.Start();
             //if the evecs of the lanczos matrices will need to be stored then save the lanczos matrices.
-            if (input.PrintVector && !input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit)
+            if (input.PrintVector && !input.BlockLanczos && array1[0].innerobj.m >= Lanczos.Lanczos.basisSetLimit)
             {
                 lanczosEVectors = new List<double[,]>();
                 for (int i = 0; i < array1.Length; i++)
@@ -530,14 +530,14 @@ namespace ConsoleApplication1
                         ITER[i] = input.NumberOfIts;
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];
-                        Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], SeedCoefficientsByJ[i], i, input.FilePath);
+                        Lanczos.Lanczos.NaiveLanczos(ref evs, ref temp, array1[i], input.NumberOfIts, input.Tolerance, input.PrintVector, SeedPositionsByJ[i], SeedCoefficientsByJ[i], i, input.FilePath);
                     }
                     else//means use block Lanczos from SOCJT
                     {
                         evs = new double[input.M + 1];
                         temp = new double[numcolumnsA[i], input.M + 1];//changed here to numcolumnsA
                         IECODE[i] = -1;
-                        ITER[i] = Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.NumberOfIts, input.Tolerance, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.ParVectorMultiplication);
+                        ITER[i] = Lanczos.Lanczos.MINVAL(numcolumnsA[i], input.M + 1, input.kFactor, input.M, input.NumberOfIts, input.Tolerance, 0, ref evs, ref temp, ref IECODE[i], array1[i], input.ParVectorMultiplication);
                     }
 
                     //initialize eigenvalues to have a length.                    
@@ -559,7 +559,7 @@ namespace ConsoleApplication1
                         }
                     }
                     //here if evectors are needed and hamiltonian is too large assign the lanczosEVectors to the 
-                    if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.basisSetLimit && input.PrintVector)
+                    if (!input.BlockLanczos && array1[0].innerobj.m >= Lanczos.Lanczos.basisSetLimit && input.PrintVector)
                     {
                         //assign the evecs of the lanczos matrices to the lanczosEVectors list.
                         lanczosEVectors[i] = new double[temp.GetLength(0), temp.GetLength(1)];
@@ -599,7 +599,7 @@ namespace ConsoleApplication1
                 CheckJohnEigenvector(input, array1[jBlock], eigenvalues[jBlock][input.JBlockEigenvector.Item2 - 1]);
             }
 
-            if (!input.BlockLanczos && array1[0].innerobj.m * input.NumberOfIts >= Lanczos.basisSetLimit && input.PrintVector)
+            if (!input.BlockLanczos && array1[0].innerobj.m * input.NumberOfIts >= Lanczos.Lanczos.basisSetLimit && input.PrintVector)
             {
                 //make it so that the output file generator does not try to print the values in the zmatrices which will be the eigenvectors of the lanczos matrix, not the hamiltonian
                 input.PrintVector = false;
