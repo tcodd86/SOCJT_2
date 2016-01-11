@@ -117,5 +117,34 @@ namespace MathLibrary
             return combinedMatrix;
         }
 
+        /// <summary>
+        /// Used to multiply all elements in a sparse matrix A by the value val
+        /// </summary>
+        /// <param name="A">
+        /// Sparse matrix to be multiplied.
+        /// </param>
+        /// <param name="val">
+        /// Value to be multiplied
+        /// </param>
+        /// <returns>
+        /// Sparesmatrix containing the original matrix A times the double val.
+        /// </returns>
+        public static SparseMatrix ConstantTimesSparse(SparseMatrix A, double val)
+        {
+            int row;
+            int column;
+            double oldVal;
+            int t0 = 0;
+            int t1 = 0;
+            
+            var B = new SparseMatrix(A.Rows, A.Columns);
+            while (A.EnumerateElements(ref t0, ref t1, out row, out column, out oldVal))
+            {
+                B.AddElement(row, column, oldVal * val);
+            }
+
+            return B;
+        }
+
     }
 }

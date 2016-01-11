@@ -1429,7 +1429,7 @@ namespace ConsoleApplication1
                 alglib.sparseadd(B, i, j, oldVal * val);
             }
             return B;
-        }//end method cTimesSparse
+        }
 
         /// <summary>
         /// Takes a list of alglib.sparsematrix objects and combines them.
