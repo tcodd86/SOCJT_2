@@ -443,7 +443,7 @@ namespace ConsoleApplication1
                         //tempBasisList.Add(JvecsForOutuput[i]);
                         for (int k = 0; k < numcolumnsA[i]; k++)
                         {
-                            double temp = input.Azeta * (double)JvecsForOutuput[i][k].Lambda * (double)j;
+                            double temp = input.Azeta * (double)JvecsForOutuput[JvecsForOutuput.Count - 1][k].Lambda * (double)j;
                             alglib.sparseadd(tempMatList[tempMatList.Count - 1], k, k, temp);
                         }//end loop over diagonal matrix elements
                         tempNumbColumns.Add(numcolumnsA[i]);
@@ -481,9 +481,9 @@ namespace ConsoleApplication1
             #region Seed
             // Makes an Array of List where the first index is Floor(j) and the second index are all elements in the seed vector to be non zero.
             // The Lanczos routine is parallelized by j, and the routine takes the list at [j] to implement the seed vector. Empty list will indicate that no seed is being used.
-            var SeedPositionsByJ = new List<int>[GenHamMat.basisPositions.Count];
-            var SeedCoefficientsByJ = new List<double>[GenHamMat.basisPositions.Count];
-            for (int i = 0; i < GenHamMat.basisPositions.Count; i++)
+            var SeedPositionsByJ = new List<int>[array1.Length];
+            var SeedCoefficientsByJ = new List<double>[array1.Length];
+            for (int i = 0; i < array1.Length; i++)
             {
                 SeedPositionsByJ[i] = new List<int>(); // Initialize seed position list for each j
                 SeedCoefficientsByJ[i] = new List<double>();
